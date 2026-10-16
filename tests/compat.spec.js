@@ -26,6 +26,15 @@ const PAGES = fs.readdirSync(ROOT).filter((f) => f.endsWith('.html')).sort();
 
 /* ---------- helpers ---------- */
 
+// The pages scroll with an animation every time a section opens. That is nice for students but
+// makes the tests slow (especially in the iPhone browser), so jump instantly while testing.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = window.scrollTo.bind(window);
+    window.scrollTo = (a, b) => (typeof a === 'object' ? original({ ...a, behavior: 'instant' }) : original(a, b));
+  });
+});
+
 /** Starts listening for anything that goes wrong on a page. */
 function watchProblems(page) {
   const problems = [];
@@ -172,7 +181,7 @@ for (const file of PAGES.filter((f) => f !== 'index.html')) {
    ============================================================ */
 for (const file of PAGES.filter((f) => f !== 'index.html')) {
   test(`3. controls respond: ${file}`, async ({ page, hasTouch }, info) => {
-    test.setTimeout(240_000); // visits every section and uses every control, so it takes a while
+    test.setTimeout(480_000); // visits every section and uses every control, so it takes a while
     const problems = await loadStudyPage(page, file);
     await unlockEverything(page);
     const sections = await sectionList(page);
@@ -230,7 +239,10 @@ for (const file of PAGES.filter((f) => f !== 'index.html')) {
         try {
           hasTouch ? await btn.tap({ timeout: 2000 }) : await btn.click({ timeout: 2000 });
         } catch (e) {
-          expect.soft(null, `${where}: could not be ${hasTouch ? 'tapped' : 'clicked'} — ${String(e.message).split('\n')[0]}`).toBeUndefined();
+          // Playwright's call log says what stopped the tap (e.g. "<div class=readout> intercepts pointer events").
+          const why = String(e.message).split('\n').filter((l) => /intercepts pointer events|not visible|not stable|not enabled|outside of the viewport/.test(l))
+            .map((l) => l.replace(/\x1b\[[0-9;]*m/g, '').replace(/^\s*-\s*/, '').trim())[0] || String(e.message).split('\n')[0];
+          expect.soft(null, `${where}: could not be ${hasTouch ? 'tapped' : 'clicked'} — ${why}`).toBeUndefined();
         }
         await page.evaluate(() => document.querySelectorAll('[data-test-target]').forEach((e) => e.removeAttribute('data-test-target'))).catch(() => {});
         expect.soft(problems.slice(before), `${where}: errors when ${hasTouch ? 'tapped' : 'clicked'}`).toEqual([]);
