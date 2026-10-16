@@ -87,8 +87,17 @@
     .bench-levers{width:100%;flex-basis:auto}
     .readout{grid-template-columns:repeat(4,1fr)}
   }
+  /* On tablets the pinned plot is capped to 40% of the screen height so it can't cover the
+     questions below it. On phones it isn't pinned at all: the plot plus readout filled most of
+     the visible screen in iPhone Safari and sat on top of the answer buttons, making them
+     untappable. */
+  @media (max-width:1080px){
+    .bench-plot svg{max-height:40vh}
+  }
   @media (max-width:620px){
     .readout{grid-template-columns:repeat(2,1fr)}
+    .bench-plot{position:static;box-shadow:none}
+    .bench-plot svg{max-height:none}
   }
 
   /* One-time "draw" animation for the static Module 3.1 curve figure.
