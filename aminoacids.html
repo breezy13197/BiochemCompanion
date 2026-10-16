@@ -2457,7 +2457,7 @@ buildMatchActivity({name:'ptm',bodyId:'ptmBody',scoreId:'ptmScore',
                'Nothing — subunits are not held together']}}
   ];
 
-  var step=0, solved=[];
+  var step=0, solved=[], advanceTimer=null; /* advanceTimer: the pending move to the next level */
 
   function render(){
     body.innerHTML='';
@@ -2512,7 +2512,8 @@ buildMatchActivity({name:'ptm',bodyId:'ptmBody',scoreId:'ptmScore',
     if(step<LEVELS.length-1){
       var next=el('div',null,'');
       score.innerHTML='<strong>'+LEVELS[step].name+' complete.</strong> Moving up to '+LEVELS[step+1].name+'\u2026';
-      setTimeout(function(){step++;render();score.textContent='';},700);
+      clearTimeout(advanceTimer);
+      advanceTimer=setTimeout(function(){advanceTimer=null;step=Math.min(step+1,LEVELS.length-1);render();score.textContent='';},700);
     }else{
       var lastDot=body.querySelectorAll('.lvl-dot')[step];
       if(lastDot){lastDot.classList.add('done');lastDot.innerHTML='&#10003; '+LEVELS[step].name;}
@@ -2522,6 +2523,7 @@ buildMatchActivity({name:'ptm',bodyId:'ptmBody',scoreId:'ptmScore',
   }
 
   document.getElementById('lvlReset').onclick=function(){
+    clearTimeout(advanceTimer);advanceTimer=null; /* a level change still pending would otherwise push step past the last level */
     step=0;solved=[];score.textContent='';
     state.activities.levels=null;saveState();paintNav();render();
   };

@@ -1,0 +1,17 @@
+{
+  "name": "biochem-companion-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browser compatibility tests for the Biochem Companion study pages",
+  "scripts": {
+    "test": "playwright test",
+    "test:iphone": "playwright test --project=iphone",
+    "test:safari": "playwright test --project=safari-desktop",
+    "test:chrome": "playwright test --project=chromium-desktop",
+    "report": "playwright show-report",
+    "install-browsers": "playwright install chromium firefox webkit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
