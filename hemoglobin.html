@@ -1,0 +1,3298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hemoglobin — Interactive Study Companion | PHA3134</title>
+
+<link rel="stylesheet" href="shared/styles.css">
+<style>
+  /* ---- This companion's accent: deep crimson ----
+     The token names stay --green* on purpose. They mean "this
+     companion's primary colour", and renaming them would mean
+     editing every shared component. */
+  :root{
+    --green:#8E1538; --green-bright:#B81D45;
+    --green-soft:#FBE4EA; --green-line:#F0C0CE;
+
+    /* "Incorrect" is normally rose, which sits too close to a crimson
+       accent to read clearly. Neutral slate keeps the two apart. */
+    --rose:#4B5563; --rose-soft:#EEF1F4;
+  }
+  /* The darker "green ink" literal in styles.css, retuned for crimson. */
+  .opt.sel{color:#7A1130}
+  .bd-fill{background:var(--green-bright)}
+
+  /* CO is modeled but not taught by the lecture as a curve effect, so its
+     control is visually set apart from the three allosteric ones above it —
+     amber/caution rather than the page's crimson or violet callouts. */
+  .box.co-warn{background:#FFF4E5;border:1px solid #F0C24B}
+  .box.co-warn .tag{background:#C77700;color:#fff}
+
+  /* ---- Module 4.4 bench ----
+     Two columns so the curve never leaves the screen while a lever is
+     being moved. The plot sticks to the top of the viewport on desktop;
+     on narrow screens the columns stack and the plot sticks just under
+     the top of the scroll area instead. */
+  .bench{display:flex;gap:20px;align-items:flex-start;margin:20px 0}
+  .bench-plot{
+    flex:1 1 400px;min-width:0;position:sticky;top:16px;
+    background:var(--page);border:1px solid var(--line);
+    border-radius:var(--r-md);padding:14px;
+  }
+  .bench-plot svg{width:100%;height:auto;display:block}
+  .bench-levers{flex:0 1 320px;min-width:270px;display:flex;flex-direction:column;gap:14px}
+
+  .readout{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px}
+  .readout .cell{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r-sm);padding:8px 10px;
+  }
+  .readout .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)}
+  .readout .v{font-size:20px;font-weight:700;color:var(--green);line-height:1.2}
+  .readout .u{font-size:10.5px;color:var(--ink-soft)}
+  .readout .d{font-size:11px;margin-top:2px}
+  .readout .up{color:#B45309;font-weight:600}
+  .readout .down{color:var(--green);font-weight:600}
+  .readout .flat{color:var(--ink-soft)}
+
+  .lever{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r-md);padding:13px 15px;
+  }
+  .lever.unlocked{border-color:var(--green-line)}
+  .lever-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .lever-name{font-weight:700;font-size:14.5px;flex:1}
+  .lever-val{font-size:13px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+  .lever-lock{font-size:10.5px;color:var(--ink-soft)}
+  .lever input[type=range]{width:100%;accent-color:var(--green-bright);margin:2px 0}
+  .lever input[type=range]:disabled{opacity:.4;cursor:not-allowed}
+  .lever-note{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:6px}
+  .lever-check{display:flex;gap:7px;align-items:flex-start;font-size:12px;
+    color:var(--ink-mid);margin-top:9px;cursor:pointer}
+  .lever-check input{margin-top:2px;accent-color:var(--green-bright);flex:0 0 auto}
+  .lever-foot{border-top:1px solid var(--line);padding-top:12px}
+
+  .gate{margin-top:11px;padding-top:11px;border-top:1px dashed var(--line)}
+  .gate-q{font-size:13px;font-weight:600;margin-bottom:8px}
+  .gate .choice{font-size:13px;padding:8px 11px}
+  .gate-fb{font-size:12.5px;line-height:1.5;margin-top:8px}
+  .gate-fb.ok{color:var(--green)}
+  .gate-fb.no{color:var(--rose)}
+
+  @media (max-width:1080px){
+    .bench{flex-direction:column}
+    .bench-plot{position:sticky;top:8px;width:100%;flex-basis:auto;z-index:2;
+      box-shadow:0 6px 18px rgba(22,32,43,.10)}
+    .bench-levers{width:100%;flex-basis:auto}
+    .readout{grid-template-columns:repeat(4,1fr)}
+  }
+  @media (max-width:620px){
+    .readout{grid-template-columns:repeat(2,1fr)}
+  }
+
+  /* One-time "draw" animation for the static Module 3.1 curve figure.
+     Triggered by the descendant selector newly matching when engine.js
+     adds .active to the section — no JS needed for this one. */
+  .draw-curve{stroke-dasharray:1 1;stroke-dashoffset:1}
+  .section.active .draw-curve{animation:hbDrawCurve 1.3s ease forwards}
+  .section.active .draw-curve.draw-curve-2{animation-delay:.35s}
+  @keyframes hbDrawCurve{to{stroke-dashoffset:0}}
+
+  /* ---- Module 2.1 · Fe coordination-construction board ----
+     Topic-specific, per the architecture doc's own rule that
+     drag-and-drop board layout belongs to the content script, not
+     shared/. Reuses .dnd-tray / .dnd-pill / .dnd-ghost from
+     shared/styles.css for the chips themselves and the drag visuals,
+     so a chip looks and drags identically to every other
+     drag-and-drop activity in this project — only the six drop
+     targets and their radial layout are new. */
+  .coord-wrap{margin:20px 0}
+  .coord-board{
+    position:relative;width:100%;max-width:380px;aspect-ratio:1/1;
+    margin:0 auto;border-radius:50%;
+    background:radial-gradient(circle,var(--green-soft) 0%,transparent 68%);
+  }
+  .coord-lines{position:absolute;inset:0;width:100%;height:100%}
+  .coord-fe{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:56px;height:56px;border-radius:50%;background:var(--green);
+    color:#fff;font-weight:700;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 10px rgba(0,0,0,.18);z-index:2;
+  }
+  .coord-slot{
+    position:absolute;transform:translate(-50%,-50%);
+    width:78px;height:44px;border-radius:999px;
+    border:2px dashed var(--green-line);background:var(--card);
+    transition:background .15s,border-color .15s;z-index:1;
+  }
+  .coord-slot.over{background:var(--green-soft);border-color:var(--green)}
+  .coord-slot.correct{border-style:solid;border-color:var(--green);background:var(--green-soft)}
+  .coord-slot.incorrect{border-style:solid;border-color:var(--rose);background:var(--rose-soft)}
+  .coord-slot .dnd-pill{width:100%;height:100%;display:flex;align-items:center;
+    justify-content:center;text-align:center;padding:2px 6px;font-size:.74rem;
+    box-shadow:none;border-radius:999px}
+  @media (max-width:480px){
+    .coord-board{max-width:300px}
+    .coord-slot{width:64px;height:38px}
+    .coord-fe{width:46px;height:46px;font-size:13px}
+  }
+
+  /* ---- Mastery Lab · T⇌R equilibrium simulator ----
+     Topic-specific per the architecture doc. Reuses .opt (the pill
+     button already used for the curve bench's levers and every sort
+     activity) for the ↑/↓ lever buttons and .choice/.choices for the
+     chain-prediction steps, so this widget's interactive language
+     matches everything else in the companion. Only the tetramer, the
+     meter, and the lever/chain layout are new. */
+  .trm-stage{
+    display:flex;flex-wrap:wrap;gap:22px;align-items:center;
+    justify-content:center;margin:18px 0;padding:20px;
+    background:var(--page);border:1px solid var(--line);border-radius:var(--r-lg);
+  }
+  .trm-tetramer{width:260px;flex:0 0 260px;height:auto}
+  .trm-meter{flex:1 1 320px;min-width:260px}
+  .trm-meter-labels{display:flex;justify-content:space-between;
+    font-size:12.5px;font-weight:700;color:var(--ink-mid);
+    text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+  .trm-meter-track{
+    position:relative;height:14px;border-radius:999px;
+    background:linear-gradient(90deg,#7A1130,var(--line) 48%,var(--line) 52%,var(--green-bright));
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.12);
+  }
+  .trm-meter-fill{display:none} /* reserved, track gradient alone reads clearly */
+  .trm-meter-dot{
+    position:absolute;top:50%;left:50%;width:26px;height:26px;border-radius:50%;
+    background:var(--card);border:4px solid var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.25);
+    transform:translate(-50%,-50%);transition:left .05s linear;
+  }
+  .trm-meter-readout{
+    text-align:center;font-weight:700;font-size:15px;color:var(--ink);
+    margin:14px 0 0;
+  }
+
+  .trm-lever{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);
+    padding:13px 15px;margin-bottom:10px;
+  }
+  .trm-lever-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .trm-lever-name{font-weight:700;font-size:14.5px;flex:1;min-width:120px}
+  .trm-lever-state{font-size:12.5px;color:var(--ink-soft);font-weight:600}
+  .trm-lever-btns{display:flex;gap:8px}
+  .trm-lever .opt.trm-up.unlocked{border-color:var(--green-bright)}
+  .trm-lever .opt.trm-down.unlocked{border-color:#7A1130}
+  .trm-lever .opt.active{background:var(--green);border-color:var(--green);color:#fff}
+
+  .trm-chain{
+    background:var(--amber-soft);border:1px solid #F0DCBA;border-radius:var(--r-md);
+    padding:18px 20px;margin:14px 0;
+  }
+  .trm-chain h4{margin:0 0 4px;font-size:14px}
+  .trm-chain .caption{margin:0 0 14px}
+  .trm-chain-step{font-size:13px;color:var(--ink-soft);margin-bottom:6px}
+  .trm-chain-step.done{color:var(--green);font-weight:600}
+  .trm-chain .choices{margin:10px 0 0}
+  .trm-chain .choice{font-size:13.5px;padding:9px 12px}
+
+  /* ---- Module 5.2 · Methemoglobinemia treatment bench ----
+     A patient card with vitals that change when an intervention is
+     chosen. Deliberately NOT the crimson accent for the "blood" swatch:
+     the whole clinical point is that the blood is the wrong colour, so
+     the swatch has to be free to render chocolate-brown. */
+  .mh-case{
+    background:var(--page);border:1px solid var(--line);
+    border-radius:var(--r-md);padding:16px 18px;margin:18px 0;
+  }
+  .mh-case h4{margin:0 0 4px;font-size:14px}
+  .mh-stage{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--ink-soft);margin-bottom:10px}
+  .mh-vitals{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+    gap:8px;margin:14px 0}
+  .mh-vital{background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r-sm);padding:8px 10px}
+  .mh-vital .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft)}
+  .mh-vital .v{font-size:19px;font-weight:700;line-height:1.25;transition:color .3s}
+  .mh-vital .v.bad{color:#B45309}
+  .mh-vital .v.good{color:var(--green)}
+  .mh-swatch{display:inline-block;width:16px;height:16px;border-radius:50%;
+    vertical-align:-3px;margin-right:6px;border:1px solid rgba(0,0,0,.15);
+    transition:background .5s}
+
+  .mh-options{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .mh-opt{
+    text-align:left;background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r-sm);padding:11px 13px;font:inherit;font-size:13.5px;
+    color:var(--ink);cursor:pointer;transition:border-color .15s,background .15s;
+  }
+  .mh-opt:hover:not(:disabled){border-color:var(--green);background:var(--green-soft)}
+  .mh-opt:disabled{cursor:default;opacity:.75}
+  .mh-opt.picked{border-color:var(--green);background:var(--green-soft);font-weight:600}
+  .mh-opt.works{border-color:var(--green);background:var(--green-soft)}
+  .mh-opt.fails{border-color:var(--rose);background:var(--rose-soft)}
+  .mh-note{font-size:13.5px;line-height:1.55;margin-top:12px;padding:12px 14px;
+    border-radius:var(--r-sm);background:var(--green-soft);border:1px solid var(--green-line)}
+  .mh-note.fail{background:var(--rose-soft);border-color:#D3D8DF}
+  .mh-note strong{color:var(--green)}
+  .mh-note.fail strong{color:var(--rose)}
+
+  /* ---- Module 5.3 · HbS polymerization builder ----
+     Three controls (residue, oxygenation, %HbF) drive one SVG. */
+  .sk-bench{display:flex;gap:20px;align-items:flex-start;margin:20px 0;flex-wrap:wrap}
+  .sk-stage{
+    flex:1 1 320px;min-width:0;background:var(--page);border:1px solid var(--line);
+    border-radius:var(--r-md);padding:14px;
+  }
+  .sk-stage svg{width:100%;height:auto;display:block}
+  .sk-controls{flex:1 1 280px;min-width:250px;display:flex;flex-direction:column;gap:14px}
+  .sk-control{background:var(--card);border:1px solid var(--line);
+    border-radius:var(--r-md);padding:12px 14px}
+  .sk-control .lab{font-size:12.5px;font-weight:600;margin-bottom:2px}
+  .sk-control .sub{font-size:12px;color:var(--ink-soft);margin-bottom:9px;line-height:1.45}
+  .sk-toggle{display:flex;gap:6px}
+  .sk-toggle button{
+    flex:1;padding:8px 6px;font:inherit;font-size:12.5px;cursor:pointer;
+    background:var(--page);border:1px solid var(--line);border-radius:var(--r-sm);
+    color:var(--ink);transition:background .15s,border-color .15s;
+  }
+  .sk-toggle button:hover{border-color:var(--green)}
+  .sk-toggle button.active{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+  .sk-control input[type=range]{width:100%;accent-color:var(--green-bright);margin-top:2px}
+  .sk-hbf-val{font-size:19px;font-weight:700;color:var(--green)}
+
+  .sk-risk{margin-top:4px}
+  .sk-risk-track{height:12px;border-radius:99px;background:var(--green-line);
+    overflow:hidden;position:relative}
+  .sk-risk-fill{height:100%;width:0;border-radius:99px;transition:width .5s,background .5s}
+  .sk-risk-label{font-size:13px;font-weight:600;margin-top:7px}
+  .sk-readout{font-size:13px;color:var(--ink-soft);line-height:1.55;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <a href="hub.html" class="back-to-hub">
+      <span class="arrow">←</span>
+      <span>Back to hub</span>
+    </a>
+
+    <div class="brand">
+      <div class="brand-mark">Hb</div>
+      <div>
+        <div class="brand-title">Hemoglobin</div>
+        <div class="brand-sub">PHA3134 &middot; Study Companion</div>
+      </div>
+    </div>
+
+    <nav id="nav"></nav>
+
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#F0C0CE" stroke-width="5"/>
+        <circle id="ringFill" cx="22" cy="22" r="18" fill="none" stroke="#B81D45" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+                transform="rotate(-90 22 22)"/>
+      </svg>
+      <div>
+        <div class="ring-num" id="ringPct">0%</div>
+        <div class="ring-cap">of the companion<br>complete</div>
+      </div>
+    </div>
+
+    <button class="reset" id="resetBtn">Clear my saved progress</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="topTitle">Welcome</h1>
+        <div class="meta" id="topMeta">Your progress saves automatically in this browser.</div>
+      </div>
+      <div class="pill" id="topPill">Not started</div>
+    </div>
+
+<!-- ============================================================
+     MODULE 1
+     ============================================================ -->
+
+<section class="section" data-key="m1home">
+  <div class="card">
+    <div class="eyebrow">Module 1</div>
+    <h2>Globin Foundations, Heme &amp; Oxygen-Carrying Capacity</h2>
+    <p>Two proteins, one piece of chemistry. Hemoglobin and myoglobin both use
+    the same iron-containing group to bind oxygen, but they are built very
+    differently &mdash; and almost everything that follows in this companion comes
+    from that difference in structure.</p>
+    <div class="keypoints">
+      <ul>
+        <li>Where each protein lives, and how much oxygen each can carry</li>
+        <li>What heme is, and why it counts as a prosthetic group</li>
+        <li>Why only Fe<sup>2+</sup> can do the job</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m1s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Hemoglobin and myoglobin</span>
+          <span class="home-desc">Two oxygen-binding proteins, two very different jobs.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Heme, prosthetic groups and iron</span>
+          <span class="home-desc">The chemistry that actually holds the oxygen.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Compare the two proteins</span>
+          <span class="home-desc">Sort each statement to hemoglobin, myoglobin, or both.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 1 quiz</span>
+          <span class="home-desc">Eight questions drawn from this module.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s1">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 1</div>
+    <h2>Hemoglobin and myoglobin</h2>
+    <p>Both are oxygen-binding proteins and both belong to the
+    <strong>globin</strong> family, which means they share a similar tertiary
+    structure built from eight alpha helices. What separates them is where they
+    live and how many pieces they are made of.</p>
+
+    <table>
+      <tr><th></th><th>Hemoglobin (Hb)</th><th>Myoglobin (Mb)</th></tr>
+      <tr><td>Location</td><td>Red blood cells (erythrocytes)</td><td>Cardiac and skeletal muscle (myocytes)</td></tr>
+      <tr><td>Subunits</td><td>Tetramer, &alpha;<sub>2</sub>&beta;<sub>2</sub></td><td>Monomer</td></tr>
+      <tr><td>Heme groups</td><td>Four (one per chain)</td><td>One</td></tr>
+      <tr><td>O<sub>2</sub> carried</td><td>Four molecules</td><td>One molecule</td></tr>
+      <tr><td>Role</td><td>Transport oxygen through the body</td><td>Hold oxygen in the tissue that needs it</td></tr>
+    </table>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 170" role="img" aria-label="Myoglobin drawn as a single subunit with one heme group beside hemoglobin drawn as four subunits with four heme groups">
+        <text x="120" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="var(--green)">Myoglobin</text>
+        <circle cx="120" cy="90" r="42" fill="var(--green-soft)" stroke="var(--green-line)" stroke-width="2"/>
+        <circle cx="120" cy="90" r="11" fill="var(--green)"/>
+        <text x="120" y="155" text-anchor="middle" font-size="12" fill="var(--ink-mid)">1 subunit &middot; 1 heme &middot; 1 O&#8322;</text>
+
+        <text x="430" y="22" text-anchor="middle" font-size="14" font-weight="700" fill="var(--green)">Hemoglobin</text>
+        <circle cx="386" cy="62" r="36" fill="var(--green-soft)" stroke="var(--green-line)" stroke-width="2"/>
+        <circle cx="474" cy="62" r="36" fill="var(--green-soft)" stroke="var(--green-line)" stroke-width="2"/>
+        <circle cx="386" cy="122" r="36" fill="var(--green-soft)" stroke="var(--green-line)" stroke-width="2"/>
+        <circle cx="474" cy="122" r="36" fill="var(--green-soft)" stroke="var(--green-line)" stroke-width="2"/>
+        <circle cx="386" cy="62" r="9" fill="var(--green)"/><circle cx="474" cy="62" r="9" fill="var(--green)"/>
+        <circle cx="386" cy="122" r="9" fill="var(--green)"/><circle cx="474" cy="122" r="9" fill="var(--green)"/>
+        <text x="386" y="46" text-anchor="middle" font-size="11" fill="var(--ink-mid)">&alpha;</text>
+        <text x="474" y="46" text-anchor="middle" font-size="11" fill="var(--ink-mid)">&alpha;</text>
+        <text x="386" y="106" text-anchor="middle" font-size="11" fill="var(--ink-mid)">&beta;</text>
+        <text x="474" y="106" text-anchor="middle" font-size="11" fill="var(--ink-mid)">&beta;</text>
+        <text x="430" y="163" text-anchor="middle" font-size="12" fill="var(--ink-mid)">4 subunits &middot; 4 hemes &middot; 4 O&#8322;</text>
+      </svg>
+      <p class="caption">Same heme chemistry in both. The dark circles are heme groups; the difference is how many of them are working together.</p>
+    </div>
+
+    <p>When either protein is carrying oxygen it is called
+    <strong>oxyhemoglobin</strong> or <strong>oxymyoglobin</strong>; without
+    oxygen, <strong>deoxyhemoglobin</strong> or <strong>deoxymyoglobin</strong>.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c1">
+        <p>How many oxygen molecules can a single myoglobin molecule carry?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c1b">
+        <p>Where is hemoglobin produced and located?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s2">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 2</div>
+    <h2>Heme, prosthetic groups and iron</h2>
+    <p>In both proteins the part that actually binds oxygen is <strong>heme b</strong>,
+    an iron-containing porphyrin. The protein itself does not touch the oxygen &mdash;
+    the iron atom at the centre of the heme does.</p>
+
+    <p>Heme is covalently attached to the globin chain, which makes it a
+    <strong>prosthetic group</strong>: a non-amino-acid component tightly or
+    covalently bound to a protein. And because both proteins contain iron, they
+    belong to the wider class of <strong>metalloproteins</strong> &mdash; an
+    estimated 50% of all proteins are bound to a metal ion.</p>
+
+    <div class="box clinical">
+      <h3><span class="tag">Where heme comes from</span></h3>
+      <p style="margin-bottom:0">Heme is synthesised mainly in the mitochondria of liver and
+      bone marrow cells. Glycine and acetate supply the nitrogen and carbon
+      atoms of the scaffold, and once that scaffold is built,
+      <strong>ferrochelatase</strong> inserts the iron atom into the centre.</p>
+    </div>
+
+    <p>Iron has two relevant oxidation states, Fe<sup>2+</sup> (ferrous) and
+    Fe<sup>3+</sup> (ferric). Only <strong>Fe<sup>2+</sup></strong> binds oxygen
+    within hemoglobin. Hold onto that &mdash; Module 5 is largely about what goes
+    wrong when iron ends up stuck as Fe<sup>3+</sup>.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c2">
+        <p>Heme is tightly bound to globin and is not made of amino acids. What is it called?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c2b">
+        <p>Which oxidation state of iron is able to bind oxygen within hemoglobin?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c2c">
+        <p>Which statement describes the role of ferrochelatase?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s3">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 3</div>
+    <h2>Compare the two proteins</h2>
+    <p>Assign each statement to hemoglobin, to myoglobin, or to both. Getting
+    these clearly separated now makes Module 3 much easier, because everything
+    cooperativity does is a consequence of hemoglobin having four subunits and
+    myoglobin having one.</p>
+
+    <div id="hbmbRows"></div>
+    <div class="controls" style="margin-top:16px">
+      <button class="btn" id="hbmbCheck">Check my answers</button>
+      <button class="btn ghost" id="hbmbReset">Try again</button>
+      <span class="caption" id="hbmbScore" style="margin:0"></span>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Apply what you know</span></h3>
+      <div class="cp-item" data-check="c3">
+        <p>Which protein delivers more of the oxygen it carries, and why?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1quiz">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Mastery check</div>
+    <h2>Module 1 quiz</h2>
+    <p>Eight questions, drawn at random from this module's question bank. The
+    questions and the answer order reshuffle every time you retake it.</p>
+    <div class="quiz-body" data-quiz="m1"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 2
+     ============================================================ -->
+
+<section class="section" data-key="m2home">
+  <div class="card">
+    <div class="eyebrow">Module 2</div>
+    <h2>Molecular Mechanics of Oxygen Binding</h2>
+    <p>Zoom all the way in to a single iron atom. What happens here &mdash; a
+    movement of a fraction of a nanometre &mdash; is the event that the rest of the
+    tetramer eventually reads as a signal.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m2s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Six coordination sites</span>
+          <span class="home-desc">Where the iron is held, and where oxygen fits.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Redox, the distal histidine and CO</span>
+          <span class="home-desc">What binding does to the iron, and who else wants the seat.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Oxygen binding, step by step</span>
+          <span class="home-desc">Put the molecular events into the right order.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 2 quiz</span>
+          <span class="home-desc">Eight questions drawn from this module.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s1">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 1</div>
+    <h2>Six coordination sites</h2>
+    <p>The Fe<sup>2+</sup> atom coordinates <strong>six</strong> groups total
+    &mdash; but they don't all come from the same source, and not everything in
+    the tray below belongs in this diagram at all. Build the coordination
+    environment yourself before reading the explanation underneath it.</p>
+
+    <div class="coord-wrap">
+      <div class="coord-board" id="coordBoard">
+        <svg class="coord-lines" viewBox="0 0 100 100" aria-hidden="true">
+          <line x1="50" y1="50" x2="50" y2="8"  stroke="var(--green-bright)" stroke-width="1.4" stroke-dasharray="3 2.4"/>
+          <line x1="50" y1="50" x2="50" y2="92" stroke="var(--green)" stroke-width="1.4"/>
+          <line x1="50" y1="50" x2="82" y2="26" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="50" y1="50" x2="18" y2="26" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="50" y1="50" x2="82" y2="74" stroke="var(--line)" stroke-width="1.4"/>
+          <line x1="50" y1="50" x2="18" y2="74" stroke="var(--line)" stroke-width="1.4"/>
+        </svg>
+        <div class="coord-fe">Fe<sup>2+</sup></div>
+        <div class="coord-slot" data-answer="o2"         data-pos="top"    style="left:50%;top:8%"></div>
+        <div class="coord-slot" data-answer="proximalHis" data-pos="bottom" style="left:50%;top:92%"></div>
+        <div class="coord-slot" data-answer="hemeN" data-pos="ne" style="left:82%;top:26%"></div>
+        <div class="coord-slot" data-answer="hemeN" data-pos="nw" style="left:18%;top:26%"></div>
+        <div class="coord-slot" data-answer="hemeN" data-pos="se" style="left:82%;top:74%"></div>
+        <div class="coord-slot" data-answer="hemeN" data-pos="sw" style="left:18%;top:74%"></div>
+      </div>
+      <div class="dnd-tray" id="coordTray"></div>
+      <div class="controls" style="margin-top:14px">
+        <button class="btn" id="coordCheck">Check my structure</button>
+        <button class="btn ghost" id="coordReset">Try again</button>
+        <span class="caption" id="coordScore" style="margin:0"></span>
+      </div>
+    </div>
+
+    <div class="box clinical">
+      <h3><span class="tag">How it actually works</span></h3>
+      <p>Four positions are held by the heme ring itself. A fifth is the
+      imidazole side chain of the <strong>proximal histidine</strong>, on an
+      alpha helix near the interface between the two &alpha;&beta; dimers. The
+      sixth is left open for <strong>O<sub>2</sub></strong>.</p>
+      <p style="margin-bottom:0"><strong>Distal histidine and 2,3-BPG were in
+      the tray on purpose &mdash; neither belongs in this diagram.</strong> The
+      distal histidine sits near the pocket and stabilises O<sub>2</sub> once
+      it's bound, but it never coordinates the iron itself (Section 2 covers
+      exactly what it does instead). 2,3-BPG doesn't come near the heme pocket
+      at all: it binds a completely different, positively charged site in the
+      central cavity between the &beta; chains (Module 4). If you placed
+      either one in a slot, that's worth remembering &mdash; it's a genuinely
+      common mix-up.</p>
+    </div>
+
+    <p>When oxygen binds at the sixth site, the heme changes shape and the
+    iron atom moves <strong>into the plane</strong> of the porphyrin. Because
+    the iron is still bonded to the proximal histidine, the histidine gets
+    pulled along with it &mdash; and that is the whole mechanism of
+    communication that Module 3 picks up from here.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c4">
+        <p>How are the six coordination sites of the heme iron occupied?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c4b">
+        <p>What happens to the position of the iron atom when oxygen binds?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s2">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 2</div>
+    <h2>Redox, the distal histidine and CO</h2>
+    <p>Oxygen binding is not just a docking event, it is a redox event. As
+    O<sub>2</sub> binds, the iron is <em>temporarily</em> oxidised from
+    Fe<sup>2+</sup> to Fe<sup>3+</sup>. Something has to be reduced in exchange,
+    and that something is the oxygen itself, which becomes the
+    <strong>superoxide anion</strong>, O<sub>2</sub><sup>&minus;</sup>. Once the
+    oxygen is released, both changes reverse.</p>
+
+    <p>There is a second histidine near the heme pocket: the
+    <strong>distal histidine</strong>. It does two jobs. It stabilises the bound
+    oxygen molecule, and it makes the pocket less welcoming to other small
+    molecules such as carbon monoxide and isocyanates.</p>
+
+    <div class="box clinical">
+      <h3><span class="tag">Pharmacy connection</span></h3>
+      <p style="margin-bottom:0">"Less favourable" is not the same as "prevented."
+      Even with the distal histidine discouraging it, CO still binds heme about
+      <strong>250 times more strongly</strong> than oxygen does. Structural
+      protection buys margin, not immunity &mdash; which is why carbon monoxide
+      exposure remains a genuine emergency.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c5">
+        <p>The iron is oxidised when oxygen binds. What is the oxygen converted into?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c5b">
+        <p>What does the distal histidine do?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c5c">
+        <p>How strongly does CO bind heme compared with oxygen?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s3">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 3</div>
+    <h2>Oxygen binding, step by step</h2>
+    <p>Number these events from 1 to 6 in the order they happen, starting with
+    deoxygenated heme. This sequence is the bridge between the chemistry in this
+    module and the cooperativity in the next one.</p>
+
+    <div id="seqRows"></div>
+    <div class="controls" style="margin-top:16px">
+      <button class="btn" id="seqCheck">Check my order</button>
+      <button class="btn ghost" id="seqReset">Try again</button>
+      <span class="caption" id="seqScore" style="margin:0"></span>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Apply what you know</span></h3>
+      <div class="cp-item" data-check="c6">
+        <p>Which event turns a chemical change at the iron into a mechanical change the protein can transmit?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2quiz">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Mastery check</div>
+    <h2>Module 2 quiz</h2>
+    <p>Eight questions on coordination chemistry, redox and the heme pocket.</p>
+    <div class="quiz-body" data-quiz="m2"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 3
+     ============================================================ -->
+
+<section class="section" data-key="m3home">
+  <div class="card">
+    <div class="eyebrow">Module 3</div>
+    <h2>Cooperativity &amp; Quaternary Structure</h2>
+    <p>This is the conceptual centre of the lecture. Four subunits that talk to
+    each other behave completely differently from four subunits working alone,
+    and the difference is measured in how much oxygen actually reaches tissue.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m3s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Two dimers, four subunits</span>
+          <span class="home-desc">How the tetramer is organised, and what cooperativity buys.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">The T and R states</span>
+          <span class="home-desc">The single framework the rest of the companion runs on.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Concerted vs sequential</span>
+          <span class="home-desc">Two models, and the evidence for each.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 3 quiz</span>
+          <span class="home-desc">Eight questions drawn from this module.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s1">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 1</div>
+    <h2>Two dimers, four subunits</h2>
+    <p>Hemoglobin is a <strong>heterotetramer</strong> &mdash; two &alpha; chains
+    and two &beta; chains &mdash; but functionally it behaves as
+    <strong>two &alpha;&beta; dimers</strong>. When oxygen binds to one of the
+    dimers, the two dimers rotate with respect to one another. The oxygenated
+    form is less conformationally rigid than the deoxygenated form.</p>
+
+    <p>The individual heme groups are far too far apart to influence each other
+    directly. All of the communication travels through changes in
+    <strong>quaternary structure</strong>.</p>
+
+    <div class="keypoints">
+      <ul>
+        <li>If one subunit binds O<sub>2</sub>, the affinity of the others <strong>rises</strong></li>
+        <li>If one subunit releases O<sub>2</sub>, the affinity of the others <strong>falls</strong></li>
+      </ul>
+    </div>
+
+    <div class="figure">
+      <svg viewBox="0 0 620 200" role="img" aria-label="Oxygen binding curves: a hyperbolic curve for myoglobin and a sigmoidal curve for hemoglobin">
+        <line x1="60" y1="170" x2="580" y2="170" stroke="var(--line)" stroke-width="2"/>
+        <line x1="60" y1="170" x2="60" y2="24" stroke="var(--line)" stroke-width="2"/>
+        <text x="320" y="194" text-anchor="middle" font-size="12" fill="var(--ink-soft)">oxygen availability &rarr;</text>
+        <text x="20" y="100" font-size="12" fill="var(--ink-soft)" transform="rotate(-90 20 100)" text-anchor="middle">saturation</text>
+        <path pathLength="1" class="draw-curve" d="M60 170 C 110 60, 170 40, 300 34 C 420 30, 500 30, 580 30"
+              fill="none" stroke="var(--ink-soft)" stroke-width="3"/>
+        <path pathLength="1" class="draw-curve draw-curve-2" d="M60 170 C 140 168, 190 150, 250 100 C 310 50, 380 36, 580 32"
+              fill="none" stroke="var(--green)" stroke-width="3"/>
+        <text x="180" y="52" font-size="12" font-weight="700" fill="var(--ink-soft)">myoglobin</text>
+        <text x="330" y="96" font-size="12" font-weight="700" fill="var(--green)">hemoglobin</text>
+      </svg>
+      <p class="caption">Myoglobin saturates early and holds on. Hemoglobin's S-shaped curve is cooperativity made visible &mdash; it loads steeply where oxygen is plentiful and unloads steeply where it is not.</p>
+    </div>
+
+    <div class="box clinical">
+      <h3><span class="tag">Why it matters</span></h3>
+      <p style="margin-bottom:0">Under similar conditions, hemoglobin uses roughly
+      <strong>66%</strong> of its oxygen capacity while myoglobin uses roughly
+      <strong>7%</strong>. Hemoglobin delivers nearly <strong>ten times</strong>
+      as much oxygen &mdash; using exactly the same heme chemistry.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c7">
+        <p>How is the hemoglobin tetramer best described in functional terms?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c7b">
+        <p>What proportion of oxygen capacity does each protein use under similar conditions?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s2">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 2</div>
+    <h2>The T and R states</h2>
+    <p>Each of the four subunits can exist in one of two states. If you take one
+    idea from this entire companion, take this one.</p>
+
+    <table>
+      <tr><th></th><th>T state (tense / taut)</th><th>R state (relaxed)</th></tr>
+      <tr><td>Oxygen affinity</td><td>Low</td><td>High</td></tr>
+      <tr><td>Interactions between subunits</td><td>More</td><td>Fewer</td></tr>
+      <tr><td>Rigidity</td><td>More rigid</td><td>Less rigid</td></tr>
+      <tr><td>Typical occupant</td><td>Deoxyhemoglobin, almost exclusively</td><td>Oxyhemoglobin, preferentially</td></tr>
+    </table>
+
+    <div class="box clinical">
+      <h3><span class="tag">The question to keep asking</span></h3>
+      <p style="margin-bottom:0">From here on, every new molecule, every mutation and
+      every clinical scenario in this companion can be answered with one question:
+      <strong>what shifts hemoglobin toward T or R, and what does that do to
+      oxygen affinity?</strong> T means release. R means retention.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c8">
+        <p>Which state does deoxyhemoglobin almost exclusively occupy, and what is it like?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c8b">
+        <p>A change in conditions shifts the equilibrium toward the R state. What happens to oxygen affinity?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s3">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 3</div>
+    <h2>Concerted vs sequential</h2>
+    <p>Two models have been proposed to explain how the subunits move between
+    states as oxygen binds.</p>
+
+    <table>
+      <tr><th>Concerted model</th><th>Sequential model</th></tr>
+      <tr>
+        <td>All four subunits share the same state. The equilibrium shifts toward R as oxygen binding increases.</td>
+        <td>Each subunit changes state independently. Binding induces an intermediate state that is neither T nor R; the subunit fully converts to R once it binds oxygen.</td>
+      </tr>
+    </table>
+
+    <p>So which one is right? As the lecture puts it, the answer lies somewhere
+    in the middle &mdash; and there is evidence on both sides. Assign each
+    observation to the model it supports.</p>
+
+    <div id="modelRows"></div>
+    <div class="controls" style="margin-top:16px">
+      <button class="btn" id="modelCheck">Check my answers</button>
+      <button class="btn ghost" id="modelReset">Try again</button>
+      <span class="caption" id="modelScore" style="margin:0"></span>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c9">
+        <p>Which statement describes the concerted model?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c9b">
+        <p>What conclusion do the two sets of observations together support?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3quiz">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Mastery check</div>
+    <h2>Module 3 quiz</h2>
+    <p>Eight questions on quaternary structure, cooperativity and the two models.</p>
+    <div class="quiz-body" data-quiz="m3"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 4
+     ============================================================ -->
+
+<section class="section" data-key="m4home">
+  <div class="card">
+    <div class="eyebrow">Module 4</div>
+    <h2>Controlling Oxygen Delivery</h2>
+    <p>Cooperativity alone is not enough. If oxyhemoglobin simply stayed in the
+    R state it would never release its oxygen under physiological conditions.
+    This module is about the molecules that push the equilibrium back.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m4s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">2,3-BPG</span>
+          <span class="home-desc">The allosteric effector that makes delivery possible.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">The Bohr effect</span>
+          <span class="home-desc">How falling pH becomes a salt bridge.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Two routes for CO<sub>2</sub></span>
+          <span class="home-desc">Carbonic acid, carbamates, and CO<sub>2</sub> transport.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s4">
+        <span class="home-num">4</span>
+        <span class="home-body">
+          <span class="home-title">Oxygen dissociation curve simulator</span>
+          <span class="home-desc">Predict the shift, then watch the curve move.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 4 quiz</span>
+          <span class="home-desc">Eight questions drawn from this module.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s1">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 1</div>
+    <h2>2,3-bisphosphoglycerate</h2>
+    <p>2,3-BPG is a side product of glycolysis, which neatly ties the production
+    of ATP from sugar to the consumption of oxygen. It is present at roughly the
+    same concentration as hemoglobin itself.</p>
+
+    <p>It is an <strong>allosteric effector</strong>: allosteric means it binds
+    at a site other than the one used by the native ligand. 2,3-BPG never touches
+    the heme iron. It works from a separate pocket, and it works in one direction
+    &mdash; it drives hemoglobin from R back to T, releasing oxygen.</p>
+
+    <div class="keypoints">
+      <ul>
+        <li>2,3-BPG binds hemoglobin <strong>only in the T state</strong></li>
+        <li>Stabilising T makes the R state harder to reach</li>
+        <li>Full oxygen loading then requires high oxygen concentrations &mdash; which is exactly what the lungs provide</li>
+        <li>Without 2,3-BPG, hemoglobin would release only about <strong>8%</strong> of its bound oxygen to tissue</li>
+      </ul>
+    </div>
+
+    <p>The pocket it binds is <strong>positively charged</strong>, and 2,3-BPG is
+    highly negatively charged. Keep that in mind &mdash; Module 5 shows what
+    happens when one of those positive residues is swapped for a neutral one.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c10">
+        <p>Which conformation of hemoglobin does 2,3-BPG bind?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c10b">
+        <p>Which residues would 2,3-BPG be expected to bind, and why?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s2">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 2</div>
+    <h2>The Bohr effect</h2>
+    <p>Metabolically active tissue generates H<sup>+</sup> and CO<sub>2</sub>.
+    Both stimulate hemoglobin to release oxygen &mdash; the
+    <strong>Bohr effect</strong>. Affinity is directly correlated with pH: as pH
+    falls, so does hemoglobin's affinity for oxygen.</p>
+
+    <p>The mechanism is concrete. As pH drops, the imidazole side chain of a
+    histidine residue in the &beta; chain becomes <strong>protonated</strong>. In
+    deoxyhemoglobin, that protonated histidine can form a
+    <strong>salt bridge</strong> with an aspartate residue in the same chain, and
+    that bridge stabilises the T state.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 620 200" role="img" aria-label="Two oxygen binding curves showing the curve shifting to the right as pH falls">
+        <line x1="60" y1="170" x2="580" y2="170" stroke="var(--line)" stroke-width="2"/>
+        <line x1="60" y1="170" x2="60" y2="24" stroke="var(--line)" stroke-width="2"/>
+        <text x="320" y="194" text-anchor="middle" font-size="12" fill="var(--ink-soft)">oxygen availability &rarr;</text>
+        <path d="M60 170 C 130 166, 175 145, 230 95 C 285 48, 350 34, 580 30"
+              fill="none" stroke="var(--green)" stroke-width="3"/>
+        <path d="M60 170 C 165 168, 230 152, 300 108 C 375 60, 445 40, 580 34"
+              fill="none" stroke="var(--ink-soft)" stroke-width="3" stroke-dasharray="7 5"/>
+        <text x="196" y="74" font-size="12" font-weight="700" fill="var(--green)">pH 7.4</text>
+        <text x="330" y="140" font-size="12" font-weight="700" fill="var(--ink-soft)">lower pH</text>
+        <text x="430" y="112" font-size="12" fill="var(--ink-soft)">shift right = release</text>
+      </svg>
+      <p class="caption">A rightward shift means lower affinity at any given oxygen level &mdash; more oxygen handed over to the tissue that made the acid.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c11">
+        <p>Blood entering metabolically active tissue meets a lower pH. What happens to oxygen affinity?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11b">
+        <p>What happens after the &beta;-chain histidine is protonated?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s3">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 3</div>
+    <h2>Two routes for CO<sub>2</sub></h2>
+    <p>Two mechanisms have been proposed for how CO<sub>2</sub> stimulates oxygen
+    release. They are worth keeping separate in your head, because they reach the
+    same destination by different roads.</p>
+
+    <table>
+      <tr><th>Indirect &mdash; CO<sub>2</sub> as a mild acid</th><th>Direct &mdash; carbamate formation</th></tr>
+      <tr>
+        <td>CO<sub>2</sub> + H<sub>2</sub>O &rarr; carbonic acid (via carbonic anhydrase) &rarr; H<sup>+</sup> &rarr; protonation &rarr; salt bridge &rarr; T state stabilised</td>
+        <td>CO<sub>2</sub> + N-terminal amino groups &rarr; negatively charged carbamates &rarr; salt bridges with the other &alpha;&beta; dimer &rarr; T state stabilised</td>
+      </tr>
+    </table>
+
+    <div class="box clinical">
+      <h3><span class="tag">Pharmacy connection</span></h3>
+      <p style="margin-bottom:0">Carbamate formation is not only a signal, it is also
+      <strong>transport</strong>. It accounts for about <strong>15%</strong> of
+      total CO<sub>2</sub> carried back to the lungs. The remainder travels as
+      bicarbonate, and carbonic anhydrase catalyses the conversion back to
+      CO<sub>2</sub> in the lungs.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c12">
+        <p>By which mechanism does CO<sub>2</sub> act as a mild acid?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c12b">
+        <p>CO<sub>2</sub> reacts with N-terminal amino groups. What forms, and what does it do?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s4">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 4</div>
+    <h2>Oxygen dissociation curve bench</h2>
+    <p>Three levers, one curve. Each lever stays <strong>locked until you
+    commit a prediction</strong> &mdash; and the curve stays on screen while you
+    move it, so you can watch what your prediction actually did. The pale
+    dotted curve stays put as your reference: pH 7.40, PCO<sub>2</sub> 40 mmHg,
+    2,3-BPG 5 mM.</p>
+
+    <div class="bench">
+      <div class="bench-plot">
+        <svg id="curveSvg" viewBox="0 0 520 400" role="img"
+             aria-label="Oxygen dissociation curve for adult hemoglobin"></svg>
+        <div class="readout">
+          <div class="cell">
+            <div class="k">P₅₀</div>
+            <div class="v" id="roP50">26.6</div>
+            <div class="u">mmHg</div>
+            <div class="d" id="roP50d">reference</div>
+          </div>
+          <div class="cell">
+            <div class="k">Sat @ lung (100)</div>
+            <div class="v" id="roSa">97.8</div>
+            <div class="u">%</div>
+            <div class="d" id="roSad"></div>
+          </div>
+          <div class="cell">
+            <div class="k">Sat @ tissue (40)</div>
+            <div class="v" id="roSv">75.0</div>
+            <div class="u">%</div>
+            <div class="d" id="roSvd"></div>
+          </div>
+          <div class="cell">
+            <div class="k">O₂ unloaded</div>
+            <div class="v" id="roDel">22.8</div>
+            <div class="u">% of capacity</div>
+            <div class="d" id="roDeld"></div>
+          </div>
+        </div>
+        <p class="caption" id="curveVerdict" style="margin-top:12px"></p>
+      </div>
+
+      <div class="bench-levers">
+        <div class="lever" data-lever="ph">
+          <div class="lever-top">
+            <span class="lever-name">pH</span>
+            <span class="lever-lock" data-lock>&#128274; predict first</span>
+            <span class="lever-val" id="valPh">7.40</span>
+          </div>
+          <input type="range" id="sPh" min="7.0" max="7.7" step="0.01" value="7.4" disabled aria-label="pH">
+          <div class="lever-note">Working tissue makes H<sup>+</sup>. A protonated
+          &beta;-chain histidine forms a salt bridge with an aspartate in the same
+          chain &mdash; a bridge that only exists in deoxyhemoglobin.</div>
+          <div class="gate" data-gate="ph"></div>
+        </div>
+
+        <div class="lever" data-lever="co2">
+          <div class="lever-top">
+            <span class="lever-name">PCO<sub>2</sub></span>
+            <span class="lever-lock" data-lock>&#128274; predict first</span>
+            <span class="lever-val" id="valCo2">40 mmHg</span>
+          </div>
+          <input type="range" id="sCo2" min="15" max="90" step="1" value="40" disabled aria-label="Partial pressure of carbon dioxide">
+          <div class="lever-note">Two routes, both from Section 3: carbamates on the
+          N-terminal amino groups (direct), and carbonic acid &rarr; H<sup>+</sup>
+          (indirect).</div>
+          <label class="lever-check">
+            <input type="checkbox" id="cCouple" disabled>
+            <span>Let CO<sub>2</sub> drive pH the way it does in a patient
+            (&minus;0.08 pH per 10 mmHg rise) &mdash; switches on the indirect route</span>
+          </label>
+          <div class="gate" data-gate="co2"></div>
+        </div>
+
+        <div class="lever" data-lever="bpg">
+          <div class="lever-top">
+            <span class="lever-name">2,3-BPG</span>
+            <span class="lever-lock" data-lock>&#128274; predict first</span>
+            <span class="lever-val" id="valBpg">5.0 mM</span>
+          </div>
+          <input type="range" id="sBpg" min="0" max="10" step="0.1" value="5" disabled aria-label="2,3-BPG concentration">
+          <div class="lever-note">A glycolytic side product, present at roughly
+          hemoglobin&rsquo;s own concentration. It binds the positively charged
+          pocket &mdash; and only fits the T state.</div>
+          <div class="gate" data-gate="bpg"></div>
+        </div>
+
+        <div class="lever-foot">
+          <label class="lever-check">
+            <input type="checkbox" id="cGhost" checked>
+            <span>Show the reference curve</span>
+          </label>
+          <button class="btn ghost" id="curveReset" style="margin-top:10px">Reset all conditions</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box co-warn">
+      <h3><span class="tag">Not on this bench &mdash; and that&rsquo;s the point</span></h3>
+      <p style="margin-bottom:0">Carbon monoxide is missing from the levers above
+      deliberately. pH, CO<sub>2</sub> and 2,3-BPG are <strong>allosteric</strong>:
+      they bind somewhere other than the heme iron and shift the T&#8646;R
+      equilibrium, which is why each one slides the curve along. CO does something
+      categorically different &mdash; it takes the oxygen seat itself, competing
+      directly at the sixth coordination site. It doesn&rsquo;t just move the curve,
+      it removes carrying capacity. Keep that distinction: three levers that shift
+      the curve, and one competitor that shortens it.</p>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Apply what you know</span></h3>
+      <div class="cp-item" data-check="c13">
+        <p>Blood arrives at a metabolically active tissue with high CO<sub>2</sub>, low pH and 2,3-BPG present. Which way does the equilibrium shift, and what follows?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c13b">
+        <p>Which combination of effects does carbon monoxide exposure have on the oxygen dissociation curve?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4quiz">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Mastery check</div>
+    <h2>Module 4 quiz</h2>
+    <p>Eight questions on 2,3-BPG, the Bohr effect and CO<sub>2</sub>.</p>
+    <div class="quiz-body" data-quiz="m4"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 5
+     ============================================================ -->
+
+<section class="section" data-key="m5home">
+  <div class="card">
+    <div class="eyebrow">Module 5</div>
+    <h2>Hemoglobin in Clinical Pharmacy</h2>
+    <p>Three short cases. Each one is the same reasoning exercise: a change in
+    structure, an effect on an interaction, a shift in conformation, and a
+    clinical consequence.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m5s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Case: fetal hemoglobin</span>
+          <span class="home-desc">One residue swap, and oxygen crosses the placenta.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Case: methemoglobinemia</span>
+          <span class="home-desc">What happens when the iron stays oxidised.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Case: sickle cell anemia</span>
+          <span class="home-desc">Glu6Val, and why only the T state aggregates.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 5 quiz</span>
+          <span class="home-desc">Eight questions drawn from this module.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s1">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Case 1</div>
+    <h2>Fetal hemoglobin</h2>
+    <p>For oxygen to move from maternal blood into fetal blood, fetal hemoglobin
+    has to hold oxygen <em>more</em> tightly than the mother's. It manages that
+    without changing a single thing about the heme chemistry.</p>
+
+    <p>Adult hemoglobin is &alpha;<sub>2</sub>&beta;<sub>2</sub>. Fetal
+    hemoglobin is &alpha;<sub>2</sub>&gamma;<sub>2</sub>. The &gamma; chain is
+    about 72% identical to the &beta; chain in primary sequence, and the
+    difference that matters is a single substitution in the 2,3-BPG binding site:
+    a <strong>histidine</strong> is replaced by a <strong>serine</strong>.</p>
+
+    <div class="keypoints">
+      <ul>
+        <li>&beta; &rarr; &gamma; chain substitution</li>
+        <li>Histidine (positive) &rarr; serine (neutral) in the 2,3-BPG pocket</li>
+        <li>Less positive charge &rarr; weaker binding of negatively charged 2,3-BPG</li>
+        <li>Less T-state stabilisation &rarr; <strong>higher oxygen affinity</strong></li>
+        <li>Oxygen transfers from maternal to fetal red blood cells</li>
+      </ul>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c14">
+        <p>Which subunit composition describes fetal hemoglobin?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c14b">
+        <p>Why does replacing that histidine with serine raise oxygen affinity?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s2">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Case 2</div>
+    <h2>Methemoglobinemia</h2>
+    <p>Module 1 established that only Fe<sup>2+</sup> binds oxygen. When the heme
+    iron sits in the Fe<sup>3+</sup> state, the protein is called
+    <strong>methemoglobin</strong>, and it cannot carry oxygen. About
+    <strong>1&ndash;2%</strong> of circulating hemoglobin is methemoglobin in a
+    healthy person.</p>
+
+    <p><strong>Cytochrome-b<sub>5</sub> reductase</strong> (methemoglobin
+    reductase) converts methemoglobin back to functional hemoglobin. A deficiency
+    in this enzyme predisposes to methemoglobinemia, and certain
+    <strong>medications and environmental exposures</strong> can cause it as well.</p>
+
+    <div class="box clinical">
+      <h3><span class="tag">Pharmacy connection</span></h3>
+      <p>Methemoglobinemia is treated with <strong>methylene blue</strong>, which
+      helps regenerate NAD<sup>+</sup> for cytochrome-b<sub>5</sub> reductase.
+      Note that it supports the enzyme pathway rather than acting on hemoglobin
+      directly.</p>
+      <p class="caption" style="margin-bottom:0"><em>Beyond this lecture:</em> dosing,
+      monitoring and contraindications for methylene blue are clinical pharmacy
+      content and are not covered by the source lecture. Treat them as a separate
+      resource rather than examinable material from this module.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c15">
+        <p>What defines methemoglobin?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c15b">
+        <p>Which enzyme restores functional hemoglobin from methemoglobin?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:34px">Activity &middot; Treat the patient</h3>
+    <p>Two patients arrive with the same presentation. The reasoning that works for
+    the first one does not work for the second &mdash; and the reason why is the
+    whole point of this activity. Choose an intervention and watch what happens.</p>
+
+    <div class="mh-case" id="mhCase">
+      <div class="mh-stage" id="mhStage">Patient 1 of 2</div>
+      <h4 id="mhTitle"></h4>
+      <p class="caption" id="mhVignette" style="margin-bottom:0"></p>
+
+      <div class="mh-vitals">
+        <div class="mh-vital">
+          <div class="k">Pulse oximeter</div>
+          <div class="v" id="mhSpo2"></div>
+        </div>
+        <div class="mh-vital">
+          <div class="k">Methemoglobin</div>
+          <div class="v" id="mhMet"></div>
+        </div>
+        <div class="mh-vital">
+          <div class="k">Blood appearance</div>
+          <div class="v" id="mhBlood" style="font-size:14px"></div>
+        </div>
+      </div>
+
+      <div class="mh-options" id="mhOptions"></div>
+      <div id="mhOutcome"></div>
+    </div>
+
+    <div class="controls" style="margin-top:14px">
+      <button class="btn ghost" id="mhReset">Start both patients over</button>
+    </div>
+    <p class="caption" id="mhProgress" style="margin-top:10px"></p>
+
+    <div class="box clinical" id="mhDebrief" hidden>
+      <h3><span class="tag">Why the second patient is different</span></h3>
+      <p>Methylene blue does not reduce Fe<sup>3+</sup> by itself. It is first
+      converted to <strong>leucomethylene blue</strong>, and that conversion is
+      <strong>NADPH-dependent</strong>. NADPH comes from the pentose phosphate
+      pathway, whose rate-limiting enzyme is <strong>G6PD</strong>. In a
+      G6PD-deficient patient there is not enough NADPH to activate the drug, so
+      the antidote that rescued Patient 1 does essentially nothing for Patient 2
+      &mdash; and the oxidant stress of the dye can worsen hemolysis.</p>
+      <p style="margin-bottom:0"><em>Beyond this lecture:</em> the existence of the
+      NADPH/G6PD dependency, and the alternatives used when methylene blue is
+      unsuitable, are clinical pharmacy content. They are included here because
+      they show the lecture's Fe<sup>2+</sup>/Fe<sup>3+</sup> chemistry deciding a
+      real therapeutic choice &mdash; not because dosing or protocol detail is
+      examinable from this module.</p>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s3">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Case 3</div>
+    <h2>Sickle cell anemia</h2>
+    <p>A single amino acid substitution in the &beta; chain produces
+    <strong>hemoglobin S</strong>: glutamate at position 6 is replaced by valine
+    (<strong>Glu6Val</strong>). A charged residue on the protein surface becomes a
+    hydrophobic one.</p>
+
+    <div class="keypoints">
+      <ul>
+        <li>Glu6Val &rarr; hydrophobic patch on the protein surface</li>
+        <li>That valine interacts with hydrophobic residues on a <em>neighbouring</em> hemoglobin molecule</li>
+        <li>Those partner residues are exposed <strong>only in the T state</strong>, so only deoxyhemoglobin aggregates</li>
+        <li>Fibrous aggregates &rarr; elongated, sickled, rigid red blood cells</li>
+        <li>Rigid cells clog small capillaries &rarr; impaired blood flow and tissue damage</li>
+        <li>Shortened red cell lifespan &rarr; anemia</li>
+      </ul>
+    </div>
+
+    <p>Clinically, sickle cell anemia is associated with painful swelling of the
+    extremities, higher risk of stroke, and bacterial infection.</p>
+
+    <div class="box clinical">
+      <h3><span class="tag">Back to the framework</span></h3>
+      <p style="margin-bottom:0">Everything that pushes hemoglobin toward the T state
+      &mdash; low oxygen, low pH, high CO<sub>2</sub> &mdash; is also a condition
+      that makes HbS more likely to aggregate. The same T/R framework that
+      explained oxygen delivery in Module 4 explains sickling risk here.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c16">
+        <p>Which substitution characterises hemoglobin S?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c16b">
+        <p>In which state does HbS aggregate, and why?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:34px">Activity &middot; Build the polymer</h3>
+    <p>Three switches, one outcome. Before you touch anything, commit to a
+    prediction &mdash; then find the combination that actually sickles the cell.</p>
+
+    <div class="box predict" id="skPredictBox">
+      <h3><span class="tag">Predict first</span></h3>
+      <p>Which single combination below produces fibers?</p>
+      <div class="choices" id="skPredict"></div>
+      <div class="feedback" id="skPredictFb"></div>
+    </div>
+
+    <div class="sk-bench">
+      <div class="sk-stage">
+        <svg id="skSvg" viewBox="0 0 320 250" role="img"
+             aria-labelledby="skSvgTitle skSvgDesc">
+          <title id="skSvgTitle">Hemoglobin polymerization model</title>
+          <desc id="skSvgDesc">A red blood cell containing hemoglobin molecules.
+          The molecules link into fibers and the cell changes shape only when
+          hemoglobin S is in the deoxygenated T state.</desc>
+
+          <ellipse id="skCell" cx="160" cy="118" rx="104" ry="72"
+                   fill="#FBE4EA" stroke="#D9899F" stroke-width="2.5"/>
+          <ellipse id="skDimple" cx="160" cy="118" rx="46" ry="30"
+                   fill="#F5CBD7" stroke="none"/>
+          <g id="skMolecules"></g>
+          <g id="skFibers" stroke-width="4" stroke-linecap="round" fill="none"></g>
+          <text id="skCellLabel" x="160" y="222" text-anchor="middle"
+                font-size="13" font-weight="600" fill="#4B5563">Biconcave disc</text>
+        </svg>
+        <div class="sk-risk">
+          <div class="sk-risk-track"><div class="sk-risk-fill" id="skRiskFill"></div></div>
+          <div class="sk-risk-label" id="skRiskLabel"></div>
+          <div class="sk-readout" id="skReadout"></div>
+        </div>
+      </div>
+
+      <div class="sk-controls">
+        <div class="sk-control">
+          <div class="lab">Residue at &beta;6</div>
+          <div class="sub">The single substitution that defines hemoglobin S.</div>
+          <div class="sk-toggle" id="skResidue">
+            <button type="button" data-v="glu">Glu (HbA)</button>
+            <button type="button" data-v="val">Val (HbS)</button>
+          </div>
+        </div>
+
+        <div class="sk-control">
+          <div class="lab">Oxygenation state</div>
+          <div class="sub">Determines whether the partner hydrophobic pocket on the
+          neighbouring &beta; chain is exposed.</div>
+          <div class="sk-toggle" id="skState">
+            <button type="button" data-v="R">Oxygenated (R)</button>
+            <button type="button" data-v="T">Deoxygenated (T)</button>
+          </div>
+        </div>
+
+        <div class="sk-control">
+          <div class="lab">Fetal hemoglobin: <span class="sk-hbf-val" id="skHbfVal">0%</span></div>
+          <div class="sub">HbF has &gamma; chains instead of &beta;, so it carries no
+          &beta;6 valine and cannot join a growing fiber.</div>
+          <input type="range" id="skHbf" min="0" max="40" step="1" value="0"
+                 aria-label="Percent fetal hemoglobin">
+        </div>
+
+        <div class="controls">
+          <button class="btn ghost" id="skReset">Reset the model</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="box clinical" id="skDebrief" hidden>
+      <h3><span class="tag">What the model is showing you</span></h3>
+      <p>Fibers need <strong>both</strong> conditions at once. The &beta;6 valine
+      supplies a hydrophobic knob, but its partner pocket on the neighbouring
+      &beta; chain is only exposed in the <strong>T state</strong>. HbA never
+      polymerizes because it has no knob; oxygenated HbS never polymerizes because
+      there is no pocket to dock into. This is why sickling tracks every T-favoring
+      condition from Module 4 &mdash; low oxygen, low pH, high CO<sub>2</sub>.</p>
+      <p style="margin-bottom:0">The HbF slider matters more than its size suggests
+      because polymerization is steeply concentration-dependent: a modest fall in
+      the HbS concentration produces a disproportionately large delay before fibers
+      form. That relationship is the rationale behind therapies that raise HbF.
+      <em>Beyond this lecture:</em> specific agents and dosing are clinical content,
+      not examinable here.</p>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5quiz">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Mastery check</div>
+    <h2>Module 5 quiz</h2>
+    <p>Eight questions on fetal hemoglobin, methemoglobinemia and hemoglobin S.</p>
+    <div class="quiz-body" data-quiz="m5"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MASTERY LAB
+     ============================================================ -->
+
+<section class="section" data-key="labhome">
+  <div class="card">
+    <div class="eyebrow">Mastery Lab</div>
+    <h2>From Molecule to Patient</h2>
+    <p>Not a new topic &mdash; an integration area. One hemoglobin molecule, several
+    challenges, and one reasoning thread running through all of them:</p>
+    <p style="font-size:18px;font-weight:600;color:var(--green)">structure &rarr;
+    intermolecular forces &rarr; conformational state &rarr; oxygen affinity &rarr;
+    physiology &rarr; clinical consequence</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="lab1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Integration challenges</span>
+          <span class="home-desc">Sort the conditions, then predict three outcomes.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="lab2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">T &#8646; R equilibrium simulator</span>
+          <span class="home-desc">Predict the reasoning chain, then watch the equilibrium respond.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+    <div class="controls" style="margin-top:16px">
+      <button class="btn ghost" id="jumpFlash">Go to the flashcard deck</button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="lab1">
+  <div class="card">
+    <div class="eyebrow">Mastery Lab &middot; Challenges</div>
+    <h2>Integration challenges</h2>
+    <p>First, the sorting exercise that the whole companion has been building
+    toward: which way does each condition push the equilibrium?</p>
+
+    <div id="labRows"></div>
+    <div class="controls" style="margin-top:16px">
+      <button class="btn" id="labCheck">Check my answers</button>
+      <button class="btn ghost" id="labReset">Try again</button>
+      <span class="caption" id="labScore" style="margin:0"></span>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Challenge 1 &middot; Physiology</span></h3>
+      <div class="cp-item" data-check="c17">
+        <p>Blood reaches exercising skeletal muscle. Predict the effect on conformational state, oxygen affinity and delivery.</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Challenge 2 &middot; Protein engineering</span></h3>
+      <div class="cp-item" data-check="c17b">
+        <p>A serine in the 2,3-BPG pocket is replaced by a positively charged residue. Predict the result.</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Challenge 3 &middot; Clinical</span></h3>
+      <div class="cp-item" data-check="c17c">
+        <p>A patient with hemoglobin S becomes hypoxic and acidotic. Predict what happens to aggregation.</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px">Challenge 4 &middot; Read the curve</h3>
+    <p>Each curve below (solid) is shown against the standard baseline
+    (dotted). One condition from Module 4 produced each one &mdash; work out
+    which, from the shape alone.</p>
+
+    <div style="display:flex;gap:18px;flex-wrap:wrap">
+      <div class="figure" style="flex:1;min-width:260px">
+        <svg viewBox="0 0 300 150" role="img" aria-label="Curve A: left-shifted, normal maximum">
+          <line x1="36" y1="128" x2="290" y2="128" stroke="var(--line)" stroke-width="1.5"/>
+          <line x1="36" y1="128" x2="36" y2="10" stroke="var(--line)" stroke-width="1.5"/>
+          <path id="curveMiniBaseA" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="2 4"/>
+          <path id="curveMiniA" fill="none" stroke="var(--green-bright)" stroke-width="2.5"/>
+        </svg>
+        <p class="caption">Curve A</p>
+      </div>
+      <div class="figure" style="flex:1;min-width:260px">
+        <svg viewBox="0 0 300 150" role="img" aria-label="Curve B: left-shifted with reduced maximum">
+          <line x1="36" y1="128" x2="290" y2="128" stroke="var(--line)" stroke-width="1.5"/>
+          <line x1="36" y1="128" x2="36" y2="10" stroke="var(--line)" stroke-width="1.5"/>
+          <path id="curveMiniBaseB" fill="none" stroke="var(--line)" stroke-width="2" stroke-dasharray="2 4"/>
+          <path id="curveMiniB" fill="none" stroke="var(--green-bright)" stroke-width="2.5"/>
+        </svg>
+        <p class="caption">Curve B</p>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Curve A</span></h3>
+      <div class="cp-item" data-check="c18">
+        <p>Curve A reaches the same maximum as the baseline but sits to its left. Which condition most likely produced it?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">Curve B</span></h3>
+      <div class="cp-item" data-check="c18b">
+        <p>Curve B sits to the left of baseline <em>and</em> tops out below it. Which condition most likely produced it?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="lab2">
+  <div class="card">
+    <div class="eyebrow">Mastery Lab &middot; Simulator</div>
+    <h2>T &#8646; R equilibrium simulator</h2>
+    <p>Every module in this companion feeds into one question: <strong>what
+    shifts hemoglobin toward T or R, and what does that do to oxygen
+    affinity?</strong> This is that question made physical. Four
+    environmental conditions, one equilibrium, one molecule that responds.</p>
+
+    <div class="trm-stage">
+      <svg class="trm-tetramer" id="trmSvg" viewBox="0 0 320 220" role="img"
+           aria-label="Simplified hemoglobin tetramer, showing the two αβ dimers and their oxygen occupancy"></svg>
+
+      <div class="trm-meter">
+        <div class="trm-meter-labels">
+          <span>T state</span><span>R state</span>
+        </div>
+        <div class="trm-meter-track">
+          <div class="trm-meter-fill" id="trmFill"></div>
+          <div class="trm-meter-dot" id="trmDot"></div>
+        </div>
+        <p class="trm-meter-readout" id="trmReadout">Balanced &mdash; no effectors applied</p>
+      </div>
+    </div>
+
+    <p class="caption">This is a simplified teaching model of relative
+    positioning on the T&#8646;R spectrum, not a quantitative measurement of
+    real allosteric equilibrium constants.</p>
+
+    <h3 style="margin-top:24px">Set the environment</h3>
+    <p>Each control needs a one-time prediction before it will move the
+    model &mdash; work out the chain of consequences one link at a time. Once a
+    direction is unlocked you can flip back and forth on it freely.</p>
+
+    <div id="trmLevers"></div>
+    <div id="trmChainHost"></div>
+
+    <div class="controls" style="margin-top:6px">
+      <button class="btn ghost" id="trmReset">Reset all conditions</button>
+    </div>
+
+    <div class="box apply" style="margin-top:24px">
+      <h3><span class="tag">The challenge</span></h3>
+      <p>A skeletal muscle becomes highly metabolically active. Set the four
+      conditions above to <strong>maximise O<sub>2</sub> unloading</strong> to
+      that muscle, then check your setup.</p>
+      <div class="controls">
+        <button class="btn" id="trmCheck">Check my setup</button>
+      </div>
+      <p id="trmChallengeFb" style="margin-top:12px"></p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c19">
+        <p>Which combination of conditions pushes hemoglobin most strongly toward the T state?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c19b">
+        <p>Why is exercising skeletal muscle so effective at extracting oxygen from blood?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     FLASHCARDS
+     ============================================================ -->
+
+<section class="section" data-key="flashcards">
+  <div class="card">
+    <div class="eyebrow">Retrieval practice</div>
+    <h2>Flashcard deck</h2>
+    <p>Terminology, structures, mechanisms and clinical associations from all five
+    modules. Click a card to reveal the answer. The deck is shuffled each visit,
+    and nothing here is graded.</p>
+
+    <div class="fc-stage">
+      <div class="fc" id="fcCard" tabindex="0" role="button" aria-label="Flashcard. Press Enter to flip.">
+        <div class="fc-face fc-front"><div>
+          <div class="fc-term" id="fcFront"></div>
+          <div class="fc-hint">click, tap, or press Enter to flip</div>
+        </div></div>
+        <div class="fc-face fc-back"><div class="fc-def" id="fcBack"></div></div>
+      </div>
+    </div>
+
+    <div class="fc-bar">
+      <button class="btn ghost" id="fcPrev">&larr; Previous</button>
+      <span class="fc-count" id="fcCount"></span>
+      <button class="btn ghost" id="fcNext">Next &rarr;</button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     FINAL EXAM
+     ============================================================ -->
+
+<section class="section" data-key="final">
+  <div class="card">
+    <div class="eyebrow">Final assessment</div>
+    <h2>Final Mastery Exam</h2>
+    <p>Twenty-five questions across every module: 8 foundational, 10
+    mechanistic/application and 7 integrated clinical or structural items. Your
+    results break down by topic so you can see which areas still need work.</p>
+    <div class="quiz-body" data-quiz="final"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit exam</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     LOAD ORDER MATTERS — see §3 of companion-architecture.md
+     1. banks/hemoglobin.js  content data + TOPIC_ID
+     2. shared/storage.js    defines `state` (needs TOPIC_ID)
+     3. shared/helpers.js    el(), shuffle(), order()
+     4. this page's content script (runs immediately, reads state)
+     5. shared/engine.js     must be last
+     ============================================================ -->
+<script src="banks/hemoglobin.js"></script>
+<script src="banks/hemoglobin.manifest.js"></script>
+<script src="shared/storage.js"></script>
+<script src="shared/helpers.js"></script>
+<script>
+/* ============================================================
+   HEMOGLOBIN COMPANION — this page's own content script
+   Module/section structure, what gates each section, and the five
+   bespoke activities. Nothing here is reusable by another topic;
+   reusable logic belongs in shared/engine.js.
+   ============================================================ */
+
+/* ---------- Module & section structure — built from the manifest ----------
+   This used to be four separate hand-written blocks (MODULES, SECTION_REQ,
+   QUIZ_KEY_FOR_SECTION, AREA_SECTION) that had to be edited in two places —
+   here AND in banks/hemoglobin.manifest.js — every time a section changed.
+   That's the "copies drift" problem §14.4 of the architecture document
+   warns about. Now there's exactly one place this structure is written:
+   the manifest. This page reads it and builds everything below from it,
+   the same way the hub does.
+
+   MANIFEST comes from banks/hemoglobin.manifest.js, loaded by a <script>
+   tag above this one, right after banks/hemoglobin.js. If that file is
+   missing, or the <script> order gets rearranged so it loads after this
+   script, MANIFEST won't exist yet and the check below throws immediately
+   with a plain-English error — on purpose. A silent failure here would be
+   far worse: the page would just render with no modules and no obvious
+   cause. */
+if (typeof MANIFEST === 'undefined') {
+  throw new Error(
+    'hemoglobin.html: banks/hemoglobin.manifest.js did not load, or its ' +
+    '<script> tag is positioned after this one. Check that both banks/ ' +
+    'files are present and that hemoglobin.manifest.js loads before this ' +
+    '<script> block.'
+  );
+}
+
+/* The one thing that's presentation-only and doesn't belong in the
+   manifest (the hub has no use for a sidebar icon — it only needs to
+   know what's done). Keyed by module id, same ids as MANIFEST.modules. */
+var MODULE_BADGE = {
+  m1:'1', m2:'2', m3:'3', m4:'4', m5:'5',
+  lab:'&#9881;', flash:'&#10022;', final:'&#9733;'
+};
+
+var MODULES = MANIFEST.modules.map(function(m){
+  var mod = {
+    id: m.id,
+    badge: MODULE_BADGE[m.id],
+    title: m.title,
+    sections: m.sections.map(function(s){ return {key:s.key, label:s.label}; })
+  };
+  if (m.unlockAfter) mod.unlockAfter = m.unlockAfter;
+  return mod;
+});
+
+/* REQUIRED. The flat study path. Derived from MODULES so the two
+   can never disagree — see §5 of the architecture document. */
+var FLOW = []; MODULES.forEach(function(m){ m.sections.forEach(function(s){ FLOW.push(s); }); });
+
+/* Declared for readability. Ungraded status actually comes from
+   absence below, not from membership here. */
+var UNGRADED = ['m1home','m2home','m3home','m4home','m5home','labhome','flashcards'];
+
+/* SECTION_REQ and QUIZ_KEY_FOR_SECTION used to be written out by hand.
+   The manifest already folds both into each section (`checks`/`activity`
+   for SECTION_REQ, `quiz` for QUIZ_KEY_FOR_SECTION) — this just pulls
+   them back apart into the two shapes engine.js expects. */
+var SECTION_REQ = {};
+var QUIZ_KEY_FOR_SECTION = {};
+MANIFEST.modules.forEach(function(m){
+  m.sections.forEach(function(s){
+    if (s.checks) {
+      var req = {checks:s.checks};
+      if (s.activity) req.activity = s.activity;
+      SECTION_REQ[s.key] = req;
+    }
+    if (s.quiz) QUIZ_KEY_FOR_SECTION[s.key] = s.quiz;
+  });
+});
+
+var AREA_SECTION = MANIFEST.areaSection;
+
+var MODULE_QUIZ_SIZE = 8;
+var FINAL_EXAM_MIX = {concept:8, application:10, integration:7};
+
+/* ------------------------------------------------------------
+   A small builder shared by the four sorting-style activities on
+   this page. It is deliberately local to this file: it knows about
+   this topic's activities and nothing else.
+   ------------------------------------------------------------ */
+function buildSorter(cfg){
+  /* cfg = {name, mount, options, items:[{text, ans}],
+            checkBtn, resetBtn, scoreEl, verb} */
+  var mount  = document.getElementById(cfg.mount);
+  var scoreEl= document.getElementById(cfg.scoreEl);
+  var picks  = {};
+  var rows   = [];
+
+  var saved = state.activities[cfg.name];
+  var itemOrder = shuffle(cfg.items);
+
+  itemOrder.forEach(function(item){
+    var row = el('div','sort-row');
+    row.appendChild(el('div','sort-text', item.text));
+    var opts = el('div','sort-opts');
+    cfg.options.forEach(function(o){
+      var b = el('button','opt', o);
+      b.dataset.val = o;
+      b.onclick = function(){
+        picks[item.text] = o;
+        opts.querySelectorAll('.opt').forEach(function(x){
+          x.classList.remove('sel','reveal','bad');
+        });
+        b.classList.add('sel');
+      };
+      opts.appendChild(b);
+    });
+    row.appendChild(opts);
+    mount.appendChild(row);
+    rows.push({item:item, opts:opts});
+  });
+
+  /* restore a previously checked attempt */
+  if (saved && saved.picks){
+    Object.keys(saved.picks).forEach(function(k){ picks[k] = saved.picks[k]; });
+    reveal(true);
+  }
+
+  function reveal(quiet){
+    var right = 0;
+    rows.forEach(function(r){
+      var chosen = picks[r.item.text];
+      r.opts.querySelectorAll('.opt').forEach(function(b){
+        b.classList.remove('sel','reveal','bad');
+        if (b.dataset.val === r.item.ans) b.classList.add('reveal');
+        else if (b.dataset.val === chosen) b.classList.add('bad');
+      });
+      if (chosen === r.item.ans) right++;
+    });
+    scoreEl.textContent = right + ' of ' + rows.length + ' correct.' +
+      (right === rows.length ? ' Nicely done.' : ' Use “Try again” to have another go.');
+    if (!quiet){
+      state.activities[cfg.name] = {picks:picks};
+      saveState(); paintNav();
+    }
+  }
+
+  document.getElementById(cfg.checkBtn).onclick = function(){
+    var missing = rows.filter(function(r){ return !picks[r.item.text]; }).length;
+    if (missing){
+      scoreEl.textContent = missing + ' row' + (missing > 1 ? 's' : '') + ' still unanswered.';
+      return;
+    }
+    reveal(false);
+  };
+
+  document.getElementById(cfg.resetBtn).onclick = function(){
+    picks = {};
+    rows.forEach(function(r){
+      r.opts.querySelectorAll('.opt').forEach(function(b){
+        b.classList.remove('sel','reveal','bad');
+      });
+    });
+    scoreEl.textContent = '';
+    state.activities[cfg.name] = null;
+    saveState(); paintNav();
+  };
+}
+
+/* ---------- Activity 1 · Hemoglobin vs myoglobin ---------- */
+buildSorter({
+  name:'hbmb', mount:'hbmbRows',
+  checkBtn:'hbmbCheck', resetBtn:'hbmbReset', scoreEl:'hbmbScore',
+  options:['Hemoglobin','Myoglobin','Both'],
+  items:[
+    {text:'Found in cardiac and skeletal muscle', ans:'Myoglobin'},
+    {text:'Found inside red blood cells', ans:'Hemoglobin'},
+    {text:'Uses heme b to bind oxygen', ans:'Both'},
+    {text:'A monomeric protein', ans:'Myoglobin'},
+    {text:'An α₂β₂ tetramer', ans:'Hemoglobin'},
+    {text:'Binds oxygen cooperatively', ans:'Hemoglobin'},
+    {text:'Belongs to the globin family, with eight alpha helices', ans:'Both'},
+    {text:'Carries four oxygen molecules when fully saturated', ans:'Hemoglobin'}
+  ]
+});
+
+/* ---------- Activity 1a · Fe coordination-construction board ----------
+   Drag-and-drop mechanics adapted directly from the enzymes companion's
+   reaction-class board (proven pointer-based drag, works on touch).
+   The one real difference: that board matches each slot to a unique
+   answer, one-to-one. Here four slots share the identical answer
+   'hemeN', since the four heme nitrogens are chemically equivalent —
+   correctness is still just "this slot's data-answer equals this
+   pill's data-value", checked independently per slot, so duplicate
+   answers across slots need no special handling. Two of the eight
+   pills (distal His, 2,3-BPG) match no slot's answer at all — they
+   are deliberate decoys, not a bug if they end up looking "wrong"
+   wherever they're dropped. */
+(function(){
+  var board = document.getElementById('coordBoard');
+  var tray  = document.getElementById('coordTray');
+  var slots = Array.prototype.slice.call(board.querySelectorAll('.coord-slot'));
+  var checked = false;
+
+  var PILLS = [
+    {label:'Heme N',    value:'hemeN'},
+    {label:'Heme N',    value:'hemeN'},
+    {label:'Heme N',    value:'hemeN'},
+    {label:'Heme N',    value:'hemeN'},
+    {label:'Proximal His', value:'proximalHis'},
+    {label:'O₂',        value:'o2'},
+    {label:'Distal His', value:'distalHis'},   /* decoy — no matching slot */
+    {label:'2,3-BPG',    value:'bpg'}           /* decoy — no matching slot */
+  ];
+
+  function placePill(pill, slot){
+    var existing = slot.querySelector('.dnd-pill');
+    if (existing && existing !== pill) tray.appendChild(existing);
+    slot.innerHTML = '';
+    slot.appendChild(pill);
+    pill.classList.add('placed');
+  }
+
+  function wirePill(p){
+    p.addEventListener('pointerdown', function(e){
+      if (checked) return;
+      e.preventDefault();
+      var ghost = el('div','dnd-ghost', p.textContent);
+      document.body.appendChild(ghost);
+      var overSlot = null;
+      function place(x, y){ ghost.style.left = x + 'px'; ghost.style.top = y + 'px'; }
+      place(e.clientX, e.clientY);
+      p.classList.add('dragging');
+      function onMove(ev){
+        place(ev.clientX, ev.clientY);
+        ghost.style.display = 'none';
+        var under = document.elementFromPoint(ev.clientX, ev.clientY);
+        ghost.style.display = '';
+        var slot = under && under.closest('.coord-slot');
+        if (overSlot && overSlot !== slot) overSlot.classList.remove('over');
+        if (slot) slot.classList.add('over');
+        overSlot = slot || null;
+      }
+      function onUp(){
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onUp);
+        ghost.remove();
+        p.classList.remove('dragging');
+        if (overSlot){ overSlot.classList.remove('over'); placePill(p, overSlot); }
+      }
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+      document.addEventListener('pointercancel', onUp);
+    });
+  }
+
+  shuffle(PILLS).forEach(function(pill){
+    var p = el('button','dnd-pill', pill.label);
+    p.type = 'button';
+    p.dataset.value = pill.value;
+    tray.appendChild(p);
+    wirePill(p);
+  });
+
+  document.getElementById('coordCheck').onclick = function(){
+    var got = 0, map = {};
+    slots.forEach(function(slot, i){
+      var pill = slot.querySelector('.dnd-pill');
+      var right = !!pill && pill.dataset.value === slot.dataset.answer;
+      slot.classList.remove('correct','incorrect');
+      slot.classList.add(right ? 'correct' : 'incorrect');
+      map[i] = pill ? pill.dataset.value : null;
+      if (right) got++;
+    });
+    document.querySelectorAll('#coordTray .dnd-pill, #coordBoard .dnd-pill').forEach(function(p){ p.classList.add('locked'); });
+    checked = true;
+    document.getElementById('coordScore').textContent =
+      got + ' of 6 positions correct.' +
+      (got === 6 ? ' The full six-site picture is below.' : ' Keep going, or check the explanation below.');
+    state.activities.coordination = map;
+    saveState(); paintNav();
+  };
+
+  document.getElementById('coordReset').onclick = function(){
+    checked = false;
+    slots.forEach(function(slot){ slot.classList.remove('correct','incorrect'); });
+    document.querySelectorAll('#coordTray .dnd-pill, #coordBoard .dnd-pill').forEach(function(p){
+      p.classList.remove('locked','placed');
+      tray.appendChild(p);
+    });
+    document.getElementById('coordScore').textContent = '';
+    state.activities.coordination = null;
+    saveState(); paintNav();
+  };
+
+  /* restore a previous attempt */
+  var saved = state.activities.coordination;
+  if (saved){
+    Object.keys(saved).forEach(function(i){
+      var val = saved[i];
+      if (!val) return;
+      var slot = slots[Number(i)];
+      var pill = tray.querySelectorAll('.dnd-pill');
+      var match = Array.prototype.filter.call(pill, function(p){
+        return p.dataset.value === val && !p.classList.contains('placed');
+      })[0];
+      if (slot && match){ slot.appendChild(match); match.classList.add('placed','locked'); }
+    });
+    checked = true;
+    var restoredGot = 0;
+    slots.forEach(function(slot){
+      var pill = slot.querySelector('.dnd-pill');
+      var right = !!pill && pill.dataset.value === slot.dataset.answer;
+      slot.classList.add(right ? 'correct' : 'incorrect');
+      if (right) restoredGot++;
+    });
+    document.querySelectorAll('#coordTray .dnd-pill, #coordBoard .dnd-pill').forEach(function(p){ p.classList.add('locked'); });
+    document.getElementById('coordScore').textContent = restoredGot + ' of 6 positions correct.';
+  }
+})();
+
+/* ---------- Activity 2 · Order the binding steps ---------- */
+buildSorter({
+  name:'sequence', mount:'seqRows',
+  checkBtn:'seqCheck', resetBtn:'seqReset', scoreEl:'seqScore',
+  options:['1','2','3','4','5','6'],
+  items:[
+    {text:'Deoxyheme: the sixth coordination site sits empty', ans:'1'},
+    {text:'An O₂ molecule approaches the heme pocket', ans:'2'},
+    {text:'O₂ occupies the sixth coordination site of Fe²⁺', ans:'3'},
+    {text:'The iron atom moves into the plane of the porphyrin', ans:'4'},
+    {text:'The proximal histidine is pulled along with the iron', ans:'5'},
+    {text:'The alpha helix shifts at the αβ dimer interface', ans:'6'}
+  ]
+});
+
+/* ---------- Activity 3 · Which model does this support? ---------- */
+buildSorter({
+  name:'models', mount:'modelRows',
+  checkBtn:'modelCheck', resetBtn:'modelReset', scoreEl:'modelScore',
+  options:['Concerted','Sequential'],
+  items:[
+    {text:'All four subunits occupy the same state at any moment', ans:'Concerted'},
+    {text:'Each subunit can change state independently of the others', ans:'Sequential'},
+    {text:'Hemoglobin with three of four sites filled shows a 20-fold greater affinity than deoxyhemoglobin shows for its first O₂', ans:'Concerted'},
+    {text:'After the first O₂ binds, the second binds with 3–4 times greater affinity', ans:'Sequential'},
+    {text:'Binding produces an intermediate state that is neither T nor R', ans:'Sequential'},
+    {text:'The T ⇌ R equilibrium shifts toward R as oxygen binding increases', ans:'Concerted'}
+  ]
+});
+
+/* ---------- Activity 5 · Toward T or toward R? ---------- */
+buildSorter({
+  name:'lab', mount:'labRows',
+  checkBtn:'labCheck', resetBtn:'labReset', scoreEl:'labScore',
+  options:['Toward T','Toward R'],
+  items:[
+    {text:'2,3-BPG binds the β-chain pocket', ans:'Toward T'},
+    {text:'pH falls in metabolically active tissue', ans:'Toward T'},
+    {text:'CO₂ forms carbamates at the N-terminal amino groups', ans:'Toward T'},
+    {text:'Oxygen concentration is high, as in the lungs', ans:'Toward R'},
+    {text:'A histidine in the 2,3-BPG pocket is replaced by serine (HbF)', ans:'Toward R'},
+    {text:'A protonated histidine forms a salt bridge with an aspartate', ans:'Toward T'},
+    {text:'Three of the four heme groups are already occupied by O₂', ans:'Toward R'},
+    {text:'CO₂ reacts with water to generate carbonic acid', ans:'Toward T'}
+  ]
+});
+
+/* ---------- Activity 6 · Methemoglobinemia, treat the patient ----------
+   Two vignettes run through the same three intervention buttons. The
+   teaching move is that the SAME choice is right for Patient 1 and
+   wrong for Patient 2, so the activity refuses to advance until the
+   student has actually seen the failure — picking the drug on Patient
+   2 is not penalised, it's the intended path to the explanation.
+
+   Completion (§8) fires once BOTH patients have been resolved, i.e.
+   the student has chosen the effective intervention for each. On
+   Patient 2 that means choosing something other than methylene blue
+   after seeing methylene blue fail. */
+(function(){
+  var host = document.getElementById('mhCase');
+  if (!host) return;
+
+  var PATIENTS = [
+    {
+      title:'Patient 1 · 4-month-old infant, well-appearing but blue',
+      vignette:'Brought in for persistent cyanosis. She is feeding normally and ' +
+               'is not in respiratory distress. A drop of venous blood on filter ' +
+               'paper stays dark brown as it dries. Methemoglobin measures 28%.',
+      met:28, spo2:'85%', blood:'Chocolate-brown', bloodColor:'#6B3A2A',
+      solved:'mb',
+      options:[
+        { id:'o2', label:'Increase to 100% oxygen by mask',
+          works:false,
+          note:'The oximeter barely moves. Adding oxygen does not help, because ' +
+               'the problem is not oxygen supply — it is that the iron in the ' +
+               'affected hemoglobin is <strong>Fe<sup>3+</sup></strong> and ' +
+               'chemically cannot bind O<sub>2</sub> no matter how much is ' +
+               'available. This is the single most useful diagnostic clue in the ' +
+               'whole case: cyanosis that does not respond to oxygen.' },
+        { id:'mb', label:'Give methylene blue',
+          works:true,
+          note:'Methemoglobin falls, the cyanosis resolves, and the blood returns ' +
+               'to normal red. Methylene blue feeds the reducing pathway that ' +
+               'converts <strong>Fe<sup>3+</sup> back to Fe<sup>2+</sup></strong>, ' +
+               'restoring functional hemoglobin. Note that it works <em>through ' +
+               'the enzyme pathway</em> rather than acting on hemoglobin directly.' },
+        { id:'transfuse', label:'Transfuse packed red cells',
+          works:false,
+          note:'This would eventually dilute the methemoglobin, but it treats the ' +
+               'number rather than the chemistry, and it carries transfusion risk ' +
+               'that a targeted reducing agent avoids. Reserve it for when the ' +
+               'targeted option is unavailable or has failed.' }
+      ]
+    },
+    {
+      title:'Patient 2 · Same presentation, different patient',
+      vignette:'An adult with the identical picture — cyanosis unresponsive to ' +
+               'oxygen, chocolate-brown blood, methemoglobin 30%. His chart notes ' +
+               'G6PD deficiency. Try the intervention that worked a moment ago.',
+      met:30, spo2:'84%', blood:'Chocolate-brown', bloodColor:'#6B3A2A',
+      solved:'transfuse',
+      options:[
+        { id:'o2', label:'Increase to 100% oxygen by mask',
+          works:false,
+          note:'Still no. The chemistry has not changed between these two ' +
+               'patients — Fe<sup>3+</sup> cannot bind oxygen in either of them.' },
+        { id:'mb', label:'Give methylene blue',
+          works:false,
+          note:'Methemoglobin barely moves. <strong>This is the point of the ' +
+               'case.</strong> Methylene blue is a prodrug: it must be reduced to ' +
+               'leucomethylene blue first, and that step needs <strong>NADPH</strong> ' +
+               'supplied by the pentose phosphate pathway. G6PD deficiency starves ' +
+               'that pathway, so the antidote is never activated — and the oxidant ' +
+               'load can make hemolysis worse. Choose again.' },
+        { id:'transfuse', label:'Transfuse / use an alternative reducing route',
+          works:true,
+          note:'With the enzymatic route unavailable, the remaining options work ' +
+               'by replacing or diluting the affected hemoglobin rather than ' +
+               'chemically reducing it in place. The reasoning that matters here ' +
+               'is <em>why</em> the first-line drug was ruled out, not the protocol ' +
+               'that follows.' }
+      ]
+    }
+  ];
+
+  var idx = 0;
+  var resolved = [false, false];
+
+  var stageEl = document.getElementById('mhStage');
+  var titleEl = document.getElementById('mhTitle');
+  var vigEl   = document.getElementById('mhVignette');
+  var spo2El  = document.getElementById('mhSpo2');
+  var metEl   = document.getElementById('mhMet');
+  var bloodEl = document.getElementById('mhBlood');
+  var optsEl  = document.getElementById('mhOptions');
+  var outEl   = document.getElementById('mhOutcome');
+  var progEl  = document.getElementById('mhProgress');
+  var debrief = document.getElementById('mhDebrief');
+
+  function paintVitals(p, treated){
+    spo2El.textContent = treated ? '97%' : p.spo2;
+    spo2El.className = 'v ' + (treated ? 'good' : 'bad');
+    metEl.textContent = (treated ? '2' : p.met) + '%';
+    metEl.className = 'v ' + (treated ? 'good' : 'bad');
+    bloodEl.innerHTML = '<span class="mh-swatch" style="background:' +
+      (treated ? '#B81D45' : p.bloodColor) + '"></span>' +
+      (treated ? 'Normal red' : p.blood);
+  }
+
+  function render(){
+    var p = PATIENTS[idx];
+    stageEl.textContent = 'Patient ' + (idx + 1) + ' of ' + PATIENTS.length;
+    titleEl.textContent = p.title;
+    vigEl.innerHTML = p.vignette;
+    paintVitals(p, false);
+    outEl.innerHTML = '';
+    optsEl.innerHTML = '';
+
+    p.options.forEach(function(opt){
+      var b = el('button','mh-opt', opt.label);
+      b.type = 'button';
+      b.onclick = function(){ choose(opt, b, p); };
+      optsEl.appendChild(b);
+    });
+    paintProgress();
+  }
+
+  function choose(opt, btn, p){
+    Array.prototype.forEach.call(optsEl.children, function(c){
+      c.classList.remove('picked');
+    });
+    btn.classList.add('picked', opt.works ? 'works' : 'fails');
+
+    paintVitals(p, opt.works);
+
+    var note = el('div','mh-note' + (opt.works ? '' : ' fail'));
+    note.innerHTML = opt.note;
+    outEl.innerHTML = '';
+    outEl.appendChild(note);
+
+    if (opt.works){
+      /* lock this patient and offer the next one */
+      Array.prototype.forEach.call(optsEl.children, function(c){ c.disabled = true; });
+      resolved[idx] = true;
+      if (idx < PATIENTS.length - 1){
+        var next = el('button','btn','Next patient');
+        next.style.marginTop = '12px';
+        next.onclick = function(){ idx++; render(); };
+        outEl.appendChild(next);
+      } else {
+        debrief.hidden = false;
+      }
+      state.activities.metheme = {resolved:resolved.slice()};
+      saveState(); paintNav();
+    }
+    paintProgress();
+  }
+
+  function paintProgress(){
+    var done = resolved.filter(Boolean).length;
+    progEl.textContent = done === PATIENTS.length
+      ? 'Both patients resolved. The debrief below explains the difference.'
+      : done + ' of ' + PATIENTS.length + ' patients resolved.';
+  }
+
+  document.getElementById('mhReset').onclick = function(){
+    idx = 0; resolved = [false, false];
+    debrief.hidden = true;
+    state.activities.metheme = null;
+    saveState(); paintNav();
+    render();
+  };
+
+  /* restore */
+  var saved = state.activities.metheme;
+  if (saved && saved.resolved){
+    resolved = saved.resolved.slice();
+    if (resolved[0] && resolved[1]){
+      idx = PATIENTS.length - 1;
+      debrief.hidden = false;
+    } else if (resolved[0]){
+      idx = 1;
+    }
+  }
+  render();
+})();
+
+/* ---------- Activity 7 · HbS polymerization builder ----------
+   Three inputs -> one model. Fibers require BOTH the β6 valine and
+   the T state; %HbF then scales how much polymer forms. The predict
+   step is answered before the controls are useful, so the student
+   commits to a hypothesis rather than fiddling until something
+   happens. Completion fires once the prediction has been submitted
+   AND the sickling combination has actually been produced — reading
+   the answer is not the same as building it. */
+(function(){
+  var svg = document.getElementById('skSvg');
+  if (!svg) return;
+
+  var residue = 'glu', oxy = 'R', hbf = 0;
+  var predicted = false, builtIt = false;
+
+  var molG   = document.getElementById('skMolecules');
+  var fiberG = document.getElementById('skFibers');
+  var cell   = document.getElementById('skCell');
+  var dimple = document.getElementById('skDimple');
+  var label  = document.getElementById('skCellLabel');
+  var fill   = document.getElementById('skRiskFill');
+  var riskLb = document.getElementById('skRiskLabel');
+  var readout= document.getElementById('skReadout');
+  var debrief= document.getElementById('skDebrief');
+
+  /* ---- predict step ---- */
+  var PRED = [
+    {t:'HbA (Glu) in the oxygenated R state', ok:false,
+     why:'HbA has no β6 valine at all, so there is no hydrophobic knob to start a fiber — in either state.'},
+    {t:'HbA (Glu) in the deoxygenated T state', ok:false,
+     why:'The T state does expose the partner pocket, but HbA has no valine knob to dock into it. Both halves are required.'},
+    {t:'HbS (Val) in the oxygenated R state', ok:false,
+     why:'The valine knob is present, but in the R state the partner pocket on the neighbouring β chain is not exposed. Nothing to dock into.'},
+    {t:'HbS (Val) in the deoxygenated T state', ok:true,
+     why:'Correct. Only this combination has both halves: the β6 valine knob AND the T-state pocket that accepts it. Now build it with the controls.'}
+  ];
+  var predHost = document.getElementById('skPredict');
+  var predFb   = document.getElementById('skPredictFb');
+
+  shuffle(PRED.slice()).forEach(function(p){
+    var b = el('button','choice', p.t);
+    b.type = 'button';
+    b.onclick = function(){
+      if (predicted) return;
+      Array.prototype.forEach.call(predHost.children, function(c){ c.disabled = true; });
+      b.classList.add(p.ok ? 'correct' : 'incorrect');
+      predFb.className = 'feedback show' + (p.ok ? '' : ' miss');
+      predFb.innerHTML = p.why;
+      if (p.ok){
+        predicted = true;
+        save();
+      } else {
+        /* one honest miss never blocks progress — reopen after showing why */
+        setTimeout(function(){
+          Array.prototype.forEach.call(predHost.children, function(c){
+            c.disabled = false; c.classList.remove('incorrect');
+          });
+        }, 1400);
+      }
+    };
+    predHost.appendChild(b);
+  });
+
+  /* ---- model ---- */
+  function polymerFraction(){
+    if (residue !== 'val' || oxy !== 'T') return 0;
+    /* Steeply concentration-dependent: raising HbF lowers effective HbS
+       and disproportionately suppresses fiber formation. Teaching-scaled,
+       not a fitted kinetic constant. */
+    var hbs = (100 - hbf) / 100;
+    var f = Math.pow(Math.max(0, (hbs - 0.55)) / 0.45, 1.6);
+    return Math.max(0, Math.min(1, f));
+  }
+
+  function paint(){
+    var frac = polymerFraction();
+    var sickled = frac > 0.35;
+
+    /* molecules */
+    molG.innerHTML = '';
+    var COLS = 5, ROWS = 3, i = 0;
+    var hbfCount = Math.round((hbf / 100) * COLS * ROWS);
+    for (var r = 0; r < ROWS; r++){
+      for (var c = 0; c < COLS; c++){
+        var isHbF = i < hbfCount;
+        var cx = 108 + c * 26 + (r % 2 ? 13 : 0);
+        var cy = 92 + r * 26;
+        var dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        dot.setAttribute('cx', cx); dot.setAttribute('cy', cy);
+        dot.setAttribute('r', 8);
+        dot.setAttribute('fill', isHbF ? '#9CA3AF'
+                       : residue === 'val' ? (oxy === 'T' ? '#8E1538' : '#D9899F')
+                       : '#B81D45');
+        dot.setAttribute('opacity', isHbF ? '.55' : '1');
+        molG.appendChild(dot);
+        i++;
+      }
+    }
+
+    /* fibers: only when both conditions are met */
+    fiberG.innerHTML = '';
+    if (frac > 0){
+      var lines = Math.round(frac * 4);
+      for (var L = 0; L < lines; L++){
+        var y = 92 + L * 26;
+        var ln = document.createElementNS('http://www.w3.org/2000/svg','line');
+        ln.setAttribute('x1', 104); ln.setAttribute('y1', y);
+        ln.setAttribute('x2', 108 + 4 * 26 + 13); ln.setAttribute('y2', y);
+        ln.setAttribute('stroke', '#5C0E24');
+        ln.setAttribute('opacity', String(0.35 + 0.65 * frac));
+        fiberG.appendChild(ln);
+      }
+    }
+
+    /* cell shape */
+    if (sickled){
+      cell.setAttribute('rx', '118'); cell.setAttribute('ry', '42');
+      cell.setAttribute('fill', '#EBC4CF');
+      dimple.setAttribute('opacity', '0');
+      label.textContent = 'Sickled — rigid, clogs capillaries';
+    } else {
+      cell.setAttribute('rx', '104'); cell.setAttribute('ry', '72');
+      cell.setAttribute('fill', '#FBE4EA');
+      dimple.setAttribute('opacity', '1');
+      label.textContent = 'Biconcave disc';
+    }
+
+    /* risk meter */
+    fill.style.width = Math.round(frac * 100) + '%';
+    fill.style.background = frac > 0.6 ? '#8E1538' : frac > 0.25 ? '#C77700' : '#6B9E78';
+    riskLb.textContent =
+      frac === 0 ? 'No polymerization' :
+      frac > 0.6 ? 'Extensive polymerization' :
+      frac > 0.25 ? 'Partial polymerization' : 'Minimal polymerization';
+
+    readout.innerHTML =
+      residue === 'glu'
+        ? 'HbA has no &beta;6 valine, so no fiber can nucleate regardless of oxygenation.'
+      : oxy === 'R'
+        ? 'The valine knob is present, but the R state hides the partner pocket on the neighbouring &beta; chain.'
+      : hbf >= 25
+        ? 'Both halves are present, but ' + hbf + '% HbF has diluted HbS enough to largely suppress fiber growth.'
+        : 'Both halves present: the &beta;6 valine docks into the T-state pocket and fibers extend.';
+
+    if (frac > 0.6 && predicted){
+      builtIt = true;
+      debrief.hidden = false;
+      save();
+    }
+  }
+
+  function save(){
+    /* Two keys on purpose, following the trmLevers / curveGates precedent
+       in this file. `sickleProgress` persists exploration — specifically a
+       correct prediction — so a reload never makes the student answer the
+       predict step twice. `sickle` is the completion gate engine.js reads
+       (§8), and it stays null until BOTH halves are done. Writing only the
+       gate key would silently discard a correct prediction on reload,
+       because the gate is null until the model has also been built. */
+    state.activities.sickleProgress = {predicted:predicted, built:builtIt};
+    state.activities.sickle = (predicted && builtIt) ? {predicted:true, built:true} : null;
+    saveState(); paintNav();
+  }
+
+  function wireToggle(id, setter){
+    var group = document.getElementById(id);
+    Array.prototype.forEach.call(group.children, function(b){
+      b.onclick = function(){
+        Array.prototype.forEach.call(group.children, function(x){ x.classList.remove('active'); });
+        b.classList.add('active');
+        setter(b.dataset.v);
+        paint();
+      };
+    });
+  }
+  wireToggle('skResidue', function(v){ residue = v; });
+  wireToggle('skState',   function(v){ oxy = v; });
+
+  var slider = document.getElementById('skHbf');
+  slider.oninput = function(){
+    hbf = Number(slider.value);
+    document.getElementById('skHbfVal').textContent = hbf + '%';
+    paint();
+  };
+
+  document.getElementById('skReset').onclick = function(){
+    residue = 'glu'; oxy = 'R'; hbf = 0;
+    slider.value = 0;
+    document.getElementById('skHbfVal').textContent = '0%';
+    builtIt = false; predicted = false;
+    debrief.hidden = true;
+    predFb.className = 'feedback'; predFb.innerHTML = '';
+    Array.prototype.forEach.call(predHost.children, function(c){
+      c.disabled = false; c.classList.remove('correct','incorrect');
+    });
+    setActive('skResidue','glu'); setActive('skState','R');
+    save(); paint();
+  };
+
+  function setActive(groupId, val){
+    var g = document.getElementById(groupId);
+    Array.prototype.forEach.call(g.children, function(b){
+      b.classList.toggle('active', b.dataset.v === val);
+    });
+  }
+  setActive('skResidue','glu'); setActive('skState','R');
+
+  /* restore — read the progress key first, falling back to the gate key so
+     any attempt saved before the two-key split still restores. */
+  var savedSk = state.activities.sickleProgress || state.activities.sickle;
+  if (savedSk && savedSk.predicted){
+    predicted = true;
+    Array.prototype.forEach.call(predHost.children, function(c){ c.disabled = true; });
+    predFb.className = 'feedback show';
+    predFb.innerHTML = 'Prediction already recorded for this section.';
+    if (savedSk.built){ builtIt = true; debrief.hidden = false; }
+  }
+  paint();
+})();
+
+/* ============================================================
+   OXYGEN DISSOCIATION CURVE — bespoke to this topic
+   A Hill-equation model of adult hemoglobin, driven by the three
+   allosteric effectors taught in this module. Simplified for
+   teaching: the constants below give the right DIRECTION and a
+   plausible magnitude for each effector, they are not fitted
+   physiological values.
+
+     sat(P) = 100 · P^n / (P50^n + P^n)
+
+   P50 responds to:
+     pH      log-linear Bohr coefficient (Δlog P50 = −0.48 · ΔpH)
+     CO₂     direct carbamate term, independent of pH
+     2,3-BPG linear term around the 5 mM physiological baseline
+
+   `cap` (maximum reachable saturation) is carried through the
+   model but is fixed at 100 for this bench — the three levers here
+   are all allosteric and none of them remove carrying capacity.
+   It exists because the two Mastery Lab curves at the bottom of
+   this file DO use it, to draw the reduced-capacity CO curve that
+   the bench deliberately doesn't include.
+   ============================================================ */
+var HbCurve = {
+  BASELINE: {ph:7.4, co2:40, bpg:5},
+  N:        2.8,
+  REF_P50:  26.6,
+  LUNG:     100,
+  TISSUE:   40,
+
+  /* effective pH once the optional CO₂→pH coupling is applied */
+  effectivePh: function(s){
+    if (!s.couple) return s.ph;
+    return s.ph - 0.08 * ((s.co2 - 40) / 10);
+  },
+
+  p50Of: function(s){
+    var ph  = HbCurve.effectivePh(s);
+    var p50 = HbCurve.REF_P50 * Math.pow(10, -0.48 * (ph - 7.4));
+    p50 += 0.055 * (s.co2 - 40);        /* direct carbamate route */
+    p50 += 1.9   * (s.bpg - 5);          /* 2,3-BPG */
+    return Math.max(6, Math.min(90, p50));
+  },
+
+  sat: function(pO2, p50, cap){
+    if (pO2 <= 0) return 0;
+    var n = HbCurve.N;
+    var pn = Math.pow(pO2, n);
+    return (cap === undefined ? 100 : cap) * pn / (Math.pow(p50, n) + pn);
+  },
+
+  satOf: function(pO2, s){ return HbCurve.sat(pO2, HbCurve.p50Of(s), 100); }
+};
+
+/* ---------- Module 4.4 · the bench ---------- */
+(function(){
+  var svg = document.getElementById('curveSvg');
+  if (!svg) return;
+
+  /* plot geometry inside the 520×400 viewBox */
+  var PX0 = 56, PX1 = 496, PY0 = 18, PY1 = 330;
+  function xPx(p){ return PX0 + (p / 100) * (PX1 - PX0); }
+  function yPx(v){ return PY1 - (v / 100) * (PY1 - PY0); }
+  function f(v, d){ return Number(v).toFixed(d === undefined ? 1 : d); }
+
+  var S = {ph:7.4, co2:40, bpg:5, couple:false};
+  var ghost = true;
+  var gatesPassed = {ph:false, co2:false, bpg:false};
+
+  /* ---------- the gates: one prediction per lever ---------- */
+  var GATES = {
+    ph: {
+      q:'You are about to drop the pH from 7.40 toward 7.10 — the environment inside working muscle. What happens to hemoglobin\u2019s affinity for oxygen?',
+      options:[
+        'Affinity rises and the curve shifts left',
+        'Affinity falls and the curve shifts right',
+        'Affinity is unchanged, because pH acts on enzymes rather than transport proteins'
+      ],
+      answer:1,
+      why:'Affinity tracks pH directly: as pH falls, so does affinity. The rising H\u207a concentration protonates a \u03b2-chain histidine, which forms a salt bridge with an aspartate in the same chain — and that bridge exists only in deoxyhemoglobin, so it stabilises T. That is the Bohr effect, and it means the tissue working hardest gets the most oxygen.'
+    },
+    co2: {
+      q:'You are about to raise PCO\u2082 from 40 toward 80 mmHg, with the pH coupling switched off so only the direct route is active. What happens to the curve?',
+      options:[
+        'It shifts right, because carbamates on the N-terminal amino groups stabilise the T state',
+        'It shifts left, because CO\u2082 competes with O\u2082 at the heme iron',
+        'It stays put, because CO\u2082 only matters once it has become carbonic acid'
+      ],
+      answer:0,
+      why:'CO\u2082 reacts directly with N-terminal amino groups to form negatively charged carbamates, which form salt bridges with the other \u03b1\u03b2 dimer and stabilise T — no pH change required. Switch the coupling checkbox on afterwards to add the indirect carbonic-acid route on top, and watch the shift get considerably bigger.'
+    },
+    bpg: {
+      q:'You are about to drop 2,3-BPG from 5 mM toward zero. What happens to hemoglobin\u2019s affinity for oxygen?',
+      options:[
+        'Affinity rises and the curve shifts left, because nothing is left to stabilise the T state',
+        'Affinity falls and the curve shifts right, because 2,3-BPG normally holds the R state',
+        'Affinity is unchanged, because 2,3-BPG binds away from the heme iron'
+      ],
+      answer:0,
+      why:'2,3-BPG binds only the T state, so removing it takes away the thing holding hemoglobin in its low-affinity conformation. Affinity climbs and the curve slides left — which sounds good until you remember what it means in tissue: without 2,3-BPG hemoglobin releases only about 8% of its bound oxygen.'
+    }
+  };
+
+  /* ---------- rendering ---------- */
+  function pathFor(p50, cap){
+    var d = '', p;
+    for (p = 0; p <= 100; p += 2){
+      d += (p === 0 ? 'M' : 'L') + f(xPx(p)) + ',' + f(yPx(HbCurve.sat(p, p50, cap)));
+    }
+    return d;
+  }
+
+  function render(){
+    var p50 = HbCurve.p50Of(S);
+    var refP50 = HbCurve.REF_P50;
+    var m = '';
+
+    /* plot frame + gridlines */
+    m += '<rect x="'+PX0+'" y="'+PY0+'" width="'+(PX1-PX0)+'" height="'+(PY1-PY0)+
+         '" fill="var(--card)" stroke="var(--line)"/>';
+    [20,40,60,80].forEach(function(v){
+      m += '<line x1="'+PX0+'" y1="'+f(yPx(v))+'" x2="'+PX1+'" y2="'+f(yPx(v))+
+           '" stroke="var(--line)" stroke-width="1"/>';
+      m += '<text x="'+(PX0-9)+'" y="'+f(yPx(v)+4)+'" text-anchor="end" font-size="11" fill="var(--ink-soft)">'+v+'</text>';
+    });
+    [0,20,40,60,80,100].forEach(function(v){
+      m += '<text x="'+f(xPx(v))+'" y="'+(PY1+19)+'" text-anchor="middle" font-size="11" fill="var(--ink-soft)">'+v+'</text>';
+    });
+    m += '<text x="'+f((PX0+PX1)/2)+'" y="'+(PY1+41)+'" text-anchor="middle" font-size="12" fill="var(--ink-mid)">PO\u2082 (mmHg)</text>';
+    m += '<text transform="translate(17,'+f((PY0+PY1)/2)+') rotate(-90)" text-anchor="middle" font-size="12" fill="var(--ink-mid)">O\u2082 saturation (%)</text>';
+
+    /* lung and tissue markers */
+    m += '<line x1="'+f(xPx(HbCurve.TISSUE))+'" y1="'+PY0+'" x2="'+f(xPx(HbCurve.TISSUE))+'" y2="'+PY1+
+         '" stroke="var(--violet)" stroke-width="2" opacity=".35"/>';
+    m += '<line x1="'+f(xPx(HbCurve.LUNG))+'" y1="'+PY0+'" x2="'+f(xPx(HbCurve.LUNG))+'" y2="'+PY1+
+         '" stroke="var(--green-bright)" stroke-width="2" opacity=".35"/>';
+    m += '<text x="'+f(xPx(HbCurve.TISSUE))+'" y="'+(PY0-5)+'" text-anchor="middle" font-size="10" fill="var(--violet)" letter-spacing="1">TISSUE</text>';
+    m += '<text x="'+f(xPx(HbCurve.LUNG)-14)+'" y="'+(PY0-5)+'" text-anchor="middle" font-size="10" fill="var(--green)" letter-spacing="1">LUNG</text>';
+
+    /* reference ghost curve */
+    if (ghost){
+      m += '<path d="'+pathFor(refP50, 100)+'" fill="none" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="6 5" opacity=".55"/>';
+    }
+
+    /* the unloading band between lung and tissue */
+    var yT = yPx(HbCurve.satOf(HbCurve.TISSUE, S));
+    var yL = yPx(HbCurve.satOf(HbCurve.LUNG, S));
+    m += '<path d="M'+f(xPx(HbCurve.TISSUE))+','+f(yT)+' L'+f(xPx(HbCurve.LUNG))+','+f(yT)+
+         ' L'+f(xPx(HbCurve.LUNG))+','+f(yL)+' Z" fill="var(--green-bright)" opacity=".12"/>';
+
+    /* the live curve */
+    m += '<path d="'+pathFor(p50, 100)+'" fill="none" stroke="var(--green-bright)" stroke-width="3.4" stroke-linejoin="round"/>';
+
+    /* P50 caliper */
+    m += '<line x1="'+PX0+'" y1="'+f(yPx(50))+'" x2="'+f(xPx(Math.min(p50,100)))+'" y2="'+f(yPx(50))+
+         '" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3"/>';
+    m += '<line x1="'+f(xPx(Math.min(p50,100)))+'" y1="'+f(yPx(50))+'" x2="'+f(xPx(Math.min(p50,100)))+'" y2="'+PY1+
+         '" stroke="var(--ink)" stroke-width="1" stroke-dasharray="3 3"/>';
+    m += '<circle cx="'+f(xPx(Math.min(p50,100)))+'" cy="'+f(yPx(50))+'" r="5" fill="var(--ink)"/>';
+    m += '<text x="'+f(xPx(Math.min(p50,100))+9)+'" y="'+f(yPx(50)-9)+'" font-size="11.5" font-weight="700" fill="var(--ink)">P\u2085\u2080 '+f(p50)+'</text>';
+
+    /* shift arrow, drawn only once the curve has actually moved */
+    var d50 = p50 - refP50;
+    if (Math.abs(d50) > 0.8){
+      var dir = d50 > 0 ? 1 : -1;
+      var ax = xPx(Math.min(p50,100)), ay = PY1 - 20;
+      m += '<path d="M'+f(ax)+','+f(ay)+' l'+(dir*30)+',0 m'+(dir*-7)+',-5 l7,5 l-7,5" stroke="var(--ink)" stroke-width="1.8" fill="none"/>';
+      m += '<text x="'+f(ax + dir*38)+'" y="'+f(ay+4)+'" text-anchor="'+(dir>0?'start':'end')+
+           '" font-size="10.5" font-weight="700" fill="var(--ink)" letter-spacing="1">'+(dir>0?'RIGHT SHIFT':'LEFT SHIFT')+'</text>';
+    }
+
+    /* operating points */
+    m += '<circle cx="'+f(xPx(HbCurve.TISSUE))+'" cy="'+f(yT)+'" r="6" fill="var(--card)" stroke="var(--violet)" stroke-width="3"/>';
+    m += '<circle cx="'+f(xPx(HbCurve.LUNG))+'" cy="'+f(yL)+'" r="6" fill="var(--card)" stroke="var(--green)" stroke-width="3"/>';
+
+    svg.innerHTML = m;
+    renderReadout(p50);
+  }
+
+  function deltaTag(v, lowerIsBetter){
+    if (Math.abs(v) < 0.15) return '<span class="flat">— unchanged</span>';
+    var good = lowerIsBetter ? (v < 0) : (v > 0);
+    return '<span class="'+(good ? 'down' : 'up')+'">'+(v > 0 ? '▲ +' : '▼ ')+f(v)+'</span>';
+  }
+
+  function renderReadout(p50){
+    var ref = {ph:7.4, co2:40, bpg:5, couple:false};
+    var sa  = HbCurve.satOf(HbCurve.LUNG, S),   saR = HbCurve.satOf(HbCurve.LUNG, ref);
+    var sv  = HbCurve.satOf(HbCurve.TISSUE, S), svR = HbCurve.satOf(HbCurve.TISSUE, ref);
+    var del = sa - sv, delR = saR - svR;
+
+    document.getElementById('roP50').textContent  = f(p50);
+    document.getElementById('roP50d').innerHTML   = deltaTag(p50 - HbCurve.REF_P50, false);
+    document.getElementById('roSa').textContent   = f(sa);
+    document.getElementById('roSad').innerHTML    = deltaTag(sa - saR, false);
+    document.getElementById('roSv').textContent   = f(sv);
+    document.getElementById('roSvd').innerHTML    = deltaTag(sv - svR, true);
+    document.getElementById('roDel').textContent  = f(del);
+    document.getElementById('roDeld').innerHTML   = deltaTag(del - delR, false);
+
+    var msg = [];
+    var d = p50 - HbCurve.REF_P50;
+    if (Math.abs(d) > 0.8){
+      msg.push('P\u2085\u2080 is ' + (d > 0 ? 'higher' : 'lower') + ' than reference, so the curve has shifted ' +
+        (d > 0 ? 'right — lower affinity, easier unloading in tissue.'
+               : 'left — higher affinity, harder unloading in tissue.'));
+    } else {
+      msg.push('The curve is sitting at its reference position. Move a lever to shift it.');
+    }
+    if (S.couple && S.co2 !== 40){
+      msg.push('With coupling on, this CO\u2082 level is also pulling pH to ' +
+        f(HbCurve.effectivePh(S), 2) + ' — both routes from Section 3 are working at once.');
+    }
+    if (S.bpg < 1){
+      msg.push('At almost no 2,3-BPG the curve is far left: hemoglobin loads beautifully and then refuses to let go.');
+    }
+    document.getElementById('curveVerdict').innerHTML = msg.join(' ');
+  }
+
+  /* ---------- levers ---------- */
+  var LEVERS = {
+    ph:  {input:'sPh',  valEl:'valPh',  fmt:function(v){ return Number(v).toFixed(2); },
+          apply:function(v){ S.ph = Number(v); }},
+    co2: {input:'sCo2', valEl:'valCo2', fmt:function(v){ return Math.round(v) + ' mmHg'; },
+          apply:function(v){ S.co2 = Number(v); }},
+    bpg: {input:'sBpg', valEl:'valBpg', fmt:function(v){ return Number(v).toFixed(1) + ' mM'; },
+          apply:function(v){ S.bpg = Number(v); }}
+  };
+
+  Object.keys(LEVERS).forEach(function(key){
+    var L = LEVERS[key];
+    var input = document.getElementById(L.input);
+    input.oninput = function(){
+      L.apply(input.value);
+      document.getElementById(L.valEl).textContent = L.fmt(input.value);
+      render();
+    };
+  });
+
+  var couple = document.getElementById('cCouple');
+  couple.onchange = function(){ S.couple = couple.checked; render(); };
+
+  var ghostBox = document.getElementById('cGhost');
+  ghostBox.onchange = function(){ ghost = ghostBox.checked; render(); };
+
+  document.getElementById('curveReset').onclick = function(){
+    S = {ph:7.4, co2:40, bpg:5, couple:S.couple};
+    document.getElementById('sPh').value  = 7.4;
+    document.getElementById('sCo2').value = 40;
+    document.getElementById('sBpg').value = 5;
+    document.getElementById('valPh').textContent  = '7.40';
+    document.getElementById('valCo2').textContent = '40 mmHg';
+    document.getElementById('valBpg').textContent = '5.0 mM';
+    render();
+  };
+
+  /* ---------- gate rendering ----------
+     A lever's slider stays disabled until its prediction is answered
+     correctly. Wrong answers stay open and let the student retry, the
+     same retry-until-correct rule the checkpoints use — one honest
+     mistake should never permanently lock a control. */
+  function unlock(key, quiet){
+    gatesPassed[key] = true;
+    document.getElementById(LEVERS[key].input).disabled = false;
+    var lever = document.querySelector('.lever[data-lever="'+key+'"]');
+    lever.classList.add('unlocked');
+    var lockTag = lever.querySelector('[data-lock]');
+    if (lockTag) lockTag.style.display = 'none';
+    if (key === 'co2') couple.disabled = false;
+
+    var gate = lever.querySelector('.gate');
+    gate.innerHTML = '';
+    var fb = el('div','gate-fb ok','<strong>Unlocked.</strong> ' + GATES[key].why);
+    gate.appendChild(fb);
+
+    if (!quiet) saveProgress();
+  }
+
+  function buildGate(key){
+    var lever = document.querySelector('.lever[data-lever="'+key+'"]');
+    var gate  = lever.querySelector('.gate');
+    var G     = GATES[key];
+    gate.innerHTML = '';
+    gate.appendChild(el('div','gate-q', G.q));
+    var choices = el('div','choices');
+    var fb = el('div','gate-fb');
+
+    order(G.options.length).forEach(function(real, shown){
+      var b = el('button','choice');
+      b.appendChild(el('span','lt', LETTERS[shown] + '.'));
+      b.appendChild(el('span','', G.options[real]));
+      b.onclick = function(){
+        if (gatesPassed[key]) return;
+        if (real === G.answer){
+          unlock(key);
+        } else {
+          b.classList.add('wrong');
+          fb.className = 'gate-fb no';
+          fb.textContent = 'Not quite — try again.';
+        }
+      };
+      choices.appendChild(b);
+    });
+    gate.appendChild(choices);
+    gate.appendChild(fb);
+  }
+
+  /* ---------- save / restore ----------
+     Two separate keys, deliberately:
+
+     `curveGates` remembers which individual gates are open, so a
+     student who unlocks two levers and then reloads doesn't have to
+     answer those predictions again.
+
+     `curveSim` is the one named in SECTION_REQ, and it is written
+     only once ALL three gates are open. sectionComplete() just tests
+     for non-null (§8), so writing it earlier would mark the section
+     done while levers were still locked. Both are cleared together
+     by the engine's global reset. */
+  function saveProgress(){
+    var allOpen = gatesPassed.ph && gatesPassed.co2 && gatesPassed.bpg;
+    state.activities.curveGates = {
+      ph:!!gatesPassed.ph, co2:!!gatesPassed.co2, bpg:!!gatesPassed.bpg
+    };
+    state.activities.curveSim = allOpen ? {gates:{ph:true,co2:true,bpg:true}} : null;
+    saveState();
+    paintNav();
+  }
+
+  var savedGates = state.activities.curveGates ||
+                   (state.activities.curveSim && state.activities.curveSim.gates) || {};
+  Object.keys(GATES).forEach(function(key){
+    if (savedGates[key]) unlock(key, true);
+    else buildGate(key);
+  });
+
+  render();
+})();
+
+/* ============================================================
+   MASTERY LAB · T⇌R EQUILIBRIUM SIMULATOR — bespoke to this topic
+   Four levers (O2, 2,3-BPG, pH, CO2), each with an up and a down
+   direction. A direction is locked until its 5-step reasoning chain
+   is answered correctly step by step — this mirrors the retry-
+   until-correct rule checkpoints use everywhere else, just applied
+   to a short sequence instead of one question. Once a direction is
+   unlocked the student can flip back to it freely, the same
+   philosophy as the curve bench's per-lever gates in §4.4.
+   ============================================================ */
+(function(){
+  var TRM_BASELINE = 50;           /* 0 = full T, 100 = full R */
+  var PUSH = 15;                    /* each active lever's pull toward its direction */
+
+  /* Every chain follows the same five-stage shape — trigger already
+     given by the lever itself, then: molecular event, structural
+     consequence, conformational shift, affinity change, physiological
+     outcome. Up/down pairs are true mirrors of each other, which is
+     what lets the distractor set below be generated instead of
+     hand-written per chain. */
+  var CHAINS = {
+    ph_down: { lever:'ph', dir:'down', label:'\u2193 pH (more acidic)', push:-1, steps:[
+      'Protonation of the \u03b2-chain histidine increases',
+      'A salt bridge forms with the neighbouring aspartate',
+      'The equilibrium shifts toward the T state',
+      'Oxygen affinity decreases',
+      'Oxygen delivery to tissue increases'
+    ]},
+    ph_up: { lever:'ph', dir:'up', label:'\u2191 pH (more alkaline)', push:1, steps:[
+      'Protonation of the \u03b2-chain histidine decreases',
+      'That salt bridge is lost',
+      'The equilibrium shifts toward the R state',
+      'Oxygen affinity increases',
+      'Oxygen delivery to tissue decreases'
+    ]},
+    co2_up: { lever:'co2', dir:'up', label:'\u2191 CO\u2082', push:-1, steps:[
+      'Carbamates form at the N-terminal amino groups, and carbonic acid lowers pH',
+      'New salt bridges form between the two \u03b1\u03b2 dimers',
+      'The equilibrium shifts toward the T state',
+      'Oxygen affinity decreases',
+      'Oxygen delivery to tissue increases'
+    ]},
+    co2_down: { lever:'co2', dir:'down', label:'\u2193 CO\u2082', push:1, steps:[
+      'Carbamate formation decreases, and less carbonic acid forms',
+      'Those salt bridges are lost',
+      'The equilibrium shifts toward the R state',
+      'Oxygen affinity increases',
+      'Oxygen delivery to tissue decreases'
+    ]},
+    bpg_up: { lever:'bpg', dir:'up', label:'\u2191 2,3-BPG', push:-1, steps:[
+      'More 2,3-BPG binds the pocket between the \u03b2 chains',
+      'The T state is stabilised by this binding',
+      'The equilibrium shifts toward the T state',
+      'Oxygen affinity decreases',
+      'Oxygen delivery to tissue increases'
+    ]},
+    bpg_down: { lever:'bpg', dir:'down', label:'\u2193 2,3-BPG', push:1, steps:[
+      'Less 2,3-BPG is available to bind that pocket',
+      'The T state loses this stabilisation',
+      'The equilibrium shifts toward the R state',
+      'Oxygen affinity increases',
+      'Oxygen delivery to tissue decreases'
+    ]},
+    o2_up: { lever:'o2', dir:'up', label:'\u2191 O\u2082 availability', push:1, steps:[
+      'More oxygen occupies the heme binding sites',
+      'Each bound O\u2082 raises the affinity of the remaining sites (cooperativity)',
+      'The equilibrium shifts toward the R state',
+      'Oxygen affinity increases further',
+      'Oxygen loading increases'
+    ]},
+    o2_down: { lever:'o2', dir:'down', label:'\u2193 O\u2082 availability', push:-1, steps:[
+      'Fewer oxygen molecules occupy the heme binding sites',
+      'Losing bound O\u2082 lowers the affinity of the remaining sites (cooperativity)',
+      'The equilibrium shifts toward the T state',
+      'Oxygen affinity decreases further',
+      'Oxygen release increases'
+    ]}
+  };
+  var MIRROR = {ph_down:'ph_up', ph_up:'ph_down', co2_up:'co2_down', co2_down:'co2_up',
+                bpg_up:'bpg_down', bpg_down:'bpg_up', o2_up:'o2_down', o2_down:'o2_up'};
+
+  var LEVERS = [
+    {key:'ph',  name:'pH',            up:'ph_up',   down:'ph_down'},
+    {key:'co2', name:'CO\u2082',      up:'co2_up',  down:'co2_down'},
+    {key:'bpg', name:'2,3-BPG',       up:'bpg_up',  down:'bpg_down'},
+    {key:'o2',  name:'O\u2082 availability', up:'o2_up', down:'o2_down'}
+  ];
+
+  var current = {ph:'neutral', co2:'neutral', bpg:'neutral', o2:'neutral'};
+  var unlocked = {};   /* chain key -> true once its 5 steps are answered correctly */
+  var meterVal = TRM_BASELINE;
+  var leverEls = {};
+
+  /* ---------- tetramer + meter rendering ---------- */
+  function paintTetramer(v){
+    var svg = document.getElementById('trmSvg');
+    var t = (v - 0) / 100;                    /* 0 at full T, 1 at full R */
+    var rot = -7 + t * 14;                    /* dimers rotate open as R approaches */
+    var gap = 2 + t * 10;                     /* dimers separate slightly toward R */
+    var filled = Math.round(t * 4);           /* 0..4 hemes shown occupied */
+    var subs = [
+      {cx:110, cy:82,  id:0}, {cx:150, cy:82,  id:1},   /* top dimer: alpha1, beta1 */
+      {cx:110, cy:82+58+gap, id:2}, {cx:150, cy:82+58+gap, id:3} /* bottom dimer */
+    ];
+    var m = '';
+    m += '<g transform="translate(160,110)">';
+    m += '  <g transform="rotate(' + (-rot/2).toFixed(1) + ')">';
+    subs.slice(0,2).forEach(function(s){ m += subCircle(s, filled); });
+    m += '  </g>';
+    m += '  <g transform="translate(0,' + (gap).toFixed(1) + ') rotate(' + (rot/2).toFixed(1) + ')">';
+    subs.slice(2,4).forEach(function(s){ m += subCircle(s, filled); });
+    m += '  </g>';
+    m += '</g>';
+    svg.innerHTML = m;
+
+    function subCircle(s, filledCount){
+      var occupied = s.id < filledCount;
+      var lx = s.cx - 160, ly = s.cy - 110 - (s.id >= 2 ? gap : 0);
+      var html = '<circle cx="' + lx + '" cy="' + ly + '" r="26" ' +
+        'fill="' + (t > .5 ? 'var(--green-soft)' : '#FBE4EA') + '" ' +
+        'stroke="' + (t > .5 ? 'var(--green)' : '#8E1538') + '" stroke-width="2.5"/>';
+      html += '<circle cx="' + lx + '" cy="' + ly + '" r="8" fill="' +
+        (occupied ? 'var(--green-bright)' : 'var(--card)') + '" stroke="var(--ink-soft)" stroke-width="1.5"/>';
+      if (occupied) html += '<text x="' + lx + '" y="' + (ly + 3) + '" text-anchor="middle" font-size="7" font-weight="700" fill="#fff">O\u2082</text>';
+      return html;
+    }
+  }
+
+  function paintMeter(v){
+    document.getElementById('trmDot').style.left = v + '%';
+    var ro = document.getElementById('trmReadout');
+    var label, detail;
+    if (v <= 12) { label = 'Strongly T'; detail = 'oxygen released readily'; }
+    else if (v <= 38) { label = 'Leaning T'; detail = 'affinity lowered, favours release'; }
+    else if (v < 62) { label = 'Balanced'; detail = 'no strong push in either direction'; }
+    else if (v < 88) { label = 'Leaning R'; detail = 'affinity raised, favours retention'; }
+    else { label = 'Strongly R'; detail = 'oxygen held tightly'; }
+    ro.textContent = label + ' \u2014 ' + detail;
+  }
+
+  function computeTarget(){
+    var v = TRM_BASELINE;
+    LEVERS.forEach(function(l){
+      if (current[l.key] === 'up')   v += PUSH * CHAINS[l.up].push;
+      if (current[l.key] === 'down') v += PUSH * CHAINS[l.down].push;
+    });
+    return Math.max(0, Math.min(100, v));
+  }
+
+  function animateMeter(to, ms){
+    var from = meterVal, t0 = null;
+    function step(ts){
+      if (!t0) t0 = ts;
+      var t = Math.min(1, (ts - t0) / ms);
+      var e = t < .5 ? 2*t*t : -1+(4-2*t)*t;
+      meterVal = from + (to - from) * e;
+      paintMeter(meterVal);
+      paintTetramer(meterVal);
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ---------- levers + chain UI ---------- */
+  var chainHost = document.getElementById('trmChainHost');
+  var leversMount = document.getElementById('trmLevers');
+
+  function saveProgress(){
+    var allDone = LEVERS.every(function(l){
+      return unlocked[l.up] || unlocked[l.down] || current[l.key] === 'neutral';
+    });
+    /* Completion is deliberately about ATTEMPT, not about having every
+       lever set — the activity is "checked/submitted at least once"
+       per §8, which here means the challenge has been checked once
+       (see trmCheck below). This just persists the exploration state
+       so it survives a reload. */
+    state.activities.trmLevers = {current:current, unlocked:unlocked};
+    saveState();
+  }
+
+  function setLever(leverKey, dir){
+    current[leverKey] = dir;
+    paintLeverRow(leverKey);
+    animateMeter(computeTarget(), 700);
+    saveProgress();
+  }
+
+  function paintLeverRow(leverKey){
+    var row = leverEls[leverKey];
+    var l = LEVERS.filter(function(x){ return x.key === leverKey; })[0];
+    row.upBtn.classList.toggle('active', current[leverKey] === 'up');
+    row.downBtn.classList.toggle('active', current[leverKey] === 'down');
+    row.upBtn.classList.toggle('unlocked', !!unlocked[l.up]);
+    row.downBtn.classList.toggle('unlocked', !!unlocked[l.down]);
+    row.state.textContent =
+      current[leverKey] === 'up' ? CHAINS[l.up].label :
+      current[leverKey] === 'down' ? CHAINS[l.down].label : 'Normal';
+  }
+
+  function openChain(chainKey){
+    var chain = CHAINS[chainKey];
+    var mirror = CHAINS[MIRROR[chainKey]];
+    var stepIdx = 0;
+    chainHost.innerHTML = '';
+    var panel = el('div','trm-chain');
+    panel.appendChild(el('h4', '', 'Predicting: ' + chain.label));
+    panel.appendChild(el('p','caption','Work out each link before the model moves. One honest mistake never blocks you — try again.'));
+    var doneList = el('div');
+    var stepBox = el('div');
+    panel.appendChild(doneList);
+    panel.appendChild(stepBox);
+    chainHost.appendChild(panel);
+
+    function renderStep(){
+      if (stepIdx >= chain.steps.length){
+        unlocked[chainKey] = true;
+        setLever(chain.lever, chain.dir);
+        chainHost.innerHTML = '';
+        return;
+      }
+      stepBox.innerHTML = '';
+      var label = el('div','trm-chain-step', 'Step ' + (stepIdx + 1) + ' of ' + chain.steps.length);
+      stepBox.appendChild(label);
+      var choices = el('div','choices');
+      var opts = shuffle([
+        {t: chain.steps[stepIdx], ok:true},
+        {t: mirror.steps[stepIdx], ok:false},
+        {t: 'No significant change', ok:false}
+      ]);
+      opts.forEach(function(o, pos){
+        var b = el('button','choice');
+        b.appendChild(el('span','lt', LETTERS[pos] + '.'));
+        b.appendChild(el('span','', o.t));
+        b.onclick = function(){
+          if (o.ok){
+            var done = el('div','trm-chain-step done', '\u2713 ' + chain.steps[stepIdx]);
+            doneList.appendChild(done);
+            stepIdx++;
+            renderStep();
+          } else {
+            b.classList.add('wrong');
+            var fb = stepBox.querySelector('.feedback') || el('div','feedback no');
+            fb.className = 'feedback no';
+            fb.textContent = 'Not quite \u2014 try again.';
+            if (!stepBox.contains(fb)) stepBox.appendChild(fb);
+          }
+        };
+        choices.appendChild(b);
+      });
+      stepBox.appendChild(choices);
+    }
+    renderStep();
+  }
+
+  LEVERS.forEach(function(l){
+    var row = el('div','trm-lever');
+    var top = el('div','trm-lever-top');
+    top.appendChild(el('span','trm-lever-name', l.name));
+    var state = el('span','trm-lever-state','Normal');
+    top.appendChild(state);
+    var btns = el('div','trm-lever-btns');
+    var upBtn = el('button','opt trm-up','\u2191');
+    var downBtn = el('button','opt trm-down','\u2193');
+    var normalBtn = el('button','opt','Normal');
+    upBtn.onclick = function(){
+      if (unlocked[l.up]) setLever(l.key, 'up');
+      else openChain(l.up);
+    };
+    downBtn.onclick = function(){
+      if (unlocked[l.down]) setLever(l.key, 'down');
+      else openChain(l.down);
+    };
+    normalBtn.onclick = function(){ setLever(l.key, 'neutral'); };
+    btns.appendChild(upBtn); btns.appendChild(normalBtn); btns.appendChild(downBtn);
+    top.appendChild(btns);
+    row.appendChild(top);
+    leversMount.appendChild(row);
+    leverEls[l.key] = {upBtn:upBtn, downBtn:downBtn, normalBtn:normalBtn, state:state};
+    paintLeverRow(l.key);
+  });
+
+  document.getElementById('trmReset').onclick = function(){
+    LEVERS.forEach(function(l){ current[l.key] = 'neutral'; paintLeverRow(l.key); });
+    chainHost.innerHTML = '';
+    animateMeter(computeTarget(), 500);
+    saveProgress();
+  };
+
+  document.getElementById('trmCheck').onclick = function(){
+    var correct =
+      current.ph === 'down' && current.co2 === 'up' &&
+      current.bpg === 'up' && current.o2 === 'down';
+    var fb = document.getElementById('trmChallengeFb');
+    if (correct){
+      fb.className = 'feedback ok';
+      fb.innerHTML = '<strong>That\u2019s the setup.</strong> Falling pH, rising CO\u2082, rising 2,3-BPG, ' +
+        'and falling local O\u2082 all push toward T at once \u2014 exactly what exercising muscle does to the ' +
+        'blood passing through it, and exactly why it gets so much oxygen delivered.';
+    } else {
+      fb.className = 'feedback no';
+      fb.innerHTML = '<strong>Not quite that setup yet.</strong> Working muscle produces acid, CO\u2082, ' +
+        'and low local O\u2082, and 2,3-BPG rises with it \u2014 all four conditions push the same direction. ' +
+        'Check which of your four levers still isn\u2019t set that way.';
+    }
+    state.activities.trmeter = {checked:true, lastCorrect:correct};
+    saveState(); paintNav();
+  };
+
+  /* ---------- restore ---------- */
+  var savedLevers = state.activities.trmLevers;
+  if (savedLevers){
+    unlocked = savedLevers.unlocked || {};
+    current = savedLevers.current || current;
+    LEVERS.forEach(function(l){ paintLeverRow(l.key); });
+  }
+  meterVal = computeTarget();
+  paintMeter(meterVal);
+  paintTetramer(meterVal);
+})();
+
+/* ---------- Mastery Lab · read the curve ----------
+   Two static curves, drawn with the same Hill model as the bench.
+   Curve A is the bench's own 2,3-BPG lever pushed to zero. Curve B
+   is the one thing the bench deliberately cannot show: reduced
+   carrying capacity, which only a competitor at the binding site
+   (CO) produces. */
+(function(){
+  var pathA = document.getElementById('curveMiniA');
+  if (!pathA) return;
+
+  var MX0 = 36, MX1 = 288, MY0 = 10, MY1 = 128;
+  function mx(p){ return MX0 + (p / 100) * (MX1 - MX0); }
+  function my(v){ return MY1 - (v / 100) * (MY1 - MY0); }
+  function miniPath(p50, cap){
+    var d = '', p;
+    for (p = 0; p <= 100; p += 2){
+      d += (p === 0 ? 'M' : 'L') + mx(p).toFixed(1) + ',' + my(HbCurve.sat(p, p50, cap)).toFixed(1);
+    }
+    return d;
+  }
+
+  var refD = miniPath(HbCurve.REF_P50, 100);
+  pathA.setAttribute('d', miniPath(12, 100));                 /* 2,3-BPG absent */
+  document.getElementById('curveMiniB').setAttribute('d', miniPath(13, 68));  /* CO present */
+  document.getElementById('curveMiniBaseA').setAttribute('d', refD);
+  document.getElementById('curveMiniBaseB').setAttribute('d', refD);
+})();
+</script>
+<script src="shared/engine.js"></script>
+</body>
+</html>

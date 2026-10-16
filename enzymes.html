@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biochemistry of Enzymes — Interactive Companion</title>
+<link rel="stylesheet" href="shared/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a class="back-to-hub" href="hub.html"><span class="arrow">&#8592;</span> Back to hub</a>
+    <div class="brand">
+      <div class="brand-mark">E</div>
+      <div>
+        <div class="brand-title">Biochemistry of Enzymes</div>
+        <div class="brand-sub">PHA3134 · Study Companion</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#C7EBDA" stroke-width="5"/>
+        <circle id="ringFill" cx="22" cy="22" r="18" fill="none" stroke="#2FA97A" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+                transform="rotate(-90 22 22)"/>
+      </svg>
+      <div><div class="ring-num" id="ringPct">0%</div>
+      <div class="ring-cap">of the companion<br>complete</div></div>
+    </div>
+    <button class="reset" id="resetBtn">Clear my saved progress</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="topTitle">Welcome</h1>
+        <div class="meta" id="topMeta">Four modules</div>
+      </div>
+      <div class="pill" id="topPill">Not started</div>
+    </div>
+    <!-- ================= MODULE 1 ================= -->
+    <section class="section" data-key="m1home">
+      <div class="card">
+        <div class="eyebrow">Module 1</div>
+        <h2>Fundamentals, Catalysis &amp; the Active Site</h2>
+        <p>Before kinetics or inhibition make sense, you need the basics: what an enzyme actually does, why reactions need a push even when they're favorable, why enzymes are so picky about their substrates, and the vocabulary for the helper molecules many enzymes depend on.</p>
+        <div class="home-list">
+          <button class="home-item" data-goto="m1s1">
+            <span class="home-num">1</span>
+            <span class="home-body"><span class="home-title">What enzymes do</span><span class="home-desc">The catalytic cycle, and why enzymes are reusable.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m1s2">
+            <span class="home-num">2</span>
+            <span class="home-body"><span class="home-title">Energetics of catalysis</span><span class="home-desc">Activation energy, transition states, and coupled reactions.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m1s3">
+            <span class="home-num">3</span>
+            <span class="home-body"><span class="home-title">Specificity &amp; active site</span><span class="home-desc">Lock-and-key vs. induced fit, and why stereochemistry matters.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m1s4">
+            <span class="home-num">4</span>
+            <span class="home-body"><span class="home-title">Enzyme terminology</span><span class="home-desc">Cofactors, coenzymes, prosthetic groups, apo- and holoenzymes.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m1quiz">
+            <span class="home-num">✓</span>
+            <span class="home-body"><span class="home-title">Module 1 quiz</span><span class="home-desc">Eight questions covering everything above.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+    <section class="section" data-key="m1s1">
+      <div class="card">
+        <div class="eyebrow">Module 1 · Section 1</div>
+        <h2>What enzymes do</h2>
+        <p>An enzyme is a protein that speeds up a chemical reaction. A reaction that would take years on
+        its own can finish in seconds once the right enzyme is present.</p>
+        <p>The critical detail is that the enzyme is not used up. It binds its substrate, does its work,
+        releases the product, and is immediately available to run the cycle again. One enzyme molecule can
+        turn over thousands of substrate molecules.</p>
+        <div class="figure">
+          <svg viewBox="0 0 640 150" role="img" aria-label="Catalytic cycle: enzyme plus substrate forms an enzyme-substrate complex, converts to enzyme-product complex, then releases product and regenerates free enzyme.">
+            <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="14">
+              <rect x="14" y="52" width="118" height="46" rx="12" fill="#E7F6EF" stroke="#BFE6D4"/>
+              <text x="73" y="72" text-anchor="middle" fill="#1C7554" font-weight="600">E + S</text>
+              <text x="73" y="89" text-anchor="middle" fill="#4A5C68" font-size="11">free enzyme</text>
+              <rect x="176" y="52" width="118" height="46" rx="12" fill="#F3EAFB" stroke="#DED3FA"/>
+              <text x="235" y="72" text-anchor="middle" fill="#6B4FD8" font-weight="600">[ES]</text>
+              <text x="235" y="89" text-anchor="middle" fill="#4A5C68" font-size="11">substrate bound</text>
+              <rect x="338" y="52" width="118" height="46" rx="12" fill="#F3EAFB" stroke="#DED3FA"/>
+              <text x="397" y="72" text-anchor="middle" fill="#6B4FD8" font-weight="600">[EP]</text>
+              <text x="397" y="89" text-anchor="middle" fill="#4A5C68" font-size="11">product formed</text>
+              <rect x="500" y="52" width="126" height="46" rx="12" fill="#E7F6EF" stroke="#BFE6D4"/>
+              <text x="563" y="72" text-anchor="middle" fill="#1C7554" font-weight="600">E + P</text>
+              <text x="563" y="89" text-anchor="middle" fill="#4A5C68" font-size="11">enzyme recycled</text>
+              <g stroke="#7E8F9B" stroke-width="1.6" fill="none">
+                <path d="M136 75 H170" marker-end="url(#ar)"/>
+                <path d="M298 75 H332" marker-end="url(#ar)"/>
+                <path d="M460 75 H494" marker-end="url(#ar)"/>
+                <path d="M563 106 C563 132, 73 132, 73 106" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+              </g>
+              <text x="318" y="146" text-anchor="middle" fill="#7E8F9B" font-size="11">the same enzyme starts again</text>
+            </g>
+            <defs><marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="#7E8F9B"/></marker></defs>
+          </svg>
+          <p class="caption">Each enzyme is highly selective. Thousands of enzymes have been identified, and
+          each acts on its own specific substrate or small set of substrates.</p>
+        </div>
+        <div class="keypoints">
+          <h4>Hold on to these</h4>
+          <ul>
+            <li>Enzymes are protein catalysts — they change the <em>rate</em> of a reaction.</li>
+            <li>They emerge unchanged and are reused.</li>
+            <li>Only a handful of active-site amino acids do the chemistry, and they often come from distant
+                parts of the folded chain — which is why 3-D structure matters so much.</li>
+          </ul>
+        </div>
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c1">
+            <p>A single enzyme molecule converts substrate to product. Ten minutes later the reaction is still running. What is the most likely state of that enzyme molecule?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c1b">
+            <p>A mutation changes a single amino acid far from the active site, and it disrupts the enzyme&rsquo;s overall 3-D fold. What is the most likely effect on catalysis?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c1c">
+            <p>An enzyme has an unusually high turnover number. What does this best indicate about the enzyme?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m1s2">
+      <div class="card">
+        <div class="eyebrow">Module 1 · Section 2</div>
+        <h2>The energetics of catalysis</h2>
+        <p>Every reaction climbs through a high-energy transition state before reaching product. The size of
+        that climb is the activation energy. If the molecules don't have enough energy to make the climb, the
+        reaction essentially doesn't happen — no matter how favorable the overall reaction is.</p>
+        <p>Sucrose burning to carbon dioxide and water makes the point. The reaction releases a great deal of
+        energy, and yet a sugar cube sits on the counter indefinitely without bursting into flame.</p>
+        <div class="figure">
+          <svg viewBox="0 0 660 330" role="img" aria-label="Energy diagram comparing the tall uncatalyzed activation barrier with the lower enzyme-catalyzed barrier. The overall free energy change is identical in both cases.">
+            <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="13">
+              <line x1="58" y1="292" x2="640" y2="292" stroke="#D8E1E6"/>
+              <line x1="58" y1="20" x2="58" y2="292" stroke="#D8E1E6"/>
+              <text x="20" y="150" fill="#7E8F9B" font-size="12" transform="rotate(-90 20 150)" text-anchor="middle">free energy</text>
+              <text x="350" y="316" fill="#7E8F9B" font-size="12" text-anchor="middle">reaction coordinate</text>
+              <line x1="58" y1="205" x2="640" y2="205" stroke="#E4EAEE" stroke-dasharray="4 4"/>
+              <line x1="58" y1="262" x2="640" y2="262" stroke="#E4EAEE" stroke-dasharray="4 4"/>
+              <path d="M70 205 C190 205 205 48 320 48 C435 48 450 262 610 262" fill="none" stroke="#7E8F9B" stroke-width="2.6"/>
+              <text x="320" y="38" text-anchor="middle" fill="#4A5C68" font-size="12">transition state (no enzyme)</text>
+              <g id="catGroup" class="fade o0">
+                <path d="M70 205 C190 205 212 128 320 128 C428 128 450 262 610 262" fill="none" stroke="#2FA97A" stroke-width="2.8"/>
+                <text x="320" y="120" text-anchor="middle" fill="#2FA97A" font-size="12" font-weight="600">stabilized transition state</text>
+                <line x1="140" y1="205" x2="140" y2="128" stroke="#2FA97A" stroke-width="1.6" stroke-dasharray="4 3"/>
+                <text x="150" y="170" fill="#2FA97A" font-size="12" font-weight="600">lower Ea</text>
+              </g>
+              <line x1="105" y1="205" x2="105" y2="48" stroke="#7E8F9B" stroke-width="1.6" stroke-dasharray="4 3"/>
+              <text x="96" y="130" text-anchor="end" fill="#4A5C68" font-size="12">Ea</text>
+              <g stroke="#6B4FD8" stroke-width="1.8">
+                <line x1="596" y1="205" x2="596" y2="262"/><line x1="590" y1="205" x2="602" y2="205"/>
+                <line x1="590" y1="262" x2="602" y2="262"/>
+              </g>
+              <text x="584" y="238" text-anchor="end" fill="#6B4FD8" font-size="12" font-weight="600">ΔG</text>
+              <text x="70" y="199" fill="#4A5C68" font-size="12">substrate</text>
+              <text x="610" y="280" text-anchor="end" fill="#4A5C68" font-size="12">product</text>
+            </g>
+          </svg>
+          <div class="controls">
+            <button class="btn" id="enzToggle">Add the enzyme</button>
+            <span class="caption" id="enzNote" style="margin:0">Watch what changes — and what stays exactly the same.</span>
+          </div>
+        </div>
+        <p>The enzyme lowers the barrier by binding and stabilizing the transition state. What it does
+        <em>not</em> do is change ΔG. The same energy is released whether sucrose is broken down by an enzyme
+        or by a flame. An enzyme changes how fast you get there, never where you end up.</p>
+        <p>Cells handle genuinely unfavorable reactions a different way: by coupling them to a favorable one,
+        most often ATP hydrolysis, so the combined process is favorable overall.</p>
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c2">
+            <p>An enzyme-catalyzed reaction has an overall &Delta;G of &minus;15 kJ/mol. You add more enzyme. What happens to the overall &Delta;G?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c2b">
+            <p>Which statement best describes activation energy?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c2c">
+            <p>A cell couples an unfavorable reaction to ATP hydrolysis so the combined process can proceed. What does this coupling accomplish?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m1s3">
+      <div class="card">
+        <div class="eyebrow">Module 1 · Section 3</div>
+        <h2>Specificity and the active site</h2>
+        <p>Enzymes are remarkably picky. Many catalyze exactly one reaction on exactly one substrate. Because
+        proteins are built from chiral amino acids, the active site is itself chiral — so an enzyme can tell
+        one stereoisomer from another.</p>
+        <p>Glucokinase makes the point cleanly: it phosphorylates glucose but leaves galactose alone, even
+        though the two sugars differ at a single carbon.</p>
+        <div class="figure">
+          <svg viewBox="0 0 640 210" role="img" aria-label="Lock and key model with a rigid pre-shaped active site, beside the induced fit model where the enzyme changes shape around its substrate.">
+            <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="13">
+              <text x="160" y="24" text-anchor="middle" fill="#4A5C68" font-weight="600">Lock and key</text>
+              <path d="M70 150 V90 a12 12 0 0 1 12-12 h32 l0 -18 a10 10 0 0 1 10 -10 h34 a10 10 0 0 1 10 10 l0 18 h32 a12 12 0 0 1 12 12 v60 z"
+                    fill="#E7F6EF" stroke="#2FA97A" stroke-width="2"/>
+              <rect x="122" y="52" width="76" height="26" rx="8" fill="#6B4FD8" opacity=".85"/>
+              <text x="160" y="70" text-anchor="middle" fill="#fff" font-size="12">substrate</text>
+              <text x="160" y="180" text-anchor="middle" fill="#7E8F9B" font-size="11.5">rigid site, pre-shaped to fit</text>
+              <line x1="320" y1="40" x2="320" y2="180" stroke="#E4EAEE"/>
+              <text x="480" y="24" text-anchor="middle" fill="#4A5C68" font-weight="600">Induced fit</text>
+              <path id="ifShape" d="M390 150 V90 a12 12 0 0 1 12-12 h26 l0 -14 a10 10 0 0 1 10 -10 h44 a10 10 0 0 1 10 10 l0 14 h26 a12 12 0 0 1 12 12 v60 z"
+                    fill="#F3EAFB" stroke="#6B4FD8" stroke-width="2"/>
+              <rect id="ifSub" x="442" y="52" width="76" height="26" rx="8" fill="#6B4FD8" opacity=".85"/>
+              <text id="ifSubTxt" x="480" y="70" text-anchor="middle" fill="#fff" font-size="12">substrate</text>
+              <text id="ifCap" x="480" y="180" text-anchor="middle" fill="#7E8F9B" font-size="11.5">site is open and flexible</text>
+            </g>
+          </svg>
+          <div class="controls">
+            <button class="btn" id="fitBtn">Bind the substrate</button>
+            <span class="caption" style="margin:0">Induced fit accounts for the fact that proteins are dynamic, not frozen.</span>
+          </div>
+        </div>
+        <p>Binding matters because forming the enzyme-substrate complex is what makes the rate acceleration
+        possible. As the reaction proceeds the active site keeps adjusting — first to grip the substrate, then
+        to stabilize the transition state on the way to product.</p>
+        <div class="box clinical">
+          <h3><span class="tag">CLINICAL CONNECTION</span> Why stereochemistry reaches the pharmacy</h3>
+          <p>The same chirality that lets glucokinase reject galactose is why two enantiomers of a drug can
+          behave like two different drugs. Biological targets discriminate between stereoisomers, so one
+          enantiomer may carry the activity while its mirror image contributes little, or something unwanted.</p>
+        </div>
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c3">
+            <p>A researcher finds that an enzyme&rsquo;s active site is measurably wider after its substrate binds than it was before. Which model does this observation support?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c3b">
+            <p>An enzyme uses only one of two enantiomers of a molecule as its substrate. What underlies this ability?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c3c">
+            <p>Why does formation of the enzyme-substrate complex matter for catalysis?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m1s4">
+      <div class="card">
+        <div class="eyebrow">Module 1 · Section 4</div>
+        <h2>The vocabulary of enzyme helpers</h2>
+        <p>Plenty of enzymes cannot work on protein alone. They need a partner molecule or ion, and the
+        terminology for those partners is precise — and heavily tested.</p>
+        <ul>
+          <li><strong>Cofactor</strong> — any non-protein helper required for activity. The umbrella term,
+              covering both metal ions and organic molecules.</li>
+          <li><strong>Coenzyme</strong> — a cofactor that is an organic molecule.</li>
+          <li><strong>Prosthetic group</strong> — a coenzyme permanently, covalently attached to the protein.</li>
+          <li><strong>Apoenzyme</strong> — the protein without its required cofactor. Inactive.</li>
+          <li><strong>Holoenzyme</strong> — the complete, active enzyme-plus-cofactor complex.</li>
+          <li><strong>Isozymes</strong> — different amino acid sequences catalyzing the same reaction. They
+              differ in tissue distribution, kinetic parameters, and sensitivity to regulation.</li>
+        </ul>
+        <p>Alcohol dehydrogenase is the example worth memorizing, because it uses two helpers at once: a Zn²⁺
+        ion, which is inorganic, and NAD⁺, which is organic. Both are cofactors. Only NAD⁺ is a coenzyme.</p>
+        <p>Many vitamins earn their keep this way — vitamins B1 through B12, C, and K either serve as cofactors
+        or are the raw material the body uses to build them.</p>
+        <div class="figure">
+          <h3>Sort each description</h3>
+          <p class="caption" style="margin:0 0 6px">Pick the term that fits, then check your work.</p>
+          <div id="sortRows"></div>
+          <div class="controls">
+            <button class="btn" id="sortCheck">Check my answers</button>
+            <button class="btn ghost" id="sortReset">Try again</button>
+            <span class="caption" id="sortScore" style="margin:0"></span>
+          </div>
+        </div>
+        <div class="box apply">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c4">
+            <p>A purified enzyme shows no activity in the test tube. Adding Mg&sup2;&#8314; restores full activity. Before the Mg&sup2;&#8314; was added, what was in the tube?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c4b">
+            <p>Which best distinguishes a coenzyme from a prosthetic group?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+    <!-- ================= MODULE 2 ================= -->
+    <section class="section" data-key="m2home">
+      <div class="card">
+        <div class="eyebrow">Module 2</div>
+        <h2>Enzyme Kinetics &amp; Factors Affecting Activity</h2>
+        <p>Once you know what an enzyme does, the next question is how fast — and what changes that speed. This module works through the Michaelis-Menten relationship, what Km and kcat each tell you, and how substrate, temperature, and pH all move the needle.</p>
+        <div class="home-list">
+          <button class="home-item" data-goto="m2s1">
+            <span class="home-num">1</span>
+            <span class="home-body"><span class="home-title">Michaelis-Menten curve</span><span class="home-desc">Substrate concentration, Km, Vmax, and why the curve looks the way it does.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m2s2">
+            <span class="home-num">2</span>
+            <span class="home-body"><span class="home-title">kcat &amp; efficiency</span><span class="home-desc">Turnover number and the specificity constant, kcat/Km.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m2s3">
+            <span class="home-num">3</span>
+            <span class="home-body"><span class="home-title">Enzyme, temperature &amp; pH</span><span class="home-desc">The other variables that raise or collapse activity.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m2s4">
+            <span class="home-num">4</span>
+            <span class="home-body"><span class="home-title">Putting it together</span><span class="home-desc">Interpret, predict, and calculate using the equation.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m2quiz">
+            <span class="home-num">✓</span>
+            <span class="home-body"><span class="home-title">Module 2 quiz</span><span class="home-desc">Eight questions covering everything above.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+    <section class="section" data-key="m2s1">
+      <div class="card">
+        <div class="eyebrow">Module 2 · Section 1</div>
+        <h2>Substrate concentration and the Michaelis-Menten curve</h2>
+        <p>Four things set the rate of an enzyme-catalyzed reaction: substrate concentration, enzyme
+        concentration, temperature, and pH. This module works through all four, starting with substrate.</p>
+        <p>Add substrate to a fixed amount of enzyme and the rate climbs — but not forever. Eventually every
+        active site is occupied, and adding more substrate changes nothing. That ceiling is V<sub>max</sub>.
+        The whole relationship is captured by one equation:</p>
+        <p style="text-align:center;font-size:1.15rem;font-weight:600;margin:18px 0">
+          v<sub>0</sub> = V<sub>max</sub>[S] / (K<sub>m</sub> + [S])</p>
+        <p>K<sub>m</sub> is the substrate concentration that produces half of V<sub>max</sub>. Read it as a
+        measure of how tightly the enzyme holds its substrate: <strong>a lower K<sub>m</sub> means a stronger
+        interaction</strong>, because it takes less substrate to reach half-maximal speed.</p>
+
+        <div class="figure">
+          <h3>Move the substrate concentration</h3>
+          <p class="caption" style="margin:0 0 4px">Before you drag: at low [S] the curve is steep, and near
+          the top it is nearly flat. Predict where a small change in [S] matters most.</p>
+          <svg viewBox="0 0 660 330" role="img" aria-label="Michaelis-Menten curve of initial velocity against substrate concentration, with Km and half Vmax marked and a movable point on the curve.">
+            <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="12">
+              <line x1="70" y1="285" x2="640" y2="285" stroke="#D8E1E6"/>
+              <line x1="70" y1="25" x2="70" y2="285" stroke="#D8E1E6"/>
+              <text x="26" y="155" fill="#7E8F9B" transform="rotate(-90 26 155)" text-anchor="middle">initial velocity (v₀)</text>
+              <text x="355" y="318" fill="#7E8F9B" text-anchor="middle">substrate concentration [S]</text>
+              <line x1="70" y1="45" x2="640" y2="45" stroke="#BFE6D4" stroke-dasharray="5 4"/>
+              <text x="646" y="49" fill="#2FA97A" font-weight="600" text-anchor="end" font-size="11">Vmax</text>
+              <line x1="70" y1="165" x2="125" y2="165" stroke="#6B4FD8" stroke-dasharray="4 3"/>
+              <line x1="125" y1="165" x2="125" y2="285" stroke="#6B4FD8" stroke-dasharray="4 3"/>
+              <text x="64" y="169" fill="#6B4FD8" text-anchor="end" font-size="11">½Vmax</text>
+              <text x="125" y="300" fill="#6B4FD8" text-anchor="middle" font-weight="600" font-size="11">Km</text>
+              <polyline id="mmCurve" fill="none" stroke="#2FA97A" stroke-width="2.8" points=""/>
+              <line id="mmDrop" x1="125" y1="285" x2="125" y2="165" stroke="#7E8F9B" stroke-dasharray="3 3" stroke-width="1.2"/>
+              <circle id="mmDot" cx="125" cy="165" r="7" fill="#fff" stroke="#2FA97A" stroke-width="3"/>
+            </g>
+          </svg>
+          <label for="sSlider" style="font-size:.85rem;color:var(--ink-mid)">Substrate concentration, in multiples of K<sub>m</sub></label>
+          <input type="range" id="sSlider" min="0" max="100" value="10" step="1">
+          <div class="readout">
+            <div><div class="k">[S]</div><div class="v" id="sVal">1.0 × Km</div></div>
+            <div><div class="k">v₀</div><div class="v" id="vVal">50% of Vmax</div></div>
+            <div><div class="k">Sensitivity to a change in [S]</div><div class="v" id="sensVal">High</div></div>
+          </div>
+        </div>
+
+        <p>Many enzymes have evolved so that their substrate sits near K<sub>m</sub> under normal cellular
+        conditions. That is not a coincidence. Around K<sub>m</sub> the curve is steep, so a small rise or fall
+        in substrate produces a meaningful change in rate — the enzyme is responsive. Far above K<sub>m</sub>
+        the enzyme is saturated and has effectively lost the ability to respond at all.</p>
+
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c5">
+            <p>An enzyme is operating at a substrate concentration well below its K<sub>m</sub>. The cell doubles the substrate concentration. What happens to the reaction velocity?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c5b">
+            <p>Why do many enzymes operate at substrate concentrations near their own K<sub>m</sub> under normal cellular conditions?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c5c">
+            <p>An enzyme's K<sub>m</sub> for its substrate decreases while V<sub>max</sub> stays the same. At a fixed, low [S], what happens to the reaction velocity?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m2s2">
+      <div class="card">
+        <div class="eyebrow">Module 2 · Section 2</div>
+        <h2>Turnover number and catalytic efficiency</h2>
+        <p>K<sub>m</sub> tells you about binding. It says nothing about how fast the enzyme works once the
+        substrate is in place. That job belongs to k<sub>cat</sub>, the turnover number: how many substrate
+        molecules one active site converts to product per second when it is fully saturated.</p>
+        <p>Neither number alone tells you which of two enzymes is the better catalyst. An enzyme could bind
+        its substrate beautifully and then process it slowly, or grab weakly and work fast. Combining them
+        gives the specificity constant:</p>
+        <p style="text-align:center;font-size:1.15rem;font-weight:600;margin:18px 0">k<sub>cat</sub> / K<sub>m</sub></p>
+        <p>This is the standard measure of catalytic efficiency, because it accounts for both how well the
+        enzyme captures substrate and how quickly it acts on it. A high k<sub>cat</sub>/K<sub>m</sub> means
+        the enzyme is good at both — and neither number alone can tell you that.</p>
+
+        <div class="figure">
+          <h3>Efficiency bench</h3>
+          <p class="caption" style="margin:0 0 4px">Two enzymes, described but not numbered. Predict which one
+          is more catalytically efficient before the numbers appear.</p>
+          <div class="rxn-head">
+            <span class="caption" id="benchCount" style="margin:0"></span>
+            <span class="caption" id="benchScore" style="margin:0"></span>
+          </div>
+          <div class="bench-pair" id="benchPair"></div>
+          <div class="choices" id="benchChoices"></div>
+          <div class="bench-bars" id="benchBars" style="display:none"></div>
+          <div class="feedback" id="benchFb"></div>
+          <div class="controls">
+            <button class="btn ghost" id="benchNext">Next scenario &rarr;</button>
+            <button class="btn ghost" id="benchReset">Start over</button>
+          </div>
+        </div>
+
+        <div class="figure">
+          <h3>Try your own values</h3>
+          <p class="caption" style="margin:0 0 10px">There is a ceiling on efficiency: an enzyme cannot act on
+          a substrate it hasn&rsquo;t yet encountered, so k<sub>cat</sub>/K<sub>m</sub> is ultimately capped by
+          how fast the two molecules can diffuse together in solution. Drag both sliders toward that ceiling
+          and see what it takes to get there.</p>
+          <div class="bench-slider-row">
+            <label for="benchKcat">k<sub>cat</sub></label>
+            <input type="range" id="benchKcat" min="0" max="100" value="35">
+            <span class="v" id="benchKcatVal"></span>
+          </div>
+          <div class="bench-slider-row">
+            <label for="benchKm">K<sub>m</sub></label>
+            <input type="range" id="benchKm" min="0" max="100" value="55">
+            <span class="v" id="benchKmVal"></span>
+          </div>
+          <div class="bench-bar-row" style="margin-top:14px">
+            <span class="bench-bar-label">k<sub>cat</sub>/K<sub>m</sub></span>
+            <span class="bench-bar-track"><span class="bench-bar-fill" id="benchEffFill" style="width:2%"></span><span class="bench-limit-line" style="left:71.4%"></span></span>
+            <span class="bench-bar-val" id="benchEffVal"></span>
+          </div>
+          <p class="caption" id="benchEffNote" style="margin-top:10px"></p>
+        </div>
+        <div class="keypoints">
+          <h4>Three numbers, three different questions</h4>
+          <ul>
+            <li><strong>K<sub>m</sub></strong> — how much substrate does it take to get to half speed? Lower means tighter binding.</li>
+            <li><strong>k<sub>cat</sub></strong> — how fast does one saturated active site turn over?</li>
+            <li><strong>k<sub>cat</sub>/K<sub>m</sub></strong> — how good is this enzyme overall, at realistic substrate levels?</li>
+          </ul>
+        </div>
+        <div class="box clinical">
+          <h3><span class="tag">CLINICAL CONNECTION</span> Why kinetics shows up in drug metabolism</h3>
+          <p>How quickly the body clears a drug depends on how much metabolizing enzyme is present, how much
+          drug is present relative to that enzyme's K<sub>m</sub>, and how fast the enzyme turns over. When drug
+          concentrations climb well above K<sub>m</sub>, the enzyme approaches saturation and can no longer
+          speed up in response — which is the kinetic reason some drugs behave very differently at high doses.</p>
+        </div>
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c6">
+            <p>Enzyme A and enzyme B catalyze the same reaction with the same k<sub>cat</sub>, but enzyme A has a lower K<sub>m</sub>. Which statement best describes enzyme A?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c6b">
+            <p>Which statement best defines k<sub>cat</sub>?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m2s3">
+      <div class="card">
+        <div class="eyebrow">Module 2 · Section 3</div>
+        <h2>Enzyme concentration, temperature, and pH</h2>
+        <h3>Enzyme concentration</h3>
+        <p>More enzyme means more active sites, so more reaction. The cell controls this on two fronts: how
+        much enzyme it makes, and how fast it destroys what it has made. Signaling pathways typically act by
+        changing gene expression, and regulated degradation pathways can be dialed up or down in response to
+        external signals. Both are slower levers than the ones you will meet in Module 4, but they set the
+        baseline everything else operates against.</p>
+
+        <h3>Temperature</h3>
+        <p>Raising the temperature raises the rate, because molecules move faster and collide more often. That
+        holds only up to a point. Push too far and the protein denatures, the active site loses its shape, and
+        activity collapses. The falling side of the temperature curve is not a slowdown — it is destruction.</p>
+
+        <h3>pH</h3>
+        <p>Every enzyme has a pH range where it works best, and that range matches where the enzyme actually
+        lives. pH matters because it sets the ionization state of amino acid side chains, and those charges are
+        what bind substrate and perform catalysis.</p>
+
+        <div class="figure">
+          <h3>Two enzymes, two environments</h3>
+          <svg viewBox="0 0 660 280" role="img" aria-label="Two pH activity curves: pepsin peaks near pH 2, glucose-6-phosphatase peaks near pH 7.2.">
+            <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="12">
+              <line x1="60" y1="235" x2="640" y2="235" stroke="#D8E1E6"/>
+              <line x1="60" y1="20" x2="60" y2="235" stroke="#D8E1E6"/>
+              <text x="24" y="130" fill="#7E8F9B" transform="rotate(-90 24 130)" text-anchor="middle">activity</text>
+              <text x="350" y="268" fill="#7E8F9B" text-anchor="middle">pH</text>
+              <g fill="#7E8F9B" font-size="11" text-anchor="middle">
+                <text x="60" y="252">0</text><text x="205" y="252">3.5</text>
+                <text x="350" y="252">7</text><text x="495" y="252">10.5</text><text x="640" y="252">14</text>
+              </g>
+              <path id="pepCurve" d="M60 235 Q100 40 145 235" fill="none" stroke="#B57614" stroke-width="3"/>
+              <text id="pepLbl" x="145" y="60" fill="#B57614" font-size="12" font-weight="600">pepsin</text>
+              <path id="g6pCurve" d="M310 235 Q365 40 420 235" fill="none" stroke="#2E7DA8" stroke-width="3"/>
+              <text id="g6pLbl" x="430" y="70" fill="#2E7DA8" font-size="12" font-weight="600">glucose-6-phosphatase</text>
+            </g>
+          </svg>
+          <div class="controls">
+            <button class="btn ghost" data-ph="pep">Pepsin · stomach</button>
+            <button class="btn ghost" data-ph="g6p">Glucose-6-phosphatase · cytosol</button>
+            <span class="caption" id="phNote" style="margin:0">Select an enzyme to see why its optimum sits where it does.</span>
+          </div>
+        </div>
+
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c7">
+            <p>A reaction is run at 37 &deg;C and again at 65 &deg;C, and activity is far lower at the higher temperature. Which explanation fits best?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c7b">
+            <p>Why does raising temperature from 20 &deg;C to 37 &deg;C initially increase an enzyme's reaction rate?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c7c">
+            <p>An enzyme that normally functions at pH 8 is placed in a pH 2 buffer. What is the most likely outcome?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m2s4">
+      <div class="card">
+        <div class="eyebrow">Module 2 · Section 4</div>
+        <h2>Putting the kinetics together</h2>
+        <p>The three tasks below get progressively harder: read the graph, predict from it, then calculate
+        with it. Work through them in order.</p>
+
+        <div class="box apply">
+          <h3><span class="tag">1 · INTERPRET</span></h3>
+          <p>On a Michaelis-Menten plot, which point on the horizontal axis corresponds to K<sub>m</sub>?</p>
+          <div class="choices" data-check="c8"></div><div class="feedback"></div>
+        </div>
+
+        <div class="box apply">
+          <h3><span class="tag">2 · PREDICT</span></h3>
+          <p>An enzyme is running at a substrate concentration roughly ten times its K<sub>m</sub>. The cell
+          doubles the substrate concentration again. What is the most likely effect on velocity?</p>
+          <div class="choices" data-check="c9"></div><div class="feedback"></div>
+        </div>
+
+        <div class="box apply">
+          <h3><span class="tag">3 · CALCULATE</span></h3>
+          <p>An enzyme has a V<sub>max</sub> of 100 µmol/min and a K<sub>m</sub> of 4 mM. The substrate
+          concentration is 4 mM. What is v<sub>0</sub>?</p>
+          <div class="choices" data-check="c10"></div><div class="feedback"></div>
+        </div>
+
+        <div class="keypoints">
+          <h4>Before you move on</h4>
+          <ul>
+            <li>Substrate above K<sub>m</sub> buys you less and less; substrate near K<sub>m</sub> gives the enzyme its responsiveness.</li>
+            <li>K<sub>m</sub> is about binding, k<sub>cat</sub> is about speed, and k<sub>cat</sub>/K<sub>m</sub> is about both.</li>
+            <li>Temperature and pH curves fall off for different reasons: denaturation on one side, changed ionization on the other.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+    <!-- ================= MODULE 3 ================= -->
+    <section class="section" data-key="m3home">
+      <div class="card">
+        <div class="eyebrow">Module 3</div>
+        <h2>The Seven Enzyme Classes</h2>
+        <p>Rather than memorizing seven definitions, this module gives you one question to ask of any reaction: what happened to the molecule? That question, plus a set of name clues, is enough to classify almost anything you'll be shown.</p>
+        <div class="home-list">
+          <button class="home-item" data-goto="m3s1">
+            <span class="home-num">1</span>
+            <span class="home-body"><span class="home-title">One question tells you the class</span><span class="home-desc">The decision framework, in one diagram.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m3s2">
+            <span class="home-num">2</span>
+            <span class="home-body"><span class="home-title">The seven classes</span><span class="home-desc">Oxidoreductases through translocases, with examples and name clues.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m3s3">
+            <span class="home-num">3</span>
+            <span class="home-body"><span class="home-title">Classification challenge</span><span class="home-desc">Practice classifying eight real reactions.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m3quiz">
+            <span class="home-num">✓</span>
+            <span class="home-body"><span class="home-title">Module 3 quiz</span><span class="home-desc">Eight questions covering everything above.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+    <section class="section" data-key="m3s1">
+      <div class="card">
+        <div class="eyebrow">Module 3 · Section 1</div>
+        <h2>One question tells you the class</h2>
+        <p>Every enzyme has a unique name and code number identifying the reaction it catalyzes and the
+        substrates involved. There are seven classes. Memorizing seven definitions is the hard way to learn
+        them. The efficient way is to ask a single question of any reaction you are shown:</p>
+        <p style="font-size:1.1rem;font-weight:650;text-align:center;margin:20px 0">What happened to the molecule?</p>
+        <div class="figure">
+          <h3>Match each class to what happened</h3>
+          <p class="caption" style="margin:0 0 12px">Drag a class pill onto the row it belongs with. The
+          distinction the lecture calls out as most important is the third row versus the fourth — did water
+          participate in breaking the bond?</p>
+          <div class="dnd-board" id="dndBoard"></div>
+          <div class="dnd-tray" id="dndTray"></div>
+          <div class="controls">
+            <button class="btn" id="dndCheck">Check my matches</button>
+            <button class="btn ghost" id="dndReset">Try again</button>
+            <span class="caption" id="dndScore" style="margin:0"></span>
+          </div>
+        </div>
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c11">
+            <p>An enzyme cleaves a carbon-nitrogen bond and a molecule of water is incorporated into the products. Which class does this enzyme belong to?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c11b">
+            <p>An enzyme moves a phosphate group from one molecule onto another, with no atoms left over. Which class fits?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c11c">
+            <p>An enzyme converts one isomer of a molecule into another, with no atoms added or removed. Which question from the decision framework identifies this, and which class does it point to?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m3s2">
+      <div class="card">
+        <div class="eyebrow">Module 3 · Section 2</div>
+        <h2>The seven classes</h2>
+
+        <p>Every enzyme has a unique name and code number identifying the reaction it catalyzes. There are
+        seven classes — and rather than memorizing seven definitions, you can derive any of them by inspecting
+        what actually happened to the molecule.</p>
+
+        <div class="figure">
+          <h3>Reaction inspector</h3>
+          <p class="caption" style="margin:0 0 14px">The enzyme&rsquo;s name is hidden on purpose. Inspect the
+          reaction, answer the three questions, and the class follows from your answers — that is the whole
+          skill this module is teaching.</p>
+
+          <div class="rxn-head">
+            <span class="caption" id="rxnCount" style="margin:0"></span>
+            <span class="caption" id="rxnScore" style="margin:0"></span>
+          </div>
+          <div class="rxn-eq" id="rxnEq"></div>
+
+          <div id="rxnQs"></div>
+
+          <div class="controls">
+            <button class="btn" id="rxnCheck">Identify the class</button>
+            <button class="btn ghost" id="rxnNext">Next reaction &rarr;</button>
+            <button class="btn ghost" id="rxnReset">Start the deck over</button>
+          </div>
+          <div class="feedback" id="rxnFb"></div>
+        </div>
+
+        <h3>Reference: the seven classes</h3>
+        <p>Once you can derive a class, this table is what you are deriving toward. Use it to check yourself,
+        not as something to memorize front to back.</p>
+        <table>
+          <thead><tr><th>Class</th><th>What happened to the molecule</th><th>Examples worth knowing</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Oxidoreductase</strong></td>
+              <td>Electrons transferred — an oxidation paired with a reduction</td>
+              <td>Typically uses NAD⁺/NADH or NADP⁺/NADPH; dominates oxidative phosphorylation; many carry a metal cofactor</td>
+            </tr>
+            <tr>
+              <td><strong>Transferase</strong></td>
+              <td>A functional group moved from a donor to an acceptor</td>
+              <td>Kinases (phosphoryl from ATP); histone methylation and acetylation; glycosyltransferases</td>
+            </tr>
+            <tr>
+              <td><strong>Hydrolase</strong></td>
+              <td>A bond broken using water, which is incorporated into the products</td>
+              <td>Phosphatases (reversing kinases); peptidases; glycoside hydrolases</td>
+            </tr>
+            <tr>
+              <td><strong>Lyase</strong></td>
+              <td>A bond broken by elimination, generating a double bond or a ring</td>
+              <td>Histidine decarboxylase (histidine → histamine); adenylate cyclase (ATP → cAMP)</td>
+            </tr>
+            <tr>
+              <td><strong>Isomerase</strong></td>
+              <td>Rearranged into an isomer, with nothing added or removed</td>
+              <td>Central to glycolysis; D→L amino acid conversion; mutases relocate a group within one molecule; DNA-unwinding enzymes are drug targets</td>
+            </tr>
+            <tr>
+              <td><strong>Ligase</strong></td>
+              <td>Two molecules joined into one, paid for by ATP hydrolysis</td>
+              <td>DNA ligase; aminoacyl tRNA synthetases</td>
+            </tr>
+            <tr>
+              <td><strong>Translocase</strong></td>
+              <td>Something moved across a membrane</td>
+              <td>Na⁺/K⁺ pump (3 out, 2 in per ATP; ~70% of neuronal ATP use); ATP synthase runs the logic in reverse. Class created in 2018, so older references list only six.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="box clinical">
+          <h3><span class="tag">CLINICAL CONNECTION</span> Hydrolase or lyase?</h3>
+          <p>This is the distinction to get right. Both classes break bonds. The question is whether water
+          participated in the cleavage. If water is consumed and appears in the products, it is a hydrolase.
+          If the bond is broken by elimination and a double bond or ring appears, it is a lyase.</p>
+        </div>
+
+        <div class="keypoints">
+          <h4>Name clues worth recognizing</h4>
+          <ul>
+            <li><code>___ dehydrogenase</code> → oxidoreductase</li>
+            <li><code>___ kinase</code> → transferase</li>
+            <li><code>___ phosphatase</code>, <code>___ peptidase</code> → hydrolase</li>
+            <li><code>___ synthetase</code> → often a ligase</li>
+            <li><code>___ mutase</code> → isomerase</li>
+          </ul>
+          <p class="caption" style="margin-top:0">Treat these as recognition cues, not rules. They are reliable
+          often enough to be useful and not so reliable that you should stop reading the reaction.</p>
+        </div>
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c16">
+            <p>An enzyme joins two molecules together in a reaction coupled to ATP hydrolysis. Which class does
+            it belong to?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c17">
+            <p>An enzyme's name ends in &ldquo;-kinase.&rdquo; Which class does this name suggest, and why?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m3s3">
+      <div class="card">
+        <div class="eyebrow">Module 3 · Section 3</div>
+        <h2>Classification challenge</h2>
+        <p>Eight reactions. For each one, work out what happened to the molecule, then choose the class. Check
+        your answers when you are done — you will get an explanation for every item, not just the ones you missed.</p>
+        <div class="figure">
+          <div id="classRows"></div>
+          <div class="controls">
+            <button class="btn" id="classCheck">Check my answers</button>
+            <button class="btn ghost" id="classReset">Try again</button>
+            <span class="caption" id="classScore" style="margin:0"></span>
+          </div>
+        </div>
+        <div id="classWhy"></div>
+        <div class="box apply">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c12">
+            <p>An enzyme converts glucose-6-phosphate into fructose-6-phosphate. The molecular formula is unchanged and no water is consumed. Which class is responsible?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c12b">
+            <p>Which single question is most useful for telling a hydrolase apart from a lyase?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <!-- ================= MODULE 4 ================= -->
+    <section class="section" data-key="m4home">
+      <div class="card">
+        <div class="eyebrow">Module 4</div>
+        <h2>Enzyme Inhibition &amp; Regulation</h2>
+        <p>The most clinically relevant module: how inhibitors change Km and Vmax, how to read that off a graph, the difference between reversible and covalent inhibition, and how cells regulate enzymes beyond inhibition altogether.</p>
+        <div class="home-list">
+          <button class="home-item" data-goto="m4s1">
+            <span class="home-num">1</span>
+            <span class="home-body"><span class="home-title">Competitive &amp; uncompetitive</span><span class="home-desc">How each inhibitor type changes Km and Vmax.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m4s2">
+            <span class="home-num">2</span>
+            <span class="home-body"><span class="home-title">Identify the inhibitor</span><span class="home-desc">Read a kinetics graph and name what’s present.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m4s3">
+            <span class="home-num">3</span>
+            <span class="home-body"><span class="home-title">Irreversible &amp; mechanism-based</span><span class="home-desc">Covalent inhibition and the penicillin mechanism.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m4s4">
+            <span class="home-num">4</span>
+            <span class="home-body"><span class="home-title">Allosteric control &amp; isozymes</span><span class="home-desc">Regulation away from the active site, and why isozymes matter.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+          <button class="home-item" data-goto="m4quiz">
+            <span class="home-num">✓</span>
+            <span class="home-body"><span class="home-title">Module 4 quiz</span><span class="home-desc">Eight questions covering everything above.</span></span>
+            <span class="home-status">Not started</span>
+          </button>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+    <section class="section" data-key="m4s1">
+      <div class="card">
+        <div class="eyebrow">Module 4 · Section 1</div>
+        <h2>Competitive and uncompetitive inhibition</h2>
+        <p>An inhibitor is anything that reduces enzyme activity. Where it binds determines what it does to
+        the kinetics — and whether adding more substrate can rescue the reaction.</p>
+
+        <h3>Competitive inhibitors</h3>
+        <p>A competitive inhibitor binds the active site of the free enzyme, competing directly with substrate
+        for the same space. Because it is a competition, more substrate wins: flood the enzyme with substrate
+        and the inhibitor is displaced. How much substrate it takes depends on the inhibitor concentration, the
+        inhibitor's affinity for the enzyme (K<sub>i</sub>), and the substrate's own affinity (K<sub>m</sub>).</p>
+        <p>Kinetically, the enzyme now needs more substrate to reach half-maximal velocity, so
+        <strong>K<sub>m</sub> rises</strong>. But with enough substrate it still reaches the same ceiling, so
+        <strong>V<sub>max</sub> is unchanged</strong>.</p>
+
+        <h3>Uncompetitive inhibitors</h3>
+        <p>An uncompetitive inhibitor binds somewhere other than the active site — an allosteric site — and it
+        binds the enzyme-substrate complex rather than free enzyme. That inverts the logic: the more substrate
+        present, the more [ES] exists, and the more target the inhibitor has. Adding substrate makes it worse,
+        not better. <strong>Both K<sub>m</sub> and V<sub>max</sub> fall.</strong></p>
+
+        <div class="figure">
+          <h3>Fill in the table</h3>
+          <p class="caption" style="margin:0 0 8px">Choose the effect on each parameter, then check.</p>
+          <table>
+            <thead><tr><th>Inhibitor</th><th>Binds</th><th>Effect on K<sub>m</sub></th><th>Effect on V<sub>max</sub></th></tr></thead>
+            <tbody id="inhibTable"></tbody>
+          </table>
+          <div class="controls">
+            <button class="btn" id="tblCheck">Check my answers</button>
+            <button class="btn ghost" id="tblReset">Try again</button>
+            <span class="caption" id="tblScore" style="margin:0"></span>
+          </div>
+        </div>
+
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c13">
+            <p>A reaction is inhibited. Increasing the substrate concentration substantially restores the original velocity. Which type of inhibition is this?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c13b">
+            <p>A kinetic study shows an inhibited reaction reaching a lower V<sub>max</sub> than the control, with the effect getting worse as more substrate is added. Which type of inhibition is this?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m4s2">
+      <div class="card">
+        <div class="eyebrow">Module 4 · Section 2</div>
+        <h2>Identify the inhibitor</h2>
+        <p>On an exam you are far more likely to be handed a graph than a label. Below, a control curve is
+        plotted in green. Reveal an unknown inhibitor, decide which parameter moved, and name it before you
+        check.</p>
+        <div class="figure">
+          <svg viewBox="0 0 660 320" role="img" aria-label="Michaelis-Menten plot showing a control curve and an inhibited curve for comparison.">
+            <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="12">
+              <line x1="70" y1="275" x2="640" y2="275" stroke="#D8E1E6"/>
+              <line x1="70" y1="25" x2="70" y2="275" stroke="#D8E1E6"/>
+              <text x="26" y="150" fill="#7E8F9B" transform="rotate(-90 26 150)" text-anchor="middle">v₀</text>
+              <text x="355" y="305" fill="#7E8F9B" text-anchor="middle">[S]</text>
+              <polyline id="ctrlCurve" fill="none" stroke="#2FA97A" stroke-width="2.8" points=""/>
+              <polyline id="inhCurve" fill="none" stroke="#D4536B" stroke-width="2.8" stroke-dasharray="6 4" points="" class="fade o0"/>
+              <text x="600" y="60" fill="#2FA97A" font-size="11" font-weight="600" text-anchor="end">control</text>
+              <text id="inhLbl" x="600" y="80" fill="#D4536B" font-size="11" font-weight="600" text-anchor="end" class="fade o0">+ inhibitor</text>
+            </g>
+          </svg>
+          <div class="controls">
+            <button class="btn" id="showInh">Show the inhibited curve</button>
+            <button class="btn ghost" id="newInh">Give me a different one</button>
+          </div>
+          <div class="choices" id="inhChoices" style="margin-top:16px"></div>
+          <div class="feedback" id="inhFb"></div>
+        </div>
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c17b">
+            <p>On a Michaelis-Menten plot, an inhibited curve reaches the same V<sub>max</sub> as the control
+            but needs more substrate to get there. Which inhibitor type is this?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c17c">
+            <p>Which inhibitor type would you expect to lower the V<sub>max</sub> of the inhibited curve no
+            matter how much substrate is added?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m4s3">
+      <div class="card">
+        <div class="eyebrow">Module 4 · Section 3</div>
+        <h2>Irreversible and mechanism-based inhibition</h2>
+        <p>Competitive and uncompetitive inhibitors bind reversibly — remove them and activity returns.
+        Irreversible inhibitors do not. They form a covalent bond to the enzyme, usually modifying a key amino
+        acid side chain in the active site, though they can also act at an allosteric site. They generally
+        carry a highly reactive functional group that does the bonding. That enzyme molecule is finished; the
+        cell only recovers activity by synthesizing new protein.</p>
+        <p>One subtype is worth special attention. Some enzymes work by forming a temporary covalent bond with
+        their substrate as part of normal catalysis. A <strong>mechanism-based inhibitor</strong> — also called
+        a suicide inhibitor — mimics that substrate closely enough that the enzyme starts processing it, forms
+        the covalent intermediate, and then cannot complete the reaction to break the bond. The enzyme's own
+        catalytic machinery is what traps it.</p>
+
+        <div class="figure">
+          <h3>Penicillin, step by step</h3>
+          <p class="caption" style="margin:0 0 10px">Put the four steps in order, then check.</p>
+          <div id="pcnRows"></div>
+          <div class="controls">
+            <button class="btn" id="pcnCheck">Check the order</button>
+            <button class="btn ghost" id="pcnReset">Reset</button>
+            <span class="caption" id="pcnScore" style="margin:0"></span>
+          </div>
+        </div>
+
+        <p>Penicillin blocks a bacterial enzyme essential for cell wall synthesis by mimicking one of its
+        substrates. The enzyme engages it as though it were the real thing, becomes covalently attached, and is
+        permanently out of commission — which is why the bacterial cell wall fails.</p>
+
+        <div class="box predict">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c14">
+            <p>An inhibitor is removed from an enzyme preparation by dialysis, and activity does not return. What does this finding indicate about the inhibitor?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c14b">
+            <p>Why is a mechanism-based (suicide) inhibitor especially effective as a drug, compared with a purely competitive one?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m4s4">
+      <div class="card">
+        <div class="eyebrow">Module 4 · Section 4</div>
+        <h2>Allosteric control and isozymes</h2>
+        <p>Inhibition is not the only way to change how much an enzyme does. Enzymes typically have multiple
+        domains, and in addition to the substrate binding site there is often a separate regulatory domain.
+        A molecule binding there is an <strong>allosteric modulator</strong>, and it can push either direction:
+        a positive modulator raises activity, a negative modulator lowers it.</p>
+        <p>This is how a cell builds control into a pathway. The end product of a pathway can act as a negative
+        modulator on an early enzyme, so the pathway slows itself down as product accumulates. A signal that the
+        pathway is needed can act as a positive modulator on the same enzyme.</p>
+
+        <div class="figure">
+          <h3>Pathway control room</h3>
+          <p class="caption" style="margin:0 0 12px">A four-step pathway ending in Product. Set the toggles,
+          then run it and watch what the pathway actually does over time.</p>
+          <svg viewBox="0 0 640 92" role="img" aria-label="Four enzymes in series leading to product, with a feedback arrow from product back to the first enzyme.">
+            <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="12">
+              <g id="pathBoxes"></g>
+              <path id="pathFeedback" d="M598 70 C 598 90, 70 90, 70 70" fill="none" stroke="#D4536B" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#pfArrow)"/>
+              <text x="334" y="90" text-anchor="middle" fill="#D4536B" font-size="11" id="pathFeedbackLbl">product inhibits the first enzyme</text>
+            </g>
+            <defs><marker id="pfArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0 0 L10 5 L0 10 z" fill="#D4536B"/></marker></defs>
+          </svg>
+          <div class="controls" style="margin-top:6px">
+            <button class="btn ghost on" id="fbToggle">Feedback inhibition: ON</button>
+            <button class="btn ghost" id="demandToggle">Demand signal: OFF</button>
+            <button class="btn" id="pathPlay">Run the pathway</button>
+          </div>
+          <div class="figure" style="margin:14px 0 0;padding:16px">
+            <svg viewBox="0 0 660 220" role="img" aria-label="Chart of product concentration over time as the pathway runs.">
+              <g font-family="-apple-system, Segoe UI, Roboto, sans-serif" font-size="11">
+                <line x1="55" y1="195" x2="630" y2="195" stroke="#D8E1E6"/>
+                <line x1="55" y1="15" x2="55" y2="195" stroke="#D8E1E6"/>
+                <text x="20" y="105" fill="#7E8F9B" transform="rotate(-90 20 105)" text-anchor="middle">product</text>
+                <text x="342" y="212" fill="#7E8F9B" text-anchor="middle">time</text>
+                <polyline id="pathLine" fill="none" stroke="#2FA97A" stroke-width="2.6" points=""/>
+              </g>
+            </svg>
+          </div>
+          <p class="caption" id="pathNote" style="margin-top:10px">Set your toggles, then press &ldquo;Run the
+          pathway&rdquo; to see what happens.</p>
+        </div>
+
+        <p><strong>Isozymes</strong> give the cell a different kind of control. These are enzymes with different
+        amino acid sequences that catalyze the same reaction, and they differ in tissue distribution, in
+        K<sub>m</sub> and V<sub>max</sub> toward their substrates, and in which allosteric modulators affect
+        them. One tissue can therefore run the same chemistry on a completely different regulatory setting than
+        another tissue.</p>
+
+        <div class="figure">
+          <h3>Same enzyme, two tissues</h3>
+          <p class="caption" style="margin:0 0 10px">Liver and muscle express different isozymes of the same
+          enzyme. Move the drug concentration slider and watch each tissue respond differently.</p>
+          <div class="bench-slider-row">
+            <label for="isoSlider">Drug concentration</label>
+            <input type="range" id="isoSlider" min="0" max="100" value="0">
+            <span class="v" id="isoSliderVal">0 units</span>
+          </div>
+          <div class="bench-bars" style="margin-top:10px">
+            <div class="bench-bar-row">
+              <span class="bench-bar-label">Liver</span>
+              <span class="bench-bar-track"><span class="bench-bar-fill" id="isoLiverFill" style="width:100%;background:var(--violet)"></span></span>
+              <span class="bench-bar-val" id="isoLiverVal">100% active</span>
+            </div>
+            <div class="bench-bar-row">
+              <span class="bench-bar-label">Muscle</span>
+              <span class="bench-bar-track"><span class="bench-bar-fill" id="isoMuscleFill" style="width:100%;background:var(--blue)"></span></span>
+              <span class="bench-bar-val" id="isoMuscleVal">100% active</span>
+            </div>
+          </div>
+          <p class="caption" id="isoNote" style="margin-top:10px">Move the slider to add the drug.</p>
+        </div>
+
+        <div class="box clinical">
+          <h3><span class="tag">CLINICAL CONNECTION</span> Enzymes as drug targets</h3>
+          <p>Every mechanism in this module is a drug strategy. Competitive inhibitors are a large share of the
+          drugs you will dispense. Mechanism-based inhibitors like penicillin achieve durable inhibition from a
+          brief exposure, because activity cannot return until new enzyme is made. Allosteric sites offer
+          targets away from a crowded, highly conserved active site. And isozyme differences between tissues are
+          part of why a drug can act at one site while sparing another.</p>
+        </div>
+
+        <div class="box apply">
+          <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+          <div class="cp-item" data-check="c15">
+            <p>Two tissues express different isozymes of the same enzyme. A drug substantially inhibits the reaction in one tissue and has little effect in the other. Which property best explains this?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+          <div class="cp-item" data-check="c15b">
+            <p>A molecule binds an enzyme's regulatory domain, away from the active site, and decreases the enzyme's activity. What is this molecule called?</p>
+            <div class="choices"></div><div class="feedback"></div>
+          </div>
+        </div>
+
+        <h3>Retrieval practice</h3>
+        <p class="caption" style="margin-bottom:0">Looking for the flashcards? They now live in their own
+        area — <a id="jumpFlash" style="color:var(--green);font-weight:600;cursor:pointer">open Retrieval
+        Practice</a> — so the full deck covering all four modules is always one click away, not buried in
+        Module 4.</p>
+      </div>
+      <div class="card pager"></div>
+    </section>
+
+    <!-- ================= RETRIEVAL PRACTICE (STANDALONE) ================= -->
+    <section class="section" data-key="flashcards">
+      <div class="card">
+        <div class="eyebrow">Retrieval practice</div>
+        <h2>Flashcards — every term, all four modules</h2>
+        <p>This deck isn't tied to any one module, so it's a good place to warm up before a quiz or the
+        final exam, or to review after class regardless of where you are in the material. Say your answer
+        out loud before flipping — recognizing a definition is much easier than producing one, and only the
+        second holds up on an exam.</p>
+        <div class="fc-stage">
+          <div class="fc" id="fcCard" tabindex="0" role="button" aria-label="Flashcard. Press Enter to flip.">
+            <div class="fc-face fc-front"><div>
+              <div class="fc-term" id="fcFront"></div>
+              <div class="fc-hint">click, tap, or press Enter to flip</div>
+            </div></div>
+            <div class="fc-face fc-back"><div class="fc-def" id="fcBack"></div></div>
+          </div>
+        </div>
+        <div class="fc-bar">
+          <button class="btn ghost" id="fcPrev">Previous</button>
+          <span class="fc-count" id="fcCount"></span>
+          <button class="btn ghost" id="fcNext">Next</button>
+        </div>
+      </div>
+      <div class="card pager"></div>
+    </section>
+    <!-- ================= QUIZ SECTIONS ================= -->
+    <section class="section" data-key="m1quiz">
+      <div class="card">
+        <div class="eyebrow">Module 1 · Mastery check</div>
+        <h2>Module 1 quiz</h2>
+        <p>Eight questions on enzyme fundamentals, catalysis, specificity, and terminology. Answer each one,
+        then submit for a breakdown by concept area. Every question explains its reasoning afterward, including
+        why the other options don't hold up. Answer choices are reshuffled each time you retake it.</p>
+        <div class="quiz-body" data-quiz="m1"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+      </div>
+      <div class="card hidden q-result"></div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m2quiz">
+      <div class="card">
+        <div class="eyebrow">Module 2 · Mastery check</div>
+        <h2>Module 2 quiz</h2>
+        <p>Eight questions on kinetics and the factors that change reaction rate. Several ask you to reason
+        from a graph or run a short calculation rather than recall a definition.</p>
+        <div class="quiz-body" data-quiz="m2"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+      </div>
+      <div class="card hidden q-result"></div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m3quiz">
+      <div class="card">
+        <div class="eyebrow">Module 3 · Mastery check</div>
+        <h2>Module 3 quiz</h2>
+        <p>Eight questions on the seven enzyme classes. Most give you a reaction and ask you to classify it,
+        which is the skill that transfers to an exam.</p>
+        <div class="quiz-body" data-quiz="m3"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+      </div>
+      <div class="card hidden q-result"></div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="m4quiz">
+      <div class="card">
+        <div class="eyebrow">Module 4 · Mastery check</div>
+        <h2>Module 4 quiz</h2>
+        <p>Eight questions on inhibition and regulation, including the kinetic signatures you are expected to
+        recognize without being told which inhibitor is present.</p>
+        <div class="quiz-body" data-quiz="m4"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+      </div>
+      <div class="card hidden q-result"></div>
+      <div class="card pager"></div>
+    </section>
+
+    <section class="section" data-key="final">
+      <div class="card">
+        <div class="eyebrow">Comprehensive</div>
+        <h2>Final mastery exam</h2>
+        <p>Twenty-five questions drawn from the full bank across all four modules, mixed each time you take it:
+        roughly eight testing concepts and interpretation, ten asking you to apply ideas to unfamiliar
+        situations, and seven requiring you to combine concepts or calculate. Answer choices are reshuffled on
+        every attempt.</p>
+        <p>Afterward you get mastery by concept area rather than a bare score, and the option to run a targeted
+        round on whatever needs work.</p>
+        <div class="quiz-body" data-quiz="final"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit exam</button>
+          <button class="btn ghost q-retake">New exam</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+      </div>
+      <div class="card hidden q-result"></div>
+      <div class="card pager"></div>
+    </section>
+
+  </main>
+</div>
+<script src="banks/enzymes.js"></script>
+<script src="banks/enzymes.manifest.js"></script>
+<script src="shared/storage.js"></script>
+<script src="shared/helpers.js"></script>
+<script>
+/* ============================================================
+   THIS TOPIC'S CONTENT & INTERACTIVE FIGURES
+   Everything below is specific to the enzymes companion: its
+   module/section structure, which checkpoints and activities gate
+   each section, the data behind its bespoke widgets (the cofactor
+   sort, the classification challenge, the inhibition table, the
+   penicillin sequence, the drag-and-drop decision framework), and
+   the code that wires each figure's SVG/DOM elements up. None of
+   this is meant to be reused by another topic's companion —
+   shared/engine.js is where the reusable logic lives.
+   Load this AFTER banks/<topic>.js (needs TOPIC_ID/CHECKPOINTS to
+   exist) and BEFORE shared/engine.js (which needs MODULES,
+   SECTION_REQ, etc. to exist before it builds the nav).
+   ============================================================ */
+
+/* ---------- Structure: modules, sections, routing ----------
+   This used to be hand-typed here (MODULES, SECTION_REQ, etc.),
+   duplicating banks/enzymes.manifest.js. Now it's DERIVED from
+   MANIFEST at load time, so there is exactly one copy of the
+   module/section layout — edit banks/enzymes.manifest.js and this
+   page (and the hub) both pick it up automatically. See §14.2 of
+   companion-architecture.md for the full explanation. */
+var BADGES={lab:'&#9883;',m1:'1',m2:'2',m3:'3',m4:'4',flash:'&#10022;',final:'&#9733;'};  // presentation-only, has no place in the manifest
+
+var MODULES=MANIFEST.modules.map(function(m){
+  var mod={id:m.id, badge:BADGES[m.id]||'&#8226;', title:m.title,
+           sections:m.sections.map(function(s){return {key:s.key,label:s.label};})};
+  if(m.unlockAfter) mod.unlockAfter=m.unlockAfter;
+  return mod;
+});
+
+/* Sections with no gating requirement — landing pages and the flashcard
+   deck. They're navigable and appear in FLOW for Back/Next, but they
+   don't block a module from showing "done" and don't get a status dot. */
+var UNGRADED=[];
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(!s.checks && !s.activity && !s.quiz) UNGRADED.push(s.key);
+});});
+
+var FLOW=[]; MODULES.forEach(function(m){m.sections.forEach(function(s){FLOW.push(s);});});
+
+/* Which section to send a student back to when an area needs review */
+var AREA_SECTION=MANIFEST.areaSection;
+
+/* ---------- Which checkpoints/activities gate each section ---------- */
+var SECTION_REQ={}, QUIZ_KEY_FOR_SECTION={};
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(s.checks||s.activity){
+    SECTION_REQ[s.key]={checks:s.checks||[]};
+    if(s.activity) SECTION_REQ[s.key].activity=s.activity;
+  }
+  if(s.quiz) QUIZ_KEY_FOR_SECTION[s.key]=s.quiz;
+});});
+/* ---------- Quiz sizing for this companion ---------- */
+var MODULE_QUIZ_SIZE=8;
+var FINAL_EXAM_MIX={concept:8,application:10,integration:7};
+
+/* ---------- Bespoke activity data (sort, classify, table, sequence) ---------- */
+var SORT_ITEMS=[
+ {text:'The Zn²⁺ ion required by alcohol dehydrogenase',answer:'Cofactor'},
+ {text:'NAD⁺ working alongside that same enzyme',answer:'Coenzyme'},
+ {text:'An organic helper permanently bonded to its protein',answer:'Prosthetic group'},
+ {text:'An enzyme protein with its required helper missing',answer:'Apoenzyme'},
+ {text:'The complete, catalytically active enzyme-cofactor complex',answer:'Holoenzyme'}];
+var SORT_OPTS=['Cofactor','Coenzyme','Prosthetic group','Apoenzyme','Holoenzyme'];
+
+var CLASS_OPTS=['Oxidoreductase','Transferase','Hydrolase','Lyase','Isomerase','Ligase','Translocase'];
+var CLASS_ITEMS=[
+ {text:'A peptide bond is cleaved and water is incorporated into the products',answer:'Hydrolase',
+  why:'Bond cleavage with water consumed is hydrolysis. Peptidases are the standard example.'},
+ {text:'A phosphoryl group is moved from ATP onto a protein side chain',answer:'Transferase',
+  why:'A functional group moves from a donor to an acceptor. Kinases are transferases, not ligases, because nothing is being joined into one molecule.'},
+ {text:'Histidine is converted to histamine, releasing carbon dioxide',answer:'Lyase',
+  why:'A decarboxylation removes a group by elimination rather than hydrolysis, which places it with the lyases.'},
+ {text:'Three Na⁺ ions move out of the cell and two K⁺ ions move in, using one ATP',answer:'Translocase',
+  why:'Movement of ions across a membrane defines a translocase. This class was only created in 2018, so older sources may file the pump elsewhere.'},
+ {text:'NADH donates electrons to a substrate, reducing it',answer:'Oxidoreductase',
+  why:'Electron transfer is oxidation-reduction. The NAD⁺/NADH pair is the usual signal.'},
+ {text:'Two DNA fragments are joined together, coupled to ATP hydrolysis',answer:'Ligase',
+  why:'Two molecules become one and ATP pays for it — the definition of a ligase.'},
+ {text:'A D amino acid is converted to its L form',answer:'Isomerase',
+  why:'Nothing is added or removed; the molecule is rearranged into a different form of itself.'},
+ {text:'ATP is converted to cyclic AMP with release of pyrophosphate, forming a ring',answer:'Lyase',
+  why:'Adenylate cyclase forms a ring by elimination without using water, so it is a lyase despite ATP appearing in the reaction. The presence of ATP alone never settles the class.'}];
+
+var TABLE_ROWS=[
+ {name:'Competitive',binds:'Free enzyme, at the active site',km:'Increases',vmax:'Unchanged'},
+ {name:'Uncompetitive',binds:'Enzyme-substrate complex, away from the active site',km:'Decreases',vmax:'Decreases'}];
+var KM_OPTS=['Increases','Decreases','Unchanged'];
+
+var PCN_STEPS=[
+ {n:1,text:'Penicillin mimics a natural substrate of a bacterial cell wall enzyme'},
+ {n:2,text:'The enzyme binds it and begins its normal catalytic mechanism'},
+ {n:3,text:'A covalent bond forms between penicillin and the enzyme'},
+ {n:4,text:'The enzyme cannot complete the reaction, so it is permanently inactivated'}];
+/* ---------- Module 1 figures: energy diagram, induced fit ---------- */
+var enzOn=false;
+document.getElementById('enzToggle').onclick=function(){
+  enzOn=!enzOn;
+  document.getElementById('catGroup').classList.toggle('o0',!enzOn);
+  this.textContent=enzOn?'Remove the enzyme':'Add the enzyme';
+  document.getElementById('enzNote').textContent=enzOn
+    ?'The barrier dropped. The ΔG bracket on the right did not move at all.'
+    :'Watch what changes — and what stays exactly the same.';
+};
+var OPEN='M390 150 V90 a12 12 0 0 1 12-12 h26 l0 -14 a10 10 0 0 1 10 -10 h44 a10 10 0 0 1 10 10 l0 14 h26 a12 12 0 0 1 12 12 v60 z';
+var CLOSED='M390 150 V90 a12 12 0 0 1 12-12 h34 l0 -8 a10 10 0 0 1 10 -10 h28 a10 10 0 0 1 10 10 l0 8 h34 a12 12 0 0 1 12 12 v60 z';
+var bound=false;
+document.getElementById('fitBtn').onclick=function(){
+  bound=!bound;
+  document.getElementById('ifShape').setAttribute('d',bound?CLOSED:OPEN);
+  var sub=document.getElementById('ifSub');
+  sub.setAttribute('y',bound?62:52);sub.setAttribute('x',bound?452:442);
+  sub.setAttribute('width',bound?56:76);
+  document.getElementById('ifSubTxt').setAttribute('y',bound?80:70);
+  this.textContent=bound?'Release the substrate':'Bind the substrate';
+  document.getElementById('ifCap').textContent=bound?'the enzyme closed around its substrate':'site is open and flexible';
+};
+
+/* Terminology sorting */
+var sortPicks=state.activities.sort?state.activities.sort.slice():new Array(SORT_ITEMS.length).fill(null);
+var sortRows=document.getElementById('sortRows');
+SORT_ITEMS.forEach(function(item,r){
+  var row=el('div','sort-row');
+  row.appendChild(el('div','sort-text',item.text));
+  var opts=el('div','sort-opts');
+  shuffle(SORT_OPTS).forEach(function(o){
+    var b=el('button','opt',o);b.dataset.val=o;
+    b.onclick=function(){sortPicks[r]=o;
+      opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel');};
+    opts.appendChild(b);
+  });
+  row.appendChild(opts);sortRows.appendChild(row);
+});
+sortRows.querySelectorAll('.sort-row').forEach(function(row,r){
+  row.querySelectorAll('.opt').forEach(function(b){b.classList.toggle('sel',b.dataset.val===sortPicks[r]);});
+});
+document.getElementById('sortCheck').onclick=function(){
+  var got=0;
+  sortRows.querySelectorAll('.sort-row').forEach(function(row,r){
+    var correct=SORT_ITEMS[r].answer;
+    if(sortPicks[r]===correct)got++;
+    row.querySelectorAll('.opt').forEach(function(b){
+      b.disabled=true;
+      if(b.dataset.val===correct)b.classList.add('reveal');
+      if(b.classList.contains('sel')&&sortPicks[r]!==correct)b.classList.add('bad');
+    });
+  });
+  document.getElementById('sortScore').textContent=got+' of '+SORT_ITEMS.length+' correct.';
+  state.activities.sort=sortPicks.slice();saveState();paintNav();
+};
+document.getElementById('sortReset').onclick=function(){
+  sortPicks=new Array(SORT_ITEMS.length).fill(null);
+  sortRows.querySelectorAll('.opt').forEach(function(b){b.disabled=false;b.classList.remove('sel','bad','reveal');});
+  document.getElementById('sortScore').textContent='';state.activities.sort=null;saveState();
+};
+/* ---------- Module 2 figures: Michaelis-Menten slider, pH toggle ---------- */
+function mmPoints(vmax,km,x0,x1,yBase,yTop,sMax){
+  var pts=[],i,s,v;
+  for(i=0;i<=100;i++){
+    s=sMax*i/100;v=vmax*s/(km+s);
+    pts.push((x0+(x1-x0)*i/100).toFixed(1)+','+(yBase-(yBase-yTop)*v).toFixed(1));
+  }
+  return pts.join(' ');
+}
+document.getElementById('mmCurve').setAttribute('points',mmPoints(1,1,70,640,285,45,10));
+var slider=document.getElementById('sSlider');
+function paintMM(){
+  var s=slider.value/10;                 /* [S] in multiples of Km */
+  var v=s/(1+s);
+  var x=70+570*(s/10),y=285-240*v;
+  document.getElementById('mmDot').setAttribute('cx',x);
+  document.getElementById('mmDot').setAttribute('cy',y);
+  document.getElementById('mmDrop').setAttribute('x1',x);
+  document.getElementById('mmDrop').setAttribute('x2',x);
+  document.getElementById('mmDrop').setAttribute('y2',y);
+  document.getElementById('sVal').textContent=s.toFixed(1)+' × Km';
+  document.getElementById('vVal').textContent=Math.round(v*100)+'% of Vmax';
+  document.getElementById('sensVal').textContent=s<0.5?'Very high':(s<2?'High':(s<5?'Modest':'Very low — saturated'));
+}
+slider.addEventListener('input',paintMM);paintMM();
+
+var PH_NOTES={
+ pep:'Pepsin works in the stomach at pH 1 to 2, so its side chains are correctly ionized in strong acid and lose that state at neutral pH.',
+ g6p:'Glucose-6-phosphatase operates in cells where pH sits near 7.2, and its optimum matches that environment.'};
+document.querySelectorAll('[data-ph]').forEach(function(b){
+  b.onclick=function(){
+    var pick=b.dataset.ph;
+    document.querySelectorAll('[data-ph]').forEach(function(x){x.classList.toggle('on',x===b);});
+    document.getElementById('pepCurve').setAttribute('opacity',pick==='pep'?1:.22);
+    document.getElementById('pepLbl').setAttribute('opacity',pick==='pep'?1:.22);
+    document.getElementById('g6pCurve').setAttribute('opacity',pick==='g6p'?1:.22);
+    document.getElementById('g6pLbl').setAttribute('opacity',pick==='g6p'?1:.22);
+    document.getElementById('phNote').textContent=PH_NOTES[pick];
+  };
+});
+/* ---------- Module 3: drag-and-drop decision framework ---------- */
+var CLASS_TREE=[
+ {answer:'Oxidoreductase',desc:'Transfers electrons'},
+ {answer:'Transferase',desc:'Transfers a functional group'},
+ {answer:'Hydrolase',desc:'Breaks a bond using water'},
+ {answer:'Lyase',desc:'Breaks a bond without water'},
+ {answer:'Isomerase',desc:'Rearranges within one molecule'},
+ {answer:'Ligase',desc:'Joins two molecules using ATP'},
+ {answer:'Translocase',desc:'Moves something across a membrane'}
+];
+var dndBoard=document.getElementById('dndBoard'),dndTray=document.getElementById('dndTray');
+var dndChecked=false;
+
+CLASS_TREE.forEach(function(row){
+  var r=el('div','dnd-row');r.dataset.answer=row.answer;
+  r.appendChild(el('div','dnd-desc',row.desc));
+  var slot=el('div','dnd-slot');slot.dataset.answer=row.answer;
+  r.appendChild(slot);dndBoard.appendChild(r);
+});
+shuffle(CLASS_TREE.map(function(r){return r.answer;})).forEach(function(name){
+  var p=el('button','dnd-pill',name);p.type='button';p.dataset.value=name;
+  dndTray.appendChild(p);wireDndPill(p);
+});
+
+function placePill(pill,slot){
+  var existing=slot.querySelector('.dnd-pill');
+  if(existing&&existing!==pill){dndTray.appendChild(existing);}
+  slot.innerHTML='';slot.appendChild(pill);pill.classList.add('placed');
+}
+function wireDndPill(p){
+  p.addEventListener('pointerdown',function(e){
+    if(dndChecked)return;
+    e.preventDefault();
+    var ghost=el('div','dnd-ghost',p.textContent);
+    document.body.appendChild(ghost);
+    var overSlot=null;
+    function place(x,y){ghost.style.left=x+'px';ghost.style.top=y+'px';}
+    place(e.clientX,e.clientY);
+    p.classList.add('dragging');
+    function onMove(ev){
+      place(ev.clientX,ev.clientY);
+      ghost.style.display='none';
+      var under=document.elementFromPoint(ev.clientX,ev.clientY);
+      ghost.style.display='';
+      var slot=under&&under.closest('.dnd-slot');
+      if(overSlot&&overSlot!==slot)overSlot.classList.remove('over');
+      if(slot)slot.classList.add('over');
+      overSlot=slot||null;
+    }
+    function onUp(){
+      document.removeEventListener('pointermove',onMove);
+      document.removeEventListener('pointerup',onUp);
+      document.removeEventListener('pointercancel',onUp);
+      ghost.remove();p.classList.remove('dragging');
+      if(overSlot){overSlot.classList.remove('over');placePill(p,overSlot);}
+    }
+    document.addEventListener('pointermove',onMove);
+    document.addEventListener('pointerup',onUp);
+    document.addEventListener('pointercancel',onUp);
+  });
+}
+document.getElementById('dndCheck').onclick=function(){
+  var got=0,map={};
+  dndBoard.querySelectorAll('.dnd-row').forEach(function(row){
+    var pill=row.querySelector('.dnd-slot .dnd-pill');
+    var right=!!pill&&pill.dataset.value===row.dataset.answer;
+    row.classList.remove('correct','incorrect');
+    row.classList.add(right?'correct':'incorrect');
+    map[row.dataset.answer]=pill?pill.dataset.value:null;
+    if(right)got++;
+  });
+  document.querySelectorAll('.dnd-pill').forEach(function(p){p.classList.add('locked');});
+  dndChecked=true;
+  document.getElementById('dndScore').textContent=got+' of '+CLASS_TREE.length+' correct.';
+  state.activities.tree=map;saveState();paintNav();
+};
+document.getElementById('dndReset').onclick=function(){
+  dndChecked=false;
+  dndBoard.querySelectorAll('.dnd-row').forEach(function(row){row.classList.remove('correct','incorrect');});
+  document.querySelectorAll('.dnd-pill').forEach(function(p){p.classList.remove('locked','placed');dndTray.appendChild(p);});
+  document.getElementById('dndScore').textContent='';
+  state.activities.tree=null;saveState();paintNav();
+};
+if(state.activities.tree){
+  Object.keys(state.activities.tree).forEach(function(ans){
+    var val=state.activities.tree[ans];if(!val)return;
+    var slot=dndBoard.querySelector('.dnd-row[data-answer="'+ans+'"] .dnd-slot');
+    var pill=[].slice.call(dndTray.querySelectorAll('.dnd-pill')).filter(function(p){return p.dataset.value===val;})[0];
+    if(slot&&pill){slot.appendChild(pill);pill.classList.add('placed','locked');}
+  });
+  var restoredGot=0;
+  dndBoard.querySelectorAll('.dnd-row').forEach(function(row){
+    var pill=row.querySelector('.dnd-slot .dnd-pill');
+    var right=!!pill&&pill.dataset.value===row.dataset.answer;
+    row.classList.add(right?'correct':'incorrect');
+    if(right)restoredGot++;
+  });
+  dndChecked=true;
+  document.getElementById('dndScore').textContent=restoredGot+' of '+CLASS_TREE.length+' correct.';
+}
+
+
+var clsPicks=state.activities.cls?state.activities.cls.slice():new Array(CLASS_ITEMS.length).fill(null);
+var classRows=document.getElementById('classRows');
+CLASS_ITEMS.forEach(function(item,r){
+  var row=el('div','sort-row');
+  row.appendChild(el('div','sort-text','<strong>'+(r+1)+'.</strong> '+item.text));
+  var opts=el('div','sort-opts');
+  CLASS_OPTS.forEach(function(o){
+    var b=el('button','opt',o);b.dataset.val=o;
+    b.onclick=function(){clsPicks[r]=o;
+      opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel');};
+    opts.appendChild(b);
+  });
+  row.appendChild(opts);classRows.appendChild(row);
+});
+classRows.querySelectorAll('.sort-row').forEach(function(row,r){
+  row.querySelectorAll('.opt').forEach(function(b){b.classList.toggle('sel',b.dataset.val===clsPicks[r]);});
+});
+document.getElementById('classCheck').onclick=function(){
+  var got=0,why=el('div');
+  classRows.querySelectorAll('.sort-row').forEach(function(row,r){
+    var correct=CLASS_ITEMS[r].answer,right=clsPicks[r]===correct;
+    if(right)got++;
+    row.querySelectorAll('.opt').forEach(function(b){
+      b.disabled=true;
+      if(b.dataset.val===correct)b.classList.add('reveal');
+      if(b.classList.contains('sel')&&!right)b.classList.add('bad');
+    });
+    var f=el('div','feedback show'+(right?'':' miss'),
+      '<strong>'+(r+1)+'. '+correct+'</strong>'+CLASS_ITEMS[r].why);
+    f.style.marginBottom='10px';why.appendChild(f);
+  });
+  document.getElementById('classScore').textContent=got+' of '+CLASS_ITEMS.length+' correct.';
+  var box=document.getElementById('classWhy');box.innerHTML='';box.appendChild(why);
+  state.activities.cls=clsPicks.slice();saveState();paintNav();
+};
+document.getElementById('classReset').onclick=function(){
+  clsPicks=new Array(CLASS_ITEMS.length).fill(null);
+  classRows.querySelectorAll('.opt').forEach(function(b){b.disabled=false;b.classList.remove('sel','bad','reveal');});
+  document.getElementById('classScore').textContent='';
+  document.getElementById('classWhy').innerHTML='';state.activities.cls=null;saveState();
+};
+/* ---------- Module 2: efficiency bench ----------
+   A predict-then-reveal deck comparing two enzymes by kcat/Km,
+   followed by free-exploration sliders against an illustrative
+   diffusion-limit ceiling. Numbers are teaching values, not
+   literature figures for any specific named enzyme. */
+function fmtNum(n){
+  if(n>=1000000)return (n/1000000).toFixed(n>=10000000?0:1)+'M';
+  if(n>=1000)return (n/1000).toFixed(n>=10000?0:1)+'k';
+  if(n<1)return n.toFixed(3);
+  return Math.round(n).toString();
+}
+var BENCH_ROUNDS=[
+ {a:{label:'Enzyme A',desc:'Binds its substrate very tightly, but processes it slowly once bound.',kcat:100,km:0.01},
+  b:{label:'Enzyme B',desc:'Binds weakly and needs a lot of substrate around \u2014 but once engaged, it is extremely fast.',kcat:5000,km:5},
+  why:'Enzyme A\u2019s tight binding wins out: 100/0.01 = 10,000 vs 5000/5 = 1000. A raw speed advantage doesn\u2019t make up for binding ten times worse.'},
+ {a:{label:'Enzyme A',desc:'Operates close to the physical limit \u2014 almost every encounter with substrate leads to product, the way carbonic anhydrase does.',kcat:600000,km:12},
+  b:{label:'Enzyme B',desc:'A typical metabolic enzyme \u2014 solid, unremarkable kinetics.',kcat:200,km:0.5},
+  why:'A\u2019s efficiency (50,000) dwarfs B\u2019s (400) even though B actually binds its substrate more tightly. Once an enzyme is diffusion-limited, nothing beats it on efficiency.'},
+ {a:{label:'Enzyme A',desc:'Moderate binder, moderate speed.',kcat:300,km:1.5},
+  b:{label:'Enzyme B',desc:'Binds ten times more weakly, but is ten times faster.',kcat:3000,km:15},
+  why:'Both land at exactly 200 s\u207b\u00b9mM\u207b\u00b9 \u2014 identical efficiency from very different strategies. They would still behave differently in a cell: A pulls ahead at low substrate, B\u2019s raw speed matters more once substrate is abundant.'},
+ {a:{label:'Enzyme A',desc:'Extraordinarily tight binder, but almost lethargic once bound.',kcat:10,km:0.001},
+  b:{label:'Enzyme B',desc:'Binds only loosely, but is blindingly fast.',kcat:200000,km:8},
+  why:'This time raw speed wins: B\u2019s efficiency (25,000) beats A\u2019s (10,000) despite A binding a thousand times more tightly. A big enough speed advantage can overcome mediocre binding.'}
+];
+function effOf(e){return e.kcat/e.km;}
+var benchIdx=0,benchPick=null,benchDone=false;
+var benchSeen=(state.activities.bench&&state.activities.bench.seen)||0;
+var benchGot=(state.activities.bench&&state.activities.bench.got)||0;
+
+function paintBenchRound(){
+  var r=BENCH_ROUNDS[benchIdx];
+  benchDone=false; benchPick=null;
+  document.getElementById('benchCount').textContent='Scenario '+(benchIdx+1)+' of '+BENCH_ROUNDS.length;
+  document.getElementById('benchScore').textContent=benchSeen?(benchGot+' of '+benchSeen+' correct predictions'):'';
+  var pair=document.getElementById('benchPair'); pair.innerHTML='';
+  [r.a,r.b].forEach(function(e){
+    var card=el('div','bench-card');
+    card.appendChild(el('h4',null,e.label));
+    card.appendChild(el('p',null,e.desc));
+    pair.appendChild(card);
+  });
+  var box=document.getElementById('benchChoices'); box.innerHTML='';
+  [['a','Enzyme A is more efficient'],['equal','About equally efficient'],['b','Enzyme B is more efficient']].forEach(function(o){
+    var b=el('button','choice',o[1]);
+    b.onclick=function(){ if(!benchDone){benchPick=o[0]; revealBench();} };
+    box.appendChild(b);
+  });
+  document.getElementById('benchBars').style.display='none';
+  document.getElementById('benchFb').className='feedback';
+}
+function revealBench(){
+  var r=BENCH_ROUNDS[benchIdx];
+  var ea=effOf(r.a), eb=effOf(r.b);
+  var correct = ea>eb*1.05 ? 'a' : (eb>ea*1.05 ? 'b' : 'equal');
+  var right = benchPick===correct;
+  benchDone=true; benchSeen++; if(right)benchGot++;
+  document.querySelectorAll('#benchChoices .choice').forEach(function(b){b.disabled=true;});
+  var bars=document.getElementById('benchBars'); bars.style.display='grid'; bars.innerHTML='';
+  var maxEff=Math.max(ea,eb);
+  [['A',ea],['B',eb]].forEach(function(pair){
+    var pct=Math.max(4,pair[1]/maxEff*100);
+    var row=el('div','bench-bar-row');
+    row.appendChild(el('span','bench-bar-label','Enzyme '+pair[0]));
+    var track=el('span','bench-bar-track');
+    var fill=el('span','bench-bar-fill'); fill.style.width=pct+'%';
+    track.appendChild(fill); row.appendChild(track);
+    row.appendChild(el('span','bench-bar-val',fmtNum(pair[1])+' s\u207b\u00b9mM\u207b\u00b9'));
+    bars.appendChild(row);
+  });
+  var fb=document.getElementById('benchFb');
+  fb.className='feedback show'+(right?'':' miss');
+  fb.innerHTML='<strong>'+(right?'Correct \u2014 ':'Not quite \u2014 ')+
+    (correct==='equal'?'they\u2019re about equally efficient.':'Enzyme '+correct.toUpperCase()+' is more efficient.')+
+    '</strong>'+r.why;
+  document.getElementById('benchScore').textContent=benchGot+' of '+benchSeen+' correct predictions';
+  state.activities.bench={seen:benchSeen,got:benchGot};
+  saveState(); paintNav();
+}
+document.getElementById('benchNext').onclick=function(){benchIdx=(benchIdx+1)%BENCH_ROUNDS.length; paintBenchRound();};
+document.getElementById('benchReset').onclick=function(){
+  benchIdx=0; benchSeen=0; benchGot=0;
+  state.activities.bench=null; saveState(); paintNav();
+  paintBenchRound();
+};
+paintBenchRound();
+
+function logSlider(val,minExp,maxExp){return Math.pow(10,minExp+(maxExp-minExp)*val/100);}
+var benchKcatEl=document.getElementById('benchKcat'), benchKmEl=document.getElementById('benchKm');
+function paintExplore(){
+  var kcat=logSlider(benchKcatEl.value,0,6);   // 1 to 1,000,000 s⁻¹
+  var km=logSlider(benchKmEl.value,-3,2);       // 0.001 to 100 mM
+  var eff=kcat/km;
+  document.getElementById('benchKcatVal').textContent=fmtNum(kcat)+' s\u207b\u00b9';
+  document.getElementById('benchKmVal').textContent=fmtNum(km)+' mM';
+  document.getElementById('benchEffVal').textContent=fmtNum(eff)+' s\u207b\u00b9mM\u207b\u00b9';
+  var pct=Math.max(2,Math.min(100,(Math.log10(eff)/7)*100));
+  var fill=document.getElementById('benchEffFill');
+  fill.style.width=pct+'%';
+  fill.style.background = eff>100000?'var(--rose)':'var(--green)';
+  document.getElementById('benchEffNote').textContent = eff>100000
+    ? 'This is past where real enzymes operate \u2014 nothing reacts faster than it can meet its substrate.'
+    : (eff>50000 ? 'This is diffusion-limited territory, the way carbonic anhydrase operates.' : '');
+}
+benchKcatEl.addEventListener('input',paintExplore);
+benchKmEl.addEventListener('input',paintExplore);
+paintExplore();
+
+/* ---------- Module 3: reaction inspector ----------
+   Each reaction is inspected with three questions. The answers
+   deterministically produce a class, so the student derives the
+   answer through the framework rather than recalling a definition.
+   The enzyme's name stays hidden until after they commit, so name
+   clues can't short-circuit the reasoning. */
+var RXN_BONDS=[
+  {v:'join',     t:'Two molecules were joined into one, using ATP'},
+  {v:'transfer', t:'A group moved from one molecule to another'},
+  {v:'water',    t:'A bond was broken using water'},
+  {v:'nowater',  t:'A bond was broken without water'},
+  {v:'rearrange',t:'Nothing added or removed — just rearranged'},
+  {v:'none',     t:'No bonds changed at all'}
+];
+var RXN_QUESTIONS=[
+  {key:'membrane', q:'Did anything cross a membrane?',   opts:[{v:'yes',t:'Yes'},{v:'no',t:'No'}]},
+  {key:'electrons',q:'Were electrons transferred?',       opts:[{v:'yes',t:'Yes'},{v:'no',t:'No'}]},
+  {key:'bond',     q:'What happened to the bonds?',       opts:RXN_BONDS}
+];
+var REACTIONS=[
+  {eq:'Lactate + NAD<sup>+</sup> &rarr; Pyruvate + NADH + H<sup>+</sup>',
+   name:'lactate dehydrogenase', cls:'Oxidoreductase',
+   a:{membrane:'no',electrons:'yes',bond:'none'},
+   why:'NAD<sup>+</sup> picking up electrons is the giveaway. Oxidation and reduction always travel together — lactate is oxidized, NAD<sup>+</sup> is reduced.',
+   clue:'The &ldquo;___ dehydrogenase&rdquo; ending points at oxidoreductase.'},
+  {eq:'ATP + Glucose &rarr; ADP + Glucose-6-phosphate',
+   name:'hexokinase', cls:'Transferase',
+   a:{membrane:'no',electrons:'no',bond:'transfer'},
+   why:'A phosphoryl group moved from ATP onto glucose. Nothing was joined into a single molecule and no water was consumed, so this is group transfer, not ligation or hydrolysis.',
+   clue:'The &ldquo;___ kinase&rdquo; ending points at transferase.'},
+  {eq:'Peptide + H<sub>2</sub>O &rarr; Two shorter peptides',
+   name:'a peptidase', cls:'Hydrolase',
+   a:{membrane:'no',electrons:'no',bond:'water'},
+   why:'Water was consumed and ended up in the products. That is hydrolysis, and it is the single question that separates this class from a lyase.',
+   clue:'The &ldquo;___ peptidase&rdquo; ending points at hydrolase.'},
+  {eq:'Histidine &rarr; Histamine + CO<sub>2</sub>',
+   name:'histidine decarboxylase', cls:'Lyase',
+   a:{membrane:'no',electrons:'no',bond:'nowater'},
+   why:'A bond broke and CO<sub>2</sub> left, but no water was involved. Elimination rather than hydrolysis puts this with the lyases.',
+   clue:'No reliable name clue here — this one has to be read from the reaction.'},
+  {eq:'Glucose-6-phosphate &rarr; Fructose-6-phosphate',
+   name:'phosphoglucose isomerase', cls:'Isomerase',
+   a:{membrane:'no',electrons:'no',bond:'rearrange'},
+   why:'Same molecular formula on both sides — nothing added, nothing removed, nothing transferred anywhere. Pure rearrangement.',
+   clue:'&ldquo;___ isomerase&rdquo; and &ldquo;___ mutase&rdquo; both land in this class.'},
+  {eq:'DNA fragment + DNA fragment + ATP &rarr; Joined DNA + ADP + P<sub>i</sub>',
+   name:'DNA ligase', cls:'Ligase',
+   a:{membrane:'no',electrons:'no',bond:'join'},
+   why:'Two separate molecules became one, and ATP hydrolysis paid for it. That combination is what defines a ligase.',
+   clue:'&ldquo;___ synthetase&rdquo; often signals a ligase, as with the aminoacyl tRNA synthetases.'},
+  {eq:'3 Na<sup>+</sup><sub>(in)</sub> + 2 K<sup>+</sup><sub>(out)</sub> + ATP &rarr; 3 Na<sup>+</sup><sub>(out)</sub> + 2 K<sup>+</sup><sub>(in)</sub> + ADP + P<sub>i</sub>',
+   name:'the Na⁺/K⁺ pump', cls:'Translocase',
+   a:{membrane:'yes',electrons:'no',bond:'none'},
+   why:'ATP is hydrolyzed here, but the work being done is transport across a membrane, not bond chemistry. Once something crosses a membrane, that answer settles the class before the other two questions matter.',
+   clue:'This class was only created in 2018, so older references file the pump elsewhere.'},
+  {eq:'ATP &rarr; cyclic AMP + PP<sub>i</sub>',
+   name:'adenylate cyclase', cls:'Lyase',
+   a:{membrane:'no',electrons:'no',bond:'nowater'},
+   why:'The presence of ATP tempts you toward ligase or transferase, but nothing was joined and no group was handed to another molecule. A ring formed by elimination, with no water consumed — that is lyase chemistry.',
+   clue:'A good reminder that ATP in a reaction never settles the class on its own.'},
+  {eq:'Glucose-6-phosphate + H<sub>2</sub>O &rarr; Glucose + P<sub>i</sub>',
+   name:'glucose-6-phosphatase', cls:'Hydrolase',
+   a:{membrane:'no',electrons:'no',bond:'water'},
+   why:'Water was consumed to cleave the phosphate ester. Phosphatases reverse what kinases do, but reversing a transferase reaction does not make an enzyme a transferase — the chemistry here is hydrolysis.',
+   clue:'The &ldquo;___ phosphatase&rdquo; ending points at hydrolase.'}
+];
+
+function deriveClass(a){
+  if(a.membrane==='yes')return 'Translocase';
+  if(a.electrons==='yes')return 'Oxidoreductase';
+  return {join:'Ligase',transfer:'Transferase',water:'Hydrolase',
+          nowater:'Lyase',rearrange:'Isomerase',none:null}[a.bond];
+}
+
+var rxnIdx=0, rxnPicks={}, rxnDone=false;
+var rxnSeen=(state.activities.inspect&&state.activities.inspect.seen)||0;
+var rxnGot=(state.activities.inspect&&state.activities.inspect.got)||0;
+var rxnEq=document.getElementById('rxnEq'), rxnQs=document.getElementById('rxnQs'),
+    rxnFb=document.getElementById('rxnFb');
+
+function paintRxn(){
+  var r=REACTIONS[rxnIdx];
+  rxnPicks={}; rxnDone=false;
+  document.getElementById('rxnCount').textContent='Reaction '+(rxnIdx+1)+' of '+REACTIONS.length;
+  document.getElementById('rxnScore').textContent=rxnSeen?(rxnGot+' of '+rxnSeen+' identified correctly'):'';
+  rxnEq.innerHTML=r.eq.replace(/&rarr;/g,'<span class="rxn-arrow">&rarr;</span>')+
+    '<span class="rxn-note">Enzyme name hidden until you commit.</span>';
+  rxnFb.className='feedback';
+  rxnQs.innerHTML='';
+  RXN_QUESTIONS.forEach(function(q){
+    var row=el('div','sort-row');
+    row.appendChild(el('div','sort-text',q.q));
+    var opts=el('div','sort-opts');
+    q.opts.forEach(function(o){
+      var b=el('button','opt',o.t); b.dataset.val=o.v;
+      b.onclick=function(){
+        if(rxnDone)return;
+        rxnPicks[q.key]=o.v;
+        opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+        b.classList.add('sel');
+      };
+      opts.appendChild(b);
+    });
+    row.appendChild(opts); rxnQs.appendChild(row);
+  });
+  document.getElementById('rxnCheck').disabled=false;
+}
+
+document.getElementById('rxnCheck').onclick=function(){
+  if(rxnDone)return;
+  if(!rxnPicks.membrane||!rxnPicks.electrons||!rxnPicks.bond){
+    rxnFb.className='feedback show miss';
+    rxnFb.innerHTML='<strong>Answer all three questions first.</strong>'+
+      'Each one narrows the possibilities — the class falls out of the combination.';
+    return;
+  }
+  var r=REACTIONS[rxnIdx];
+  var derived=deriveClass(rxnPicks);
+  var right=(derived===r.cls);
+  rxnDone=true;
+  rxnSeen++; if(right)rxnGot++;
+  this.disabled=true;
+
+  rxnQs.querySelectorAll('.sort-row').forEach(function(row,qi){
+    var key=RXN_QUESTIONS[qi].key;
+    row.querySelectorAll('.opt').forEach(function(b){
+      b.disabled=true;
+      if(b.dataset.val===r.a[key])b.classList.add('reveal');
+      if(b.classList.contains('sel')&&rxnPicks[key]!==r.a[key])b.classList.add('bad');
+    });
+  });
+
+  rxnEq.innerHTML=r.eq.replace(/&rarr;/g,'<span class="rxn-arrow">&rarr;</span>')+
+    '<span class="rxn-reveal">'+r.name+' &middot; '+r.cls+'</span>';
+
+  rxnFb.className='feedback show'+(right?'':' miss');
+  rxnFb.innerHTML='<strong>'+(right
+      ? 'Your inspection produced '+derived+' — correct.'
+      : (derived? 'Your answers produce '+derived+', but this is a '+r.cls+'.'
+                : 'Your answers don\u2019t resolve to a class yet. This one is a '+r.cls+'.'))+'</strong>'+
+    r.why+'<span class="rxn-note">'+r.clue+'</span>';
+
+  document.getElementById('rxnScore').textContent=rxnGot+' of '+rxnSeen+' identified correctly';
+  state.activities.inspect={seen:rxnSeen,got:rxnGot};
+  saveState(); paintNav();
+};
+
+document.getElementById('rxnNext').onclick=function(){
+  rxnIdx=(rxnIdx+1)%REACTIONS.length;
+  paintRxn();
+};
+document.getElementById('rxnReset').onclick=function(){
+  rxnIdx=0; rxnSeen=0; rxnGot=0;
+  state.activities.inspect=null; saveState(); paintNav();
+  paintRxn();
+};
+paintRxn();
+
+/* ---------- Module 4 activities: table, identify-the-inhibitor, penicillin sequence ---------- */
+var tblPicks=state.activities.tbl?state.activities.tbl.slice():[null,null,null,null];
+var tbody=document.getElementById('inhibTable');
+TABLE_ROWS.forEach(function(row,r){
+  var tr=el('tr');
+  tr.appendChild(el('td',null,'<strong>'+row.name+'</strong>'));
+  tr.appendChild(el('td',null,row.binds));
+  ['km','vmax'].forEach(function(field,c){
+    var cell=el('td'),wrap=el('div','cellopts'),slot=r*2+c;
+    shuffle(KM_OPTS).forEach(function(o){
+      var b=el('button','opt',o);b.dataset.val=o;
+      b.onclick=function(){tblPicks[slot]=o;
+        wrap.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+        b.classList.add('sel');};
+      wrap.appendChild(b);
+    });
+    cell.appendChild(wrap);tr.appendChild(cell);
+  });
+  tbody.appendChild(tr);
+});
+function tblCorrect(slot){var r=Math.floor(slot/2);return slot%2===0?TABLE_ROWS[r].km:TABLE_ROWS[r].vmax;}
+tbody.querySelectorAll('.cellopts').forEach(function(wrap,slot){
+  wrap.querySelectorAll('.opt').forEach(function(b){b.classList.toggle('sel',b.dataset.val===tblPicks[slot]);});
+});
+document.getElementById('tblCheck').onclick=function(){
+  var got=0;
+  tbody.querySelectorAll('.cellopts').forEach(function(wrap,slot){
+    var correct=tblCorrect(slot);
+    if(tblPicks[slot]===correct)got++;
+    wrap.querySelectorAll('.opt').forEach(function(b){
+      b.disabled=true;
+      if(b.dataset.val===correct)b.classList.add('reveal');
+      if(b.classList.contains('sel')&&tblPicks[slot]!==correct)b.classList.add('bad');
+    });
+  });
+  document.getElementById('tblScore').textContent=got+' of 4 correct. Competitive inhibition is outcompeted by substrate, so the ceiling survives; uncompetitive inhibition needs the ES complex, so both values fall.';
+  state.activities.tbl=tblPicks.slice();saveState();paintNav();
+};
+document.getElementById('tblReset').onclick=function(){
+  tblPicks=[null,null,null,null];
+  tbody.querySelectorAll('.opt').forEach(function(b){b.disabled=false;b.classList.remove('sel','bad','reveal');});
+  document.getElementById('tblScore').textContent='';state.activities.tbl=null;saveState();paintNav();
+};
+
+/* Identify-the-inhibitor game */
+var INH_TYPES={
+ competitive:{vmax:1,km:3,label:'Competitive — Km increased, Vmax unchanged',
+  why:'The curve still climbs to the same ceiling, but it takes far more substrate to get halfway there. An unchanged Vmax with a raised Km is competitive inhibition: substrate and inhibitor compete for the same active site, and enough substrate wins.'},
+ uncompetitive:{vmax:0.5,km:0.4,label:'Uncompetitive — Km and Vmax both decreased',
+  why:'The ceiling dropped and the curve reaches half of its new maximum sooner than the control does. Both values falling is uncompetitive inhibition, which binds the enzyme-substrate complex — so adding substrate makes the inhibition worse rather than better.'}};
+var INH_DISTRACT=['Competitive — Km and Vmax both decreased','Uncompetitive — Vmax unchanged, Km increased'];
+var curInh=null,inhRevealed=false;
+document.getElementById('ctrlCurve').setAttribute('points',mmPoints(1,1,70,640,275,45,10));
+function newInhibitor(){
+  curInh=Math.random()<0.5?'competitive':'uncompetitive';
+  var d=INH_TYPES[curInh];
+  document.getElementById('inhCurve').setAttribute('points',mmPoints(d.vmax,d.km,70,640,275,45,10));
+  document.getElementById('inhCurve').classList.add('o0');
+  document.getElementById('inhLbl').classList.add('o0');
+  inhRevealed=false;
+  document.getElementById('showInh').disabled=false;
+  document.getElementById('inhFb').className='feedback';
+  var box=document.getElementById('inhChoices');box.innerHTML='';
+  var correct=d.label;
+  var opts=shuffle([correct,INH_TYPES[curInh==='competitive'?'uncompetitive':'competitive'].label].concat(INH_DISTRACT)).slice(0,4);
+  if(opts.indexOf(correct)===-1)opts[0]=correct;
+  opts=shuffle(opts);
+  opts.forEach(function(text,pos){
+    var b=el('button','choice','<span class="mark">'+LETTERS[pos]+'</span>'+text);
+    b.disabled=true;
+    b.onclick=function(){
+      var right=(text===correct);
+      box.querySelectorAll('.choice').forEach(function(x){x.disabled=true;});
+      box.querySelectorAll('.choice').forEach(function(x,i){
+        if(opts[i]===correct)x.classList.add('right');else if(i===pos)x.classList.add('wrong');
+      });
+      var fb=document.getElementById('inhFb');
+      fb.className='feedback show'+(right?'':' miss');
+      fb.innerHTML='<strong>'+(right?'Correct.':'Look at the ceiling first.')+'</strong>'+d.why;
+      state.activities.inh=true;saveState();paintNav();
+    };
+    box.appendChild(b);
+  });
+}
+document.getElementById('showInh').onclick=function(){
+  document.getElementById('inhCurve').classList.remove('o0');
+  document.getElementById('inhLbl').classList.remove('o0');
+  inhRevealed=true;this.disabled=true;
+  document.querySelectorAll('#inhChoices .choice').forEach(function(b){b.disabled=false;});
+};
+document.getElementById('newInh').onclick=newInhibitor;
+newInhibitor();
+
+/* Penicillin sequencing */
+var pcnOrder=shuffle(PCN_STEPS.slice());
+var pcnPicks=state.activities.pcn?state.activities.pcn.slice():new Array(PCN_STEPS.length).fill(null);
+var pcnRows=document.getElementById('pcnRows');
+pcnOrder.forEach(function(step,r){
+  var row=el('div','sort-row');
+  row.appendChild(el('div','sort-text',step.text));
+  var opts=el('div','sort-opts');
+  [1,2,3,4].forEach(function(n){
+    var b=el('button','opt','Step '+n);b.dataset.val=n;
+    b.onclick=function(){pcnPicks[r]=n;
+      opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel');};
+    opts.appendChild(b);
+  });
+  row.appendChild(opts);pcnRows.appendChild(row);
+});
+document.getElementById('pcnCheck').onclick=function(){
+  var got=0;
+  pcnRows.querySelectorAll('.sort-row').forEach(function(row,r){
+    var correct=pcnOrder[r].n,right=pcnPicks[r]===correct;
+    if(right)got++;
+    row.querySelectorAll('.opt').forEach(function(b){
+      b.disabled=true;
+      if(Number(b.dataset.val)===correct)b.classList.add('reveal');
+      if(b.classList.contains('sel')&&!right)b.classList.add('bad');
+    });
+  });
+  document.getElementById('pcnScore').textContent=got+' of 4 in the right place. The sequence matters: substrate mimicry gets it in, the enzyme\u2019s own mechanism forms the bond, and the trap is what makes it irreversible.';
+  state.activities.pcn=pcnPicks.slice();saveState();paintNav();
+};
+document.getElementById('pcnReset').onclick=function(){
+  pcnPicks=new Array(PCN_STEPS.length).fill(null);
+  pcnRows.querySelectorAll('.opt').forEach(function(b){b.disabled=false;b.classList.remove('sel','bad','reveal');});
+  document.getElementById('pcnScore').textContent='';state.activities.pcn=null;saveState();
+};
+
+/* ---------- Module 4: pathway control room + isozyme sensitivity ----------
+   Both are free exploration, not gated activities — same treatment as
+   the energy-diagram toggle in Module 1 and the pH toggle in Module 2.
+   The section's two checkpoints (c15, c15b) already do the assessing;
+   these widgets exist to make the concepts something a student watches
+   happen rather than reads about. */
+var PATH_STEPS=['E1','E2','E3','E4'];
+(function(){
+  var g=document.getElementById('pathBoxes');
+  var x0=14,w=118,gap=22,y=28,h=34;
+  PATH_STEPS.forEach(function(label,i){
+    var x=x0+i*(w+gap);
+    var r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',w);r.setAttribute('height',h);
+    r.setAttribute('rx',10);r.setAttribute('fill','#E7F6EF');r.setAttribute('stroke','#BFE6D4');
+    var t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',x+w/2);t.setAttribute('y',y+h/2+5);t.setAttribute('text-anchor','middle');
+    t.setAttribute('fill','#1C7554');t.setAttribute('font-weight','600');t.textContent=label;
+    g.appendChild(r);g.appendChild(t);
+    if(i>0){
+      var ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+      ln.setAttribute('x1',x-gap+2);ln.setAttribute('y1',y+h/2);
+      ln.setAttribute('x2',x-2);ln.setAttribute('y2',y+h/2);
+      ln.setAttribute('stroke','#7E8F9B');ln.setAttribute('stroke-width',1.6);
+      g.appendChild(ln);
+    }
+  });
+  var px=x0+PATH_STEPS.length*(w+gap)-gap+14;
+  var pr=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  pr.setAttribute('x',px);pr.setAttribute('y',y);pr.setAttribute('width',86);pr.setAttribute('height',h);
+  pr.setAttribute('rx',10);pr.setAttribute('fill','#F3EAFB');pr.setAttribute('stroke','#DED3FA');
+  var pt=document.createElementNS('http://www.w3.org/2000/svg','text');
+  pt.setAttribute('x',px+43);pt.setAttribute('y',y+h/2+5);pt.setAttribute('text-anchor','middle');
+  pt.setAttribute('fill','#6B4FD8');pt.setAttribute('font-weight','600');pt.textContent='Product';
+  g.appendChild(pr);g.appendChild(pt);
+  var lastLn=document.createElementNS('http://www.w3.org/2000/svg','line');
+  lastLn.setAttribute('x1',px-16);lastLn.setAttribute('y1',y+h/2);
+  lastLn.setAttribute('x2',px-2);lastLn.setAttribute('y2',y+h/2);
+  lastLn.setAttribute('stroke','#7E8F9B');lastLn.setAttribute('stroke-width',1.6);
+  g.appendChild(lastLn);
+})();
+
+var fbOn=true, demandOn=false;
+document.getElementById('fbToggle').onclick=function(){
+  fbOn=!fbOn;
+  this.classList.toggle('on',fbOn);
+  this.textContent='Feedback inhibition: '+(fbOn?'ON':'OFF');
+  document.getElementById('pathFeedback').style.opacity=fbOn?1:.15;
+  document.getElementById('pathFeedbackLbl').style.opacity=fbOn?1:.15;
+};
+document.getElementById('demandToggle').onclick=function(){
+  demandOn=!demandOn;
+  this.classList.toggle('on',demandOn);
+  this.textContent='Demand signal: '+(demandOn?'ON':'OFF');
+};
+function productAt(t,feedbackOn,demand){
+  if(feedbackOn){
+    var pss=demand?95:60, tau=7;
+    return pss*(1-Math.exp(-t/tau));
+  }
+  var rate=demand?6.5:3.4;
+  return rate*t;
+}
+function computePathPoints(feedbackOn,demand){
+  var x0=55,x1=630,y0=195,y1=15,maxY=115,steps=30,pts=[];
+  for(var i=0;i<=steps;i++){
+    var p=Math.min(productAt(i,feedbackOn,demand),maxY);
+    var x=x0+(x1-x0)*i/steps;
+    var y=y0-(y0-y1)*p/maxY;
+    pts.push(x.toFixed(1)+','+y.toFixed(1));
+  }
+  return pts.join(' ');
+}
+document.getElementById('pathPlay').onclick=function(){
+  document.getElementById('pathLine').setAttribute('points',computePathPoints(fbOn,demandOn));
+  var note=document.getElementById('pathNote');
+  if(fbOn&&!demandOn)note.textContent='Product climbs quickly at first, then levels off around a steady amount — feedback inhibition throttles the pathway as product accumulates.';
+  else if(fbOn&&demandOn)note.textContent='The pathway still levels off, but at a higher steady amount — a positive signal lets it override some of the throttling without abandoning control entirely.';
+  else if(!fbOn&&!demandOn)note.textContent='Nothing here tells the pathway when to stop. Product keeps climbing for as long as the pathway runs.';
+  else note.textContent='With no feedback and a demand signal pushing harder, product runs away even faster — this is exactly what negative feedback normally prevents.';
+};
+
+var isoSliderEl=document.getElementById('isoSlider');
+function paintIso(){
+  var drug=isoSliderEl.value/10;
+  var liver=100/(1+drug/1.5);
+  var muscle=100/(1+drug/12);
+  document.getElementById('isoSliderVal').textContent=drug.toFixed(1)+' units';
+  document.getElementById('isoLiverFill').style.width=liver+'%';
+  document.getElementById('isoMuscleFill').style.width=muscle+'%';
+  document.getElementById('isoLiverVal').textContent=Math.round(liver)+'% active';
+  document.getElementById('isoMuscleVal').textContent=Math.round(muscle)+'% active';
+  var note=document.getElementById('isoNote');
+  if(drug<0.5)note.textContent='Move the slider to add the drug.';
+  else if(liver<muscle-20)note.textContent='At this dose, the liver isozyme has lost far more activity than the muscle isozyme — same drug, same reaction, very different outcome by tissue.';
+  else note.textContent='Still early — keep increasing the dose to see the two isozymes diverge.';
+}
+isoSliderEl.addEventListener('input',paintIso);
+paintIso();
+
+</script>
+<script src="shared/engine.js"></script>
+</body>
+</html>

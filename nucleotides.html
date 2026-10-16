@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nucleotides, Nucleosides &amp; Nucleic Acids · PHA3134 Study Companion</title>
+<link rel="stylesheet" href="shared/styles.css">
+<style>
+  /* This companion's accent: slate blue / steel.
+     The token names stay --green* on purpose — they mean "this
+     companion's primary" everywhere in shared/styles.css. */
+  :root{
+    --green:#41678A; --green-bright:#5484AE;
+    --green-soft:#EAF0F5; --green-line:#BCCEDE;
+  }
+  /* Three places hold literal hex values and don't pick the override
+     up on their own — see companion-architecture.md §7. */
+  .opt.sel{color:#2F5170}
+  .pill,.ring-num,.mod-head.current{color:#2F5170}
+  .bd-fill{background:var(--green)!important}
+
+  /* Small page-local additions. Everything else reuses shared classes. */
+  /* Activities get their own neutral box variant so they read as
+     "do something" rather than "answer a checkpoint". */
+  .box.activity{background:#EEF3F8;border:1px solid var(--green-line)}
+  .box.activity .tag{background:#D7E3EE;color:#2F5170}
+  .box.activity .caption{margin-bottom:0}
+  .mini{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+  .mini .btn{padding:8px 14px;font-size:.85rem}
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:14px 0}
+  .panel{background:#F7FAFB;border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px}
+  .panel h4{margin:0 0 6px;font-size:.86rem;color:var(--ink)}
+  .panel p{margin:0;font-size:.88rem;color:var(--ink-mid)}
+  .tray-note{font-size:.8rem;color:var(--ink-soft);margin:8px 0 0}
+  .stepline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+  .chip{border:1.5px solid var(--green-line);background:#fff;border-radius:999px;
+        padding:7px 14px;font-size:.82rem;color:var(--ink-mid)}
+  .chip.on{background:var(--green-soft);border-color:var(--green);color:#2F5170;font-weight:600}
+  .chip.bad{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+  .seq-slot{min-height:44px;border:2px dashed var(--green-line);border-radius:var(--r-md);
+            padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#FAFCFD}
+  .case-step{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+  .case-step:first-of-type{border-top:0;padding-top:0;margin-top:0}
+  .lede{font-size:1rem;color:var(--ink-mid)}
+  svg text{font-family:var(--font)}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <a class="back-to-hub" href="hub.html"><span class="arrow">&#8592;</span> Back to hub</a>
+    <div class="brand">
+      <div class="brand-mark">N</div>
+      <div>
+        <div class="brand-title">Nucleotides &amp; Nucleic Acids</div>
+        <div class="brand-sub">PHA3134 · Study Companion</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#C9D8E5" stroke-width="5"/>
+        <circle id="ringFill" cx="22" cy="22" r="18" fill="none" stroke="#41678A" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+                transform="rotate(-90 22 22)"/>
+      </svg>
+      <div><div class="ring-num" id="ringPct">0%</div>
+      <div class="ring-cap">of the companion<br>complete</div></div>
+    </div>
+    <button class="reset" id="resetBtn">Clear my saved progress</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="topTitle">Welcome</h1><div class="meta" id="topMeta">Self-paced companion · your progress saves in this browser</div></div>
+      <div class="pill" id="topPill">Not started</div>
+    </div>
+
+<!-- ============================================================
+     THE METABOLIC MAP — persistent, fills in as modules complete
+     ============================================================ -->
+<section class="section" data-key="map">
+  <div class="card">
+    <div class="eyebrow">Start here</div>
+    <h2>Your nucleotide metabolism map</h2>
+    <p class="lede">Everything in this companion is one connected system. This map is the picture of that
+    system, and it is deliberately mostly greyed out right now. As you finish each module, the part of the
+    map that module explains lights up. By the end, the drug targets from Module 5 appear as red blocks on
+    the very pathway you built.</p>
+    <p>Come back to this page whenever you want to see where the section you are reading sits in the
+    whole. It is always the first item in the sidebar.</p>
+    <div id="mapMount"></div>
+    <div class="readout" id="mapReadout"></div>
+    <p class="caption">The map redraws every time you return to it, so it always reflects your current progress.</p>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 1
+     ============================================================ -->
+<section class="section" data-key="m1home">
+  <div class="card">
+    <div class="eyebrow">Module 1</div>
+    <h2>Building blocks &amp; nucleic acid structure</h2>
+    <p class="lede">Before any pathway makes sense, the vocabulary has to be automatic. By the end of this
+    module you should be able to look at any abbreviation — dGTP, CMP, uridine — and say exactly what it is
+    made of, and explain why a single missing oxygen changes the whole behavior of the polymer.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m1s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Nucleobases: purines and pyrimidines</span>
+          <span class="home-desc">Two ring systems, five bases, and the one methyl group that separates thymine from uracil.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Nucleoside to nucleotide</span>
+          <span class="home-desc">Assemble molecules piece by piece and watch the name change as you go.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">The sugar, and why it matters</span>
+          <span class="home-desc">Toggle one atom at C2 prime and see what it does to stability and structure.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s4">
+        <span class="home-num">4</span>
+        <span class="home-body">
+          <span class="home-title">Backbone and base pairing</span>
+          <span class="home-desc">Build a strand, then build its antiparallel partner and count the hydrogen bonds.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 1 quiz</span>
+          <span class="home-desc">Eight questions, unlimited attempts, with a breakdown of where to review.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s1">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 1</div>
+    <h2>Nucleobases: purines and pyrimidines</h2>
+    <p>Five bases appear in human nucleic acids, and they come in exactly two structural families. Getting
+    this split automatic pays off later: the two biosynthetic pathways in Modules 2 and 3 are organized
+    around it, and so is the catabolism in Module 5.</p>
+
+    <div class="figure" id="figRings"></div>
+
+    <div class="grid2">
+      <div class="panel"><h4>Purines &#8212; adenine, guanine</h4>
+        <p>Two fused rings, nine numbered positions. Larger, and built by a completely different strategy
+        from the pyrimidines. Both appear in DNA and RNA.</p></div>
+      <div class="panel"><h4>Pyrimidines &#8212; cytosine, thymine, uracil</h4>
+        <p>One six-membered ring, six numbered positions. Cytosine appears in both DNA and RNA; thymine is
+        the DNA-specific base and uracil the RNA-specific one.</p></div>
+    </div>
+
+    <p>Thymine and uracil are worth pausing on. Thymine is simply uracil with a methyl group at carbon 5 —
+    nothing else differs. That is why they are interchangeable as adenine's partner, and it is also why
+    making thymine nucleotides needs one extra enzymatic step that Module 4 is largely about.</p>
+
+    <div id="act-baseSort"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c11a">
+        <p>Which description matches the ring structure of a purine?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11b">
+        <p>Which structural difference separates thymine from uracil?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11c">
+        <p>Which two bases are purines?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s2">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 2</div>
+    <h2>Nucleoside to nucleotide</h2>
+    <p>Three words describe three stages of the same molecule, and the naming is completely systematic once
+    you see the pattern:</p>
+
+    <div class="figure" id="figStages"></div>
+
+    <table>
+      <tr><th>Base</th><th>Nucleoside (base + sugar)</th><th>Nucleotide (+ 1&#8211;3 phosphates)</th></tr>
+      <tr><td>Adenine</td><td>Adenosine</td><td>AMP, ADP, ATP</td></tr>
+      <tr><td>Guanine</td><td>Guanosine</td><td>GMP, GDP, GTP</td></tr>
+      <tr><td>Cytosine</td><td>Cytidine</td><td>CMP, CDP, CTP</td></tr>
+      <tr><td>Thymine</td><td>Thymidine</td><td>TMP, TDP, TTP</td></tr>
+      <tr><td>Uracil</td><td>Uridine</td><td>UMP, UDP, UTP</td></tr>
+    </table>
+    <p class="caption">Add the prefix <em>deoxy-</em> to a nucleoside name, or a lower-case <em>d</em> to an
+    abbreviation, to signal deoxyribose: deoxyadenosine, dAMP.</p>
+
+    <p>Rather than reading that table again, build the molecules yourself. The tool below names whatever you
+    assemble, in real time, and then asks you to hit three specific targets.</p>
+
+    <div id="act-builder"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c12a">
+        <p>Adenine is joined to ribose and nothing else is added. What has been made?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c12b">
+        <p>Which components does dAMP contain?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c12c">
+        <p>Cytosine is joined to ribose. What is the resulting nucleoside called?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s3">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 3</div>
+    <h2>The sugar, and why it matters</h2>
+    <p>DNA and RNA differ in their sugar by exactly one atom. Ribose carries a hydroxyl group at carbon 2
+    prime; deoxyribose carries a hydrogen there. Every other position — C1 prime holding the base, C3 prime
+    and C5 prime holding the backbone — is identical.</p>
+
+    <p>That sounds like a trivial difference. It is not. Before you toggle anything below, commit to a
+    prediction: what would adding a reactive hydroxyl right beside the backbone linkage do to the
+    polymer?</p>
+
+    <div id="act-sugarToggle"></div>
+
+    <div class="box clinical">
+      <h3><span class="tag">WHY THIS MATTERS</span></h3>
+      <p>The lability of RNA is the reason RNA-based products need cold chains and careful formulation,
+      while DNA is comparatively forgiving. The same 2 prime hydroxyl that makes RNA fragile is also what
+      lets it fold into the varied shapes that give RNA its catalytic and regulatory roles.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c13a">
+        <p>At which sugar carbon do ribose and deoxyribose differ?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c13b">
+        <p>What does the 2 prime hydroxyl do to the RNA backbone?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s4">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 4</div>
+    <h2>Backbone and base pairing</h2>
+    <p>Nucleotides are joined by phosphodiester linkages: a phosphate bridges the 5 prime hydroxyl of one
+    sugar to the 3 prime hydroxyl of the next. Because the two ends of the chain are chemically different,
+    the strand has a direction, and by convention sequences are written 5 prime to 3 prime.</p>
+
+    <div class="figure" id="figBackbone"></div>
+
+    <p>In a duplex, the sugar-phosphate backbones face outward and the bases face each other. Guanine pairs
+    with cytosine using three hydrogen bonds; adenine pairs with thymine (in DNA) or uracil (in RNA) using
+    two. The two strands run antiparallel — one 5 prime to 3 prime, the other 3 prime to 5 prime.</p>
+
+    <p>Build a partner strand below. Watch the hydrogen-bond total as you go and notice how much it depends
+    on which bases you are pairing.</p>
+
+    <div id="act-strand"></div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY IT</span></h3>
+      <div class="cp-item" data-check="c14a">
+        <p>Which two sugar positions does a phosphodiester linkage join?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c14b">
+        <p>Which base pair is held together by three hydrogen bonds?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c14c">
+        <p>A DNA strand reads 5 prime - A T G C - 3 prime. What is its complementary strand?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="keypoints">
+      <h4>Module 1 in five lines</h4>
+      <ul>
+        <li>Purines (A, G) are two fused rings; pyrimidines (C, T, U) are one ring.</li>
+        <li>Base + sugar = nucleoside. Base + sugar + phosphate(s) = nucleotide.</li>
+        <li>Thymine is uracil plus a methyl group at C5.</li>
+        <li>Ribose has a 2 prime hydroxyl; deoxyribose has a hydrogen there.</li>
+        <li>G-C pairs use three hydrogen bonds; A-T and A-U use two.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1quiz">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Mastery check</div>
+    <h2>Module 1 quiz</h2>
+    <p>Eight questions drawn at random from a larger bank. Unlimited attempts, and the question set
+    reshuffles each time. After you submit, you will get a breakdown by concept area and the option to run a
+    targeted round on whatever needs work.</p>
+    <div class="quiz-body" data-quiz="m1"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 2
+     ============================================================ -->
+<section class="section" data-key="m2home">
+  <div class="card">
+    <div class="eyebrow">Module 2</div>
+    <h2>Build a purine</h2>
+    <p class="lede">There is a version of this pathway that is eleven abbreviations in a row, and learning it
+    that way is both miserable and useless. This module takes the opposite order: first work out where every
+    atom in the purine ring physically comes from, and only then meet the reactions that put them there.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m2s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Where nucleotides come from</span>
+          <span class="home-desc">Diet contributes little. PRPP, and the pentose phosphate pathway behind it, contributes almost everything.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Build the purine ring</span>
+          <span class="home-desc">Place five donors onto an empty ring skeleton before you see a single pathway arrow.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">PRPP to IMP: the pathway</span>
+          <span class="home-desc">The committed step, where the energy goes, and where the fumarate ends up.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s4">
+        <span class="home-num">4</span>
+        <span class="home-body">
+          <span class="home-title">The IMP branch point</span>
+          <span class="home-desc">Run the branch yourself and watch the two purine pools keep each other in check.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 2 quiz</span>
+          <span class="home-desc">Eight questions with a concept-area breakdown and a targeted follow-up round.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s1">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 1</div>
+    <h2>Where nucleotides come from</h2>
+    <p>A cell has two possible sources of nucleotides, and they are not evenly matched. Dietary nucleotides
+    are broken down in the gut and only about five percent of them reach circulation. The sugar released can
+    be used for energy; the base cannot. So de novo synthesis — building nucleotides from small precursors —
+    carries essentially the whole load.</p>
+
+    <p>Both de novo pathways begin at the same molecule. PRPP synthetase transfers a pyrophosphate group
+    from ATP onto ribose-5-phosphate to make <strong>PRPP</strong>, and the ribose-5-phosphate itself comes
+    from the pentose phosphate pathway. That is the connection worth holding onto: the pathway usually
+    introduced for NADPH production is also the front door to every nucleotide in the cell.</p>
+
+    <div class="figure" id="figPrpp"></div>
+
+    <div id="act-sourceMatch"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c21a">
+        <p>Which source supplies most of the nucleotides a human cell uses?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c21b">
+        <p>Which substrates does PRPP synthetase combine?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c21c">
+        <p>What does the pentose phosphate pathway contribute to nucleotide synthesis?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s2">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 2</div>
+    <h2>Build the purine ring</h2>
+    <p>Here is the finished product the pathway is aiming at: a purine ring, assembled directly on a ribose
+    phosphate. Every atom of that ring arrives from a specific donor, and there are only five donors.</p>
+
+    <p>Work out the map first. Place each donor onto the ring positions it supplies. The ring drawing
+    updates as you go, and you can check and retry as often as you like — nothing is locked by a wrong
+    answer.</p>
+
+    <div id="act-ringBuild"></div>
+
+    <p>Once that map is in your head, the eleven-step pathway stops being a list of abbreviations and starts
+    being a sequence of predictable additions: glycine goes on whole, two formyl groups arrive from folate,
+    bicarbonate is inserted, aspartate donates a nitrogen and departs.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c22a">
+        <p>Which donor is incorporated intact, supplying two carbons and one nitrogen at once?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c22b">
+        <p>Which cofactor supplies the one-carbon units at C2 and C8?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c22c">
+        <p>Which donor contributes a nitrogen and then leaves as a citric acid cycle intermediate?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s3">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 3</div>
+    <h2>PRPP to IMP: the pathway</h2>
+    <p>Now the reactions. The purine ring is built <em>onto</em> PRPP, which means every intermediate from
+    the first committed step onward is already a nucleotide — there is never a free purine base floating
+    around waiting to be attached.</p>
+
+    <p>The step worth naming is the first one. Amidophosphoribosyltransferase converts PRPP to
+    5-phosphoribosyl-1-amine, and this is the <strong>committed step</strong>: PRPP has other possible
+    destinations, but once the amine is installed, the molecule is going to become a purine nucleotide.
+    Committed steps are where regulation lives, in this pathway and in every other one.</p>
+
+    <div class="figure" id="figPurinePath"></div>
+
+    <p>Put the milestones in order below. You do not need every abbreviation — you need the shape of the
+    route and the two or three places where something chemically interesting happens.</p>
+
+    <div id="act-pathOrder"></div>
+
+    <div class="grid2">
+      <div class="panel"><h4>Where the energy goes</h4>
+        <p>ATP is consumed at several steps, including glycine addition and the aspartate condensation.
+        Building a ring from scratch is expensive, which is part of why salvage exists at all.</p></div>
+      <div class="panel"><h4>Where some comes back</h4>
+        <p>Adenylosuccinate lyase releases fumarate, which enters the citric acid cycle. The pathway
+        partially pays for itself.</p></div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY IT</span></h3>
+      <div class="cp-item" data-check="c23a">
+        <p>Which reaction is the committed step of de novo purine synthesis?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c23b">
+        <p>How is the purine ring assembled?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c23c">
+        <p>Which nucleotide does the linear purine pathway produce?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s4">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 4</div>
+    <h2>The IMP branch point</h2>
+    <p>IMP is not a nucleotide that ends up in DNA or RNA. It is the fork in the road: two further steps
+    lead to AMP, two different ones lead to GMP.</p>
+
+    <p>The interesting part is what powers each branch. Making AMP costs a <strong>GTP</strong>. Making GMP
+    costs an <strong>ATP</strong>. Each branch is paid for with the product of the other one.</p>
+
+    <p>Rather than memorizing that, run it. Make some AMP, make some GMP, and watch what happens to the two
+    pools.</p>
+
+    <div id="act-branch"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c24a">
+        <p>Which nucleoside triphosphate supplies the energy for converting IMP to AMP?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c24b">
+        <p>What does the reciprocal arrangement achieve for the cell?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="keypoints">
+      <h4>Module 2 in five lines</h4>
+      <ul>
+        <li>De novo synthesis supplies most nucleotides; diet supplies very little.</li>
+        <li>PRPP, made from ribose-5-phosphate and ATP, starts both pathways.</li>
+        <li>The purine ring is built directly onto PRPP, atom by atom, from five donors.</li>
+        <li>PRPP to 5-phosphoribosyl-1-amine is the committed step.</li>
+        <li>IMP branches to AMP (using GTP) and GMP (using ATP), which keeps the pools balanced.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2quiz">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Mastery check</div>
+    <h2>Module 2 quiz</h2>
+    <p>Eight questions, reshuffled on every attempt, with a concept-area breakdown afterward.</p>
+    <div class="quiz-body" data-quiz="m2"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 3
+     ============================================================ -->
+<section class="section" data-key="m3home">
+  <div class="card">
+    <div class="eyebrow">Module 3</div>
+    <h2>Same goal, different strategy</h2>
+    <p class="lede">Both pathways end at a nucleotide and both need PRPP. Almost everything else about how
+    they get there is different, and the comparison itself is the thing worth learning here — not two
+    separate lists.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m3s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Two construction strategies</span>
+          <span class="home-desc">Ring onto ribose, or ring first and ribose last. Sort the features into the right column.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">CPS II, CPS I, and CAD</span>
+          <span class="home-desc">Two enzymes with nearly the same name and completely different jobs, plus a three-in-one protein.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Orotate to UMP</span>
+          <span class="home-desc">Where the pathway leaves the cytosol, and why that detail becomes a drug target.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s4">
+        <span class="home-num">4</span>
+        <span class="home-body">
+          <span class="home-title">Climbing the phosphate ladder</span>
+          <span class="home-desc">Phosphorylate a nucleotide step by step and pick the right enzyme at each rung.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 3 quiz</span>
+          <span class="home-desc">Eight questions with a concept-area breakdown and a targeted follow-up round.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s1">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 1</div>
+    <h2>Two construction strategies</h2>
+    <p>Imagine you have to build a nucleotide from scratch. You have a ribose phosphate available and a
+    collection of small molecules. There are two reasonable approaches: build the ring onto the sugar you
+    already have, or build the ring separately and attach the sugar at the end.</p>
+
+    <p>The cell uses both — one for each class of base.</p>
+
+    <div class="figure" id="figStrategy"></div>
+
+    <div id="act-strategySort"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c31a">
+        <p>How is the pyrimidine ring assembled?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c31b">
+        <p>Which requirement do the two de novo pathways share?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s2">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 2</div>
+    <h2>CPS II, CPS I, and CAD</h2>
+    <p>Pyrimidine synthesis starts by turning bicarbonate into carbamoyl phosphate, catalyzed by
+    <strong>carbamoyl phosphate synthetase II</strong>. There is also a CPS I, it does a chemically similar
+    reaction, and it belongs to a completely different pathway. Students mix them up constantly, so it is
+    worth fixing the distinction now.</p>
+
+    <table>
+      <tr><th></th><th>CPS I</th><th>CPS II</th></tr>
+      <tr><td>Pathway</td><td>Urea cycle</td><td>Pyrimidine synthesis</td></tr>
+      <tr><td>Nitrogen source</td><td>Free ammonium</td><td>Glutamine side chain amide</td></tr>
+      <tr><td>Location</td><td>Mitochondrion</td><td>Cytosol</td></tr>
+      <tr><td>Part of a larger protein</td><td>No</td><td>Yes &#8212; the first activity of CAD</td></tr>
+    </table>
+
+    <p><strong>CAD</strong> is one polypeptide chain carrying three consecutive enzymatic activities:
+    carbamoyl phosphate synthetase II, aspartate transcarbamoylase, and dihydroorotase. Think of it as three
+    workstations on one bench — the intermediate never has to travel far to reach the next reaction. You met
+    the same idea with the bifunctional AIR carboxylase / SAICAR synthetase protein in Module 2, and you will
+    meet it again with UMP synthase in the next section.</p>
+
+    <p>Pass an intermediate through the CAD assembly line below, in the right order.</p>
+
+    <div id="act-cad"></div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY IT</span></h3>
+      <div class="cp-item" data-check="c32a">
+        <p>Which nitrogen source does CPS II use?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c32b">
+        <p>Which statement matches the pathways the two synthetases serve?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c32c">
+        <p>What does CAD describe?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s3">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 3</div>
+    <h2>Orotate to UMP</h2>
+    <p>After CAD, dihydroorotate is oxidized to orotate by <strong>dihydroorotate dehydrogenase
+    (DHODH)</strong>. This enzyme is the odd one out in the pathway: it sits in the mitochondrion rather
+    than the cytosol, and it hands its electrons to <strong>ubiquinone</strong> rather than to NAD or NADP.
+    That ties pyrimidine synthesis directly to the electron transport chain.</p>
+
+    <p>Remember DHODH. It becomes a drug target in Module 5, and the reason it is a good one traces back to
+    exactly these two unusual features.</p>
+
+    <p>The ring is now finished, and only then does the sugar arrive. Orotate phosphoribosyltransferase
+    attaches PRPP to give OMP; OMP decarboxylase removes a carboxyl group to give UMP. Both activities sit
+    on one polypeptide called UMP synthase — the same multifunctional design as CAD.</p>
+
+    <div class="figure" id="figOrotate"></div>
+
+    <div id="act-orotateMatch"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c33a">
+        <p>Which electron acceptor does DHODH use?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c33b">
+        <p>Which enzyme joins orotate to PRPP, and what does it do?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s4">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 4</div>
+    <h2>Climbing the phosphate ladder</h2>
+    <p>Both pathways deliver a monophosphate nucleotide, but nucleic acid synthesis needs triphosphates. The
+    climb has a simple structure worth knowing: <strong>each</strong> nucleotide has its own monophosphate
+    kinase, but <strong>one shared</strong> enzyme — nucleoside diphosphate kinase — handles every
+    diphosphate-to-triphosphate step. ATP is the phosphate donor at both levels.</p>
+
+    <p>Cytosine nucleotides are a special case. There is no CMP produced by the pyrimidine pathway. Instead,
+    UMP is phosphorylated all the way to UTP, and CTP synthase converts UTP to CTP using the glutamine amide
+    as its nitrogen source.</p>
+
+    <p>Run the ladder yourself, choosing the enzyme at each rung.</p>
+
+    <div id="act-kinase"></div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY IT</span></h3>
+      <div class="cp-item" data-check="c34a">
+        <p>Which enzyme converts diphosphate nucleotides to their triphosphate forms?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c34b">
+        <p>Which substrate does CTP synthase act on, and what nitrogen source does it use?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="keypoints">
+      <h4>Module 3 in five lines</h4>
+      <ul>
+        <li>Pyrimidines build the ring first and attach PRPP afterward &#8212; the reverse of purines.</li>
+        <li>CPS II starts the pathway using glutamine nitrogen; CPS I serves the urea cycle using ammonium.</li>
+        <li>CAD carries three consecutive activities on one polypeptide chain.</li>
+        <li>DHODH is mitochondrial and passes electrons to ubiquinone.</li>
+        <li>One shared kinase makes every triphosphate; CTP synthase converts UTP to CTP.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3quiz">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Mastery check</div>
+    <h2>Module 3 quiz</h2>
+    <p>Eight questions, reshuffled on every attempt, with a concept-area breakdown afterward.</p>
+    <div class="quiz-body" data-quiz="m3"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 4
+     ============================================================ -->
+<section class="section" data-key="m4home">
+  <div class="card">
+    <div class="eyebrow">Module 4</div>
+    <h2>Making DNA building blocks</h2>
+    <p class="lede">Everything so far has produced ribonucleotides. DNA needs deoxyribonucleotides, and it
+    needs thymine, which no pathway you have seen produces. This module is about how the cell closes both
+    gaps &#8212; and it is where the pharmacology in Module 5 comes from.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m4s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Ribonucleotide reductase and the electron relay</span>
+          <span class="home-desc">Trace electrons from NADPH to the sugar and work out what the chemistry actually was.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">The thymidine problem</span>
+          <span class="home-desc">Reduction gives you a deoxy sugar. It does not give you a methyl group.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Why the route runs down and back up</span>
+          <span class="home-desc">Assemble the whole path from UDP to dTTP and see why the phosphate count dips in the middle.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 4 quiz</span>
+          <span class="home-desc">Eight questions with a concept-area breakdown and a targeted follow-up round.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s1">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Section 1</div>
+    <h2>Ribonucleotide reductase and the electron relay</h2>
+    <p>Your cell has UDP. It needs dUDP. Making that happen means removing an oxygen from C2 prime and
+    putting a hydrogen there instead &#8212; a gain of electrons at that carbon, which is a
+    <strong>reduction</strong>. So the first question is not which enzyme does it. The first question is:
+    where do the electrons come from?</p>
+
+    <p>Four components are involved. Arrange them so the electrons flow in the right direction.</p>
+
+    <div id="act-electron"></div>
+
+    <p>Note where in the phosphorylation ladder this happens. Ribonucleotide reductase acts on
+    <strong>diphosphate</strong> nucleotides, so the deoxy conversion is a single defined step: NDP becomes
+    dNDP, and phosphorylation to the triphosphate level happens afterward by the same shared kinase from
+    Module 3.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c41a">
+        <p>At which phosphorylation level does ribonucleotide reductase act?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c41b">
+        <p>In which order do the electrons travel?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c41c">
+        <p>Which chemical change occurs at the sugar, and what kind of reaction is it?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s2">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Section 2</div>
+    <h2>The thymidine problem</h2>
+    <p>Ribonucleotide reductase gives the cell dADP, dGDP, dCDP, and dUDP. Three of those are DNA precursors.
+    The fourth is a problem: DNA does not use uracil, it uses thymine.</p>
+
+    <p>Look back at Module 1 for why this is solvable. Thymine is uracil plus a methyl group at C5. So the
+    cell does not need a new pathway &#8212; it needs one methyl transfer.</p>
+
+    <p><strong>Thymidylate synthase</strong> performs it, converting dUMP to dTMP, and it takes the carbon
+    from a tetrahydrofolate derivative. The folate leaves in a more oxidized state and has to be regenerated
+    by <strong>dihydrofolate reductase</strong> before it can be used again.</p>
+
+    <p>That regeneration requirement is the single most pharmacologically important fact in this companion.
+    Build the cycle below and you will see why two different drugs can produce the same shortage.</p>
+
+    <div id="act-folate"></div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY IT</span></h3>
+      <div class="cp-item" data-check="c42a">
+        <p>Which molecule donates the one-carbon unit to thymidylate synthase?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c42b">
+        <p>Which substrate does thymidylate synthase accept?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s3">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Section 3</div>
+    <h2>Why the route runs down and back up</h2>
+    <p>Put the two previous sections together and something slightly odd appears. Ribonucleotide reductase
+    works at the diphosphate level. Thymidylate synthase works at the monophosphate level. DNA polymerase
+    needs triphosphates.</p>
+
+    <p>So the journey from UDP to dTTP goes down the ladder and then back up it. Assemble that route below,
+    and the reason for the dip should become obvious as you place each piece.</p>
+
+    <div id="act-whyT"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c43a">
+        <p>Where do thymine nucleotides come from?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c43b">
+        <p>Which sequence describes the route from UDP to dTTP?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="keypoints">
+      <h4>Module 4 in five lines</h4>
+      <ul>
+        <li>Ribonucleotide reductase converts NDP to dNDP by replacing the 2 prime hydroxyl with hydrogen.</li>
+        <li>Electrons flow NADPH &#8594; thioredoxin reductase &#8594; thioredoxin &#8594; ribonucleotide reductase.</li>
+        <li>Thymidylate synthase converts dUMP to dTMP using a folate-derived one-carbon unit.</li>
+        <li>Dihydrofolate reductase regenerates the folate so the reaction can run again.</li>
+        <li>The route to dTTP dips to the monophosphate level and then climbs back up.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4quiz">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Mastery check</div>
+    <h2>Module 4 quiz</h2>
+    <p>Eight questions, reshuffled on every attempt, with a concept-area breakdown afterward.</p>
+    <div class="quiz-body" data-quiz="m4"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 5
+     ============================================================ -->
+<section class="section" data-key="m5home">
+  <div class="card">
+    <div class="eyebrow">Module 5</div>
+    <h2>Break the pathway</h2>
+    <p class="lede">Four modules of construction. This one is about what happens when you take a piece out
+    &#8212; deliberately, with a drug, or unavoidably, in disease. The order here is intentional: you predict
+    the biochemical consequence first, and only then find out which drug does it.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m5s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Perturbation lab: predict, then meet the drug</span>
+          <span class="home-desc">Three enzymes get knocked out. Work out the consequence before the drug name appears.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Taking nucleotides apart</span>
+          <span class="home-desc">Two classes, two end products, and one shared opening move.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Clinical case: uric acid and gout</span>
+          <span class="home-desc">Work a case from presentation to mechanism to the reason the drug is chosen.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 5 quiz</span>
+          <span class="home-desc">Eight questions with a concept-area breakdown and a targeted follow-up round.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s1">
+  <div class="card">
+    <div class="eyebrow">Module 5 · Section 1</div>
+    <h2>Perturbation lab: predict, then meet the drug</h2>
+    <p>The usual way to learn this material is a list: drug X inhibits enzyme Y. That list is easy to
+    memorize and almost useless, because an exam question rarely asks for the pairing directly &#8212; it
+    asks what happens downstream.</p>
+
+    <p>So this runs the other way. Each round below removes an enzyme from the pathway you have spent four
+    modules building. Predict the consequence. Then the drug appears.</p>
+
+    <div id="act-inhibitor"></div>
+
+    <div class="box clinical">
+      <h3><span class="tag">THE COMMON THREAD</span></h3>
+      <p>All three drugs exploit the same vulnerability: a cell that is dividing quickly needs a continuous
+      supply of nucleotides, and a cell that is not dividing does not. That is the whole basis of their
+      selectivity &#8212; and also the reason their side effects land on other fast-turnover tissue such as
+      bone marrow, gut lining, and hair follicles.</p>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY IT</span></h3>
+      <div class="cp-item" data-check="c51a">
+        <p>A drug blocks dihydroorotate dehydrogenase. What is the immediate metabolic consequence?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c51b">
+        <p>How does inhibiting dihydrofolate reductase reduce thymidylate production?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c51c">
+        <p>How does fluorouracil act on thymidylate synthase?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s2">
+  <div class="card">
+    <div class="eyebrow">Module 5 · Section 2</div>
+    <h2>Taking nucleotides apart</h2>
+    <p>Catabolism of both classes opens the same way: strip the phosphate, remove the sugar, then degrade
+    the base. The released sugar has real value &#8212; it can be recycled or oxidized for energy. The base
+    does not, which is exactly why dietary nucleotides made such a poor energy source back in Module 2.</p>
+
+    <p>After that shared opening, the two classes separate completely.</p>
+
+    <div class="figure" id="figCatab"></div>
+
+    <div id="act-catab"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c52a">
+        <p>What is the end product of purine catabolism in humans?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c52b">
+        <p>Which step opens the catabolism of both nucleotide classes?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s3">
+  <div class="card">
+    <div class="eyebrow">Module 5 · Section 3</div>
+    <h2>Clinical case: uric acid and gout</h2>
+    <p>Uric acid is where purine catabolism stops in humans, and it is not very soluble. That single physical
+    fact is the whole reason the next few paragraphs are a clinical topic rather than a metabolic footnote.</p>
+
+    <div class="box clinical">
+      <h3><span class="tag">BEYOND THE LECTURE</span></h3>
+      <p>The lecture takes purine catabolism as far as uric acid. This section carries it one step further
+      into the clinical consequence, because it is where the biochemistry you have just learned becomes a
+      prescribing decision. Treat the enzyme name xanthine oxidase as useful context rather than a lecture
+      objective.</p>
+    </div>
+
+    <p>Work the case below. Each step reveals the next only after you commit to an answer.</p>
+
+    <div id="act-gout"></div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY IT</span></h3>
+      <div class="cp-item" data-check="c53a">
+        <p>Which class of nucleotide gives rise to uric acid?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c53b">
+        <p>What causes the joint inflammation of an acute gout flare?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c53c">
+        <p>Allopurinol inhibits xanthine oxidase. What does that achieve?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="keypoints">
+      <h4>Module 5 in five lines</h4>
+      <ul>
+        <li>Leflunomide inhibits DHODH, restricting pyrimidine supply to dividing lymphocytes.</li>
+        <li>Methotrexate inhibits dihydrofolate reductase, so folate is not regenerated.</li>
+        <li>Fluorouracil becomes F-dUMP and stalls thymidylate synthase.</li>
+        <li>Purines are degraded to uric acid; pyrimidines to ammonium, carbon dioxide, and water.</li>
+        <li>Urate crystal deposition in a joint produces the inflammation of gout.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5quiz">
+  <div class="card">
+    <div class="eyebrow">Module 5 · Mastery check</div>
+    <h2>Module 5 quiz</h2>
+    <p>Eight questions, reshuffled on every attempt, with a concept-area breakdown afterward.</p>
+    <div class="quiz-body" data-quiz="m5"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     FLASHCARDS
+     ============================================================ -->
+<section class="section" data-key="flashcards">
+  <div class="card">
+    <div class="eyebrow">Retrieval Practice</div>
+    <h2>Flashcards</h2>
+    <p>Thirty-five cards covering the terms, enzymes, and relationships from all five modules. Try to answer
+    before you flip &#8212; the effort of retrieving is what makes this work, not the reading.</p>
+    <div class="fc-stage">
+      <div class="fc" id="fcCard" tabindex="0" role="button" aria-label="Flashcard. Press Enter to flip.">
+        <div class="fc-face fc-front"><div>
+          <div class="fc-term" id="fcFront"></div>
+          <div class="fc-hint">click, tap, or press Enter to flip</div>
+        </div></div>
+        <div class="fc-face fc-back"><div class="fc-def" id="fcBack"></div></div>
+      </div>
+    </div>
+    <div class="fc-bar">
+      <button class="btn ghost" id="fcPrev">Previous</button>
+      <span class="fc-count" id="fcCount"></span>
+      <button class="btn ghost" id="fcNext">Next</button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     FINAL EXAM
+     ============================================================ -->
+<section class="section" data-key="final">
+  <div class="card">
+    <div class="eyebrow">Comprehensive</div>
+    <h2>Final mastery exam</h2>
+    <p>Twenty-five questions drawn from the whole bank and stratified by demand: eight recall and
+    recognition, ten application, and seven questions that ask you to reason across more than one part of the
+    pathway. Unlimited attempts, and the set is rebuilt each time.</p>
+    <p>As with the module quizzes, the breakdown afterward tells you which concept areas need another pass,
+    and offers a targeted round built only from those areas.</p>
+    <div class="quiz-body" data-quiz="final"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit exam</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     LOAD ORDER — see companion-architecture.md §3. This order is
+     load-bearing: the content script reads MANIFEST, state, and
+     el()/shuffle() while it runs, and engine.js must be last.
+     ============================================================ -->
+<script src="banks/nucleotides.js"></script>
+<script src="banks/nucleotides.manifest.js"></script>
+<script src="shared/storage.js"></script>
+<script src="shared/helpers.js"></script>
+<script>
+/* ============================================================
+   CONTENT SCRIPT — Nucleotides, Nucleosides & Nucleic Acids
+   Runs after banks/, the manifest, storage.js and helpers.js,
+   and before shared/engine.js. See companion-architecture.md §3.
+
+   Part 1 — structure derived from MANIFEST (never hand-typed)
+   Part 2 — SVG figures
+   Part 3 — small activity framework used by most sections
+   Part 4 — the eighteen activities
+   Part 5 — the metabolic map
+   ============================================================ */
+
+/* ---------- Part 1: derivation from the manifest ---------- */
+
+var BADGES = {map:'&#9906;', m1:'1', m2:'2', m3:'3', m4:'4', m5:'5',
+              flash:'&#10022;', final:'&#9733;'};
+
+var MODULES = MANIFEST.modules.map(function(m){
+  var mod = {id:m.id, badge:BADGES[m.id]||'&#8226;', title:m.title,
+             sections:m.sections.map(function(s){return {key:s.key, label:s.label};})};
+  if(m.unlockAfter) mod.unlockAfter = m.unlockAfter;
+  return mod;
+});
+
+var UNGRADED = [];
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(!s.checks && !s.activity && !s.quiz) UNGRADED.push(s.key);
+});});
+
+var FLOW = []; MODULES.forEach(function(m){ m.sections.forEach(function(s){ FLOW.push(s); }); });
+var AREA_SECTION = MANIFEST.areaSection;
+
+var SECTION_REQ = {}, QUIZ_KEY_FOR_SECTION = {};
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(s.checks || s.activity){
+    SECTION_REQ[s.key] = {checks: s.checks || []};
+    if(s.activity) SECTION_REQ[s.key].activity = s.activity;
+  }
+  if(s.quiz) QUIZ_KEY_FOR_SECTION[s.key] = s.quiz;
+});});
+
+var MODULE_QUIZ_SIZE = 8;
+var FINAL_EXAM_MIX = {concept:8, application:10, integration:7};
+
+/* ---------- Part 2: SVG figures ---------- */
+
+var C_INK='#1D2B33', C_MID='#4A5C68', C_SOFT='#7E8F9B', C_LINE='#BCCEDE', C_ACC='#41678A';
+var DONOR_COLOR = {
+  'Glycine'                 : '#2FA97A',
+  'Glutamine'               : '#2E7DA8',
+  '10-formyltetrahydrofolate':'#6B4FD8',
+  'Aspartate'               : '#B57614',
+  'Bicarbonate'             : '#D4536B'
+};
+
+/* Purine skeleton, drawn from scratch. `fills` maps a ring position
+   (N1, C2, ...) to a color; anything unmapped renders neutral grey.
+   Used both by the Module 1 figure and by the Module 2 ring builder,
+   so there is one drawing routine rather than two that can drift. */
+var PURINE_POS = {
+  N1:[-40,-23], C2:[-40,23], N3:[0,46], C4:[40,23], C5:[40,-23], C6:[0,-46],
+  N7:[78,-38], C8:[102,0], N9:[78,38]
+};
+var PURINE_BONDS = [['N1','C2'],['C2','N3'],['N3','C4'],['C4','C5'],['C5','C6'],['C6','N1'],
+                    ['C5','N7'],['N7','C8'],['C8','N9'],['N9','C4']];
+
+function purineSVG(fills, cx, cy){
+  fills = fills || {}; cx = cx===undefined?150:cx; cy = cy===undefined?90:cy;
+  var s = '';
+  PURINE_BONDS.forEach(function(b){
+    var a=PURINE_POS[b[0]], z=PURINE_POS[b[1]];
+    s += '<line x1="'+(cx+a[0])+'" y1="'+(cy+a[1])+'" x2="'+(cx+z[0])+'" y2="'+(cy+z[1])+
+         '" stroke="'+C_MID+'" stroke-width="2"/>';
+  });
+  Object.keys(PURINE_POS).forEach(function(k){
+    var p=PURINE_POS[k], f=fills[k];
+    s += '<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="15" fill="'+(f||'#FFFFFF')+
+         '" stroke="'+(f||C_LINE)+'" stroke-width="2"/>';
+    s += '<text x="'+(cx+p[0])+'" y="'+(cy+p[1]+4)+'" text-anchor="middle" font-size="11" '+
+         'font-weight="700" fill="'+(f?'#FFFFFF':C_MID)+'">'+k+'</text>';
+  });
+  return s;
+}
+
+function pyrimidineSVG(cx, cy){
+  var pos={N1:[0,46],C2:[-40,23],N3:[-40,-23],C4:[0,-46],C5:[40,-23],C6:[40,23]};
+  var bonds=[['N1','C2'],['C2','N3'],['N3','C4'],['C4','C5'],['C5','C6'],['C6','N1']];
+  var s='';
+  bonds.forEach(function(b){
+    var a=pos[b[0]],z=pos[b[1]];
+    s+='<line x1="'+(cx+a[0])+'" y1="'+(cy+a[1])+'" x2="'+(cx+z[0])+'" y2="'+(cy+z[1])+
+       '" stroke="'+C_MID+'" stroke-width="2"/>';
+  });
+  Object.keys(pos).forEach(function(k){
+    var p=pos[k];
+    s+='<circle cx="'+(cx+p[0])+'" cy="'+(cy+p[1])+'" r="15" fill="#FFFFFF" stroke="'+C_LINE+'" stroke-width="2"/>';
+    s+='<text x="'+(cx+p[0])+'" y="'+(cy+p[1]+4)+'" text-anchor="middle" font-size="11" font-weight="700" fill="'+C_MID+'">'+k+'</text>';
+  });
+  return s;
+}
+
+function box(x,y,w,h,label,fill,stroke,txt){
+  return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="9" fill="'+(fill||'#FFFFFF')+
+         '" stroke="'+(stroke||C_LINE)+'" stroke-width="1.5"/>'+
+         '<text x="'+(x+w/2)+'" y="'+(y+h/2+4)+'" text-anchor="middle" font-size="12" '+
+         'font-weight="600" fill="'+(txt||C_INK)+'">'+label+'</text>';
+}
+function arrow(x1,y1,x2,y2,color){
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+(color||C_SOFT)+
+         '" stroke-width="1.8" marker-end="url(#ah)"/>';
+}
+var ARROW_DEF = '<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '+
+                'markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="'+C_SOFT+'"/></marker></defs>';
+
+function figure(id, viewBox, inner, caption){
+  var host = document.getElementById(id); if(!host) return;
+  host.innerHTML = '<svg viewBox="'+viewBox+'" role="img" aria-label="'+caption.replace(/"/g,'')+'">'+
+                   ARROW_DEF + inner + '</svg><p class="caption">'+caption+'</p>';
+}
+
+/* ---------- Part 3: the small activity framework ---------- */
+
+function actBox(mountId, tag, intro){
+  var host = document.getElementById(mountId); if(!host) return null;
+  var b = el('div','box activity');
+  b.appendChild(el('h3', null, '<span class="tag">'+tag+'</span>'));
+  if(intro) b.appendChild(el('p', null, intro));
+  var body = el('div'); b.appendChild(body);
+  var ctrl = el('div','controls'); ctrl.style.marginTop = '16px';
+  var check = el('button','btn','Check my work');
+  var reset = el('button','btn ghost','Try again');
+  var cap = el('span','caption'); cap.style.margin = '0';
+  ctrl.appendChild(check); ctrl.appendChild(reset); ctrl.appendChild(cap);
+  b.appendChild(ctrl); host.appendChild(b);
+  return {body:body, check:check, reset:reset, cap:cap};
+}
+
+/* Activities save on Check and clear on Try again — the three-call
+   pattern from companion-architecture.md §8. sectionComplete() only
+   asks whether the value is non-null; it never grades it. */
+function saveAct(name, data){ state.activities[name] = data; saveState(); paintNav(); }
+function clearAct(name){ state.activities[name] = null; saveState(); paintNav(); }
+function actDone(name){ var a = state.activities[name]; return a !== null && a !== undefined; }
+
+/* --- Generic 1: matching / sorting rows --- */
+function sortActivity(mountId, name, tag, intro, items, options){
+  var s = actBox(mountId, tag, intro); if(!s) return;
+  var saved = state.activities[name] || {};
+  var picks = saved.picks || {};
+  var rows = [];
+  items.forEach(function(it, i){
+    var row = el('div','sort-row');
+    row.appendChild(el('div','sort-text', it.text));
+    var opts = el('div','sort-opts');
+    shuffle(options).forEach(function(o){
+      var btn = el('button','opt', o); btn.dataset.val = o;
+      btn.onclick = function(){
+        picks[i] = o;
+        opts.querySelectorAll('.opt').forEach(function(x){ x.classList.remove('sel','bad'); });
+        btn.classList.add('sel'); s.cap.textContent = '';
+      };
+      opts.appendChild(btn);
+    });
+    row.appendChild(opts); s.body.appendChild(row);
+    rows.push({opts:opts, ans:it.ans, i:i});
+  });
+  function paint(reveal){
+    rows.forEach(function(r){
+      r.opts.querySelectorAll('.opt').forEach(function(btn){
+        btn.classList.remove('sel','bad','reveal');
+        btn.disabled = !!reveal;
+        if(picks[r.i] === btn.dataset.val) btn.classList.add('sel');
+        if(reveal){
+          if(btn.dataset.val === r.ans) btn.classList.add('reveal');
+          if(picks[r.i] === btn.dataset.val && picks[r.i] !== r.ans) btn.classList.add('bad');
+        }
+      });
+    });
+  }
+  function score(){ return rows.filter(function(r){ return picks[r.i] === r.ans; }).length; }
+  s.check.onclick = function(){
+    if(Object.keys(picks).length < items.length){
+      s.cap.textContent = 'Choose an option for every row first.'; return;
+    }
+    paint(true);
+    s.cap.textContent = score()+' of '+items.length+' correct. The correct option in each row is outlined.';
+    saveAct(name, {picks:picks, done:true});
+  };
+  s.reset.onclick = function(){ picks = {}; paint(false); s.cap.textContent = ''; clearAct(name); };
+  if(saved.done){ paint(true); s.cap.textContent = score()+' of '+items.length+' correct. The correct option in each row is outlined.'; }
+}
+
+/* --- Generic 2: tap-to-place assignment (drag-and-drop styling,
+       tap interaction so it works identically on a phone) --- */
+function dndActivity(mountId, name, tag, intro, rowDefs, pills, onPaint){
+  var s = actBox(mountId, tag, intro); if(!s) return;
+  var saved = state.activities[name] || {};
+  var placed = saved.placed || {};
+  var revealed = !!saved.done;
+  var sel = null;
+  var board = el('div','dnd-board'), tray = el('div','dnd-tray'), slots = [];
+  var live = el('div'); s.body.appendChild(live);
+
+  rowDefs.forEach(function(r, i){
+    var row = el('div','dnd-row');
+    row.appendChild(el('div','dnd-desc', r.desc));
+    var slot = el('div','dnd-slot');
+    slot.onclick = function(){
+      if(revealed) return;
+      if(placed[i] !== undefined){ delete placed[i]; render(); return; }
+      if(sel !== null){
+        Object.keys(placed).forEach(function(k){ if(placed[k] === sel) delete placed[k]; });
+        placed[i] = sel; sel = null; render();
+      }
+    };
+    row.appendChild(slot); board.appendChild(row);
+    slots.push({row:row, slot:slot, ans:r.ans, i:i});
+  });
+  s.body.appendChild(board);
+  s.body.appendChild(el('p','tray-note',
+    'Tap a label below, then tap the slot it belongs in. Tap a placed label to send it back.'));
+  s.body.appendChild(tray);
+
+  function render(){
+    slots.forEach(function(sl){
+      sl.slot.innerHTML = ''; sl.row.classList.remove('correct','incorrect');
+      if(placed[sl.i] !== undefined){
+        var p = el('div','dnd-pill placed', placed[sl.i]);
+        if(revealed) p.className = 'dnd-pill locked';
+        sl.slot.appendChild(p);
+      }
+      if(revealed){
+        sl.row.classList.add(placed[sl.i] === sl.ans ? 'correct' : 'incorrect');
+      }
+    });
+    tray.innerHTML = '';
+    var usedLabels = Object.keys(placed).map(function(k){ return placed[k]; });
+    pills.forEach(function(label){
+      if(usedLabels.indexOf(label) > -1) return;
+      var p = el('button','dnd-pill', label);
+      if(sel === label) p.style.borderColor = C_ACC;
+      p.onclick = function(){ if(revealed) return; sel = (sel === label ? null : label); render(); };
+      tray.appendChild(p);
+    });
+    if(!tray.children.length) tray.appendChild(el('div','tray-note','Every label has been placed.'));
+    if(onPaint) live.innerHTML = onPaint(placed, revealed);
+  }
+  function score(){ return slots.filter(function(sl){ return placed[sl.i] === sl.ans; }).length; }
+  s.check.onclick = function(){
+    if(Object.keys(placed).length < rowDefs.length){
+      s.cap.textContent = 'Fill every slot before checking.'; return;
+    }
+    revealed = true; render();
+    s.cap.textContent = score()+' of '+rowDefs.length+' placed correctly.';
+    saveAct(name, {placed:placed, done:true});
+  };
+  s.reset.onclick = function(){
+    placed = {}; revealed = false; sel = null; render(); s.cap.textContent = ''; clearAct(name);
+  };
+  render();
+  if(revealed) s.cap.textContent = score()+' of '+rowDefs.length+' placed correctly.';
+}
+
+/* --- Generic 3: put the steps in order --- */
+function seqActivity(mountId, name, tag, intro, steps, closing){
+  var s = actBox(mountId, tag, intro); if(!s) return;
+  var saved = state.activities[name] || {};
+  var chosen = saved.chosen || [];
+  var revealed = !!saved.done;
+  var slot = el('div','seq-slot'), tray = el('div','dnd-tray');
+  s.body.appendChild(slot);
+  s.body.appendChild(el('p','tray-note','Tap the steps below in the order they occur. Tap a placed step to remove it.'));
+  s.body.appendChild(tray);
+  var note = el('div'); s.body.appendChild(note);
+
+  function render(){
+    slot.innerHTML = '';
+    if(!chosen.length) slot.appendChild(el('div','tray-note','Your sequence will appear here.'));
+    chosen.forEach(function(label, pos){
+      var c = el('button','chip', (pos+1)+'. '+label);
+      if(revealed) c.classList.add(steps[pos] === label ? 'on' : 'bad');
+      c.onclick = function(){ if(revealed) return; chosen.splice(pos,1); render(); };
+      slot.appendChild(c);
+      if(pos < chosen.length-1) slot.appendChild(el('span','tray-note','&#8594;'));
+    });
+    tray.innerHTML = '';
+    shuffle(steps).forEach(function(label){
+      if(chosen.indexOf(label) > -1) return;
+      var b = el('button','dnd-pill', label);
+      b.onclick = function(){ if(revealed) return; chosen.push(label); render(); };
+      tray.appendChild(b);
+    });
+    if(!tray.children.length) tray.appendChild(el('div','tray-note','Every step has been placed.'));
+    note.innerHTML = (revealed && closing) ? '<p class="caption">'+closing+'</p>' : '';
+  }
+  function score(){ return chosen.filter(function(l,i){ return steps[i] === l; }).length; }
+  s.check.onclick = function(){
+    if(chosen.length < steps.length){ s.cap.textContent = 'Place every step before checking.'; return; }
+    revealed = true; render();
+    s.cap.textContent = score()+' of '+steps.length+' in the right position.';
+    saveAct(name, {chosen:chosen, done:true});
+  };
+  s.reset.onclick = function(){ chosen = []; revealed = false; render(); s.cap.textContent = ''; clearAct(name); };
+  render();
+  if(revealed) s.cap.textContent = score()+' of '+steps.length+' in the right position.';
+}
+
+/* --- Generic 4: staged case / predict-then-reveal --- */
+function caseActivity(mountId, name, tag, intro, steps){
+  var host = document.getElementById(mountId); if(!host) return;
+  var b = el('div','box activity');
+  b.appendChild(el('h3', null, '<span class="tag">'+tag+'</span>'));
+  if(intro) b.appendChild(el('p', null, intro));
+  var body = el('div'); b.appendChild(body);
+  var ctrl = el('div','controls'); ctrl.style.marginTop = '16px';
+  var reset = el('button','btn ghost','Start over');
+  var cap = el('span','caption'); cap.style.margin = '0';
+  ctrl.appendChild(reset); ctrl.appendChild(cap); b.appendChild(ctrl);
+  host.appendChild(b);
+
+  var saved = state.activities[name] || {};
+  var reached = saved.reached || 0;   /* how many steps are answered */
+
+  function render(){
+    body.innerHTML = '';
+    steps.forEach(function(st, i){
+      if(i > reached) return;
+      var wrap = el('div','case-step');
+      wrap.appendChild(el('div','eyebrow', st.setup || ('Step '+(i+1))));
+      wrap.appendChild(el('p', null, st.prompt));
+      var choices = el('div','choices');
+      var fb = el('div','feedback');
+      var ord = order(st.options.length);
+      ord.forEach(function(realIdx, pos){
+        var btn = el('button','choice','<span class="mark">'+LETTERS[pos]+'</span>'+st.options[realIdx]);
+        btn.onclick = function(){
+          if(realIdx === st.ans){
+            choices.querySelectorAll('.choice').forEach(function(x, p){
+              x.disabled = true; x.classList.remove('wrong');
+              if(ord[p] === st.ans) x.classList.add('right');
+            });
+            fb.className = 'feedback show';
+            fb.innerHTML = '<strong>'+(st.verdict || 'That follows.')+'</strong>'+st.why;
+            if(i === reached){
+              reached = i+1;
+              if(reached >= steps.length){
+                saveAct(name, {reached:reached, done:true});
+                cap.textContent = 'Case complete.';
+              }else{
+                state.activities[name] = {reached:reached, done:false};
+                saveState();
+              }
+              render();
+            }
+          }else{
+            choices.querySelectorAll('.choice').forEach(function(x){ x.classList.remove('right','wrong'); });
+            choices.querySelectorAll('.choice')[ord.indexOf(realIdx)].classList.add('wrong');
+            fb.className = 'feedback show miss';
+            fb.innerHTML = '<strong>Not quite &#8212; try again.</strong>'+(st.nudge || '');
+          }
+        };
+        choices.appendChild(btn);
+      });
+      wrap.appendChild(choices); wrap.appendChild(fb);
+      if(i < reached){
+        choices.querySelectorAll('.choice').forEach(function(x, p){
+          x.disabled = true; if(ord[p] === st.ans) x.classList.add('right');
+        });
+        fb.className = 'feedback show';
+        fb.innerHTML = '<strong>'+(st.verdict || 'That follows.')+'</strong>'+st.why;
+      }
+      body.appendChild(wrap);
+    });
+    if(reached >= steps.length) cap.textContent = 'Case complete.';
+  }
+  reset.onclick = function(){ reached = 0; cap.textContent = ''; clearAct(name); render(); };
+  render();
+}
+
+/* ---------- Part 4: the activities ---------- */
+
+/* --- M1S1: sort the bases --- */
+sortActivity('act-baseSort', 'baseSort', 'SORT IT',
+  'Place each base in its family, and note which nucleic acid it appears in. '+
+  'Three of the five appear in both DNA and RNA.',
+  [{text:'Adenine',  ans:'Purine, in DNA and RNA'},
+   {text:'Guanine',  ans:'Purine, in DNA and RNA'},
+   {text:'Cytosine', ans:'Pyrimidine, in DNA and RNA'},
+   {text:'Thymine',  ans:'Pyrimidine, in DNA only'},
+   {text:'Uracil',   ans:'Pyrimidine, in RNA only'}],
+  ['Purine, in DNA and RNA','Pyrimidine, in DNA and RNA','Pyrimidine, in DNA only','Pyrimidine, in RNA only']);
+
+/* --- M1S2: the nucleotide builder --- */
+(function(){
+  var host = document.getElementById('act-builder'); if(!host) return;
+  var BASES = ['Adenine','Guanine','Cytosine','Thymine','Uracil'];
+  var NUCLEOSIDE = {Adenine:'adenosine', Guanine:'guanosine', Cytosine:'cytidine',
+                    Thymine:'thymidine', Uracil:'uridine'};
+  var LETTER = {Adenine:'A', Guanine:'G', Cytosine:'C', Thymine:'T', Uracil:'U'};
+  var COUNTWORD = ['', 'mono', 'di', 'tri'];
+  var SUFFIX = ['', 'MP', 'DP', 'TP'];
+  var TARGETS = [
+    {label:'dAMP',      base:'Adenine',  sugar:'Deoxyribose', p:1},
+    {label:'guanosine', base:'Guanine',  sugar:'Ribose',      p:0},
+    {label:'CTP',       base:'Cytosine', sugar:'Ribose',      p:3}
+  ];
+  var pick = {base:'Adenine', sugar:'Ribose', p:0};
+  var saved = state.activities.builder || {};
+  var hit = saved.hit || {};
+
+  var s = actBox('act-builder', 'BUILD IT',
+    'Choose a base, a sugar, and a number of phosphates. The name updates as you go. '+
+    'Then try to hit all three targets listed underneath.');
+
+  var rows = el('div');
+  function chipRow(label, values, key){
+    var line = el('div','stepline');
+    line.appendChild(el('span','tray-note', label));
+    values.forEach(function(v){
+      var c = el('button','chip', String(v.label !== undefined ? v.label : v));
+      c.onclick = function(){ pick[key] = (v.value !== undefined ? v.value : v); paint(); };
+      c.dataset.val = String(v.value !== undefined ? v.value : v);
+      line.appendChild(c);
+    });
+    rows.appendChild(line);
+    return line;
+  }
+  var lineBase  = chipRow('Base', BASES, 'base');
+  var lineSugar = chipRow('Sugar', ['Ribose','Deoxyribose'], 'sugar');
+  var linePhos  = chipRow('Phosphates', [{label:'none',value:0},{label:'1',value:1},
+                                         {label:'2',value:2},{label:'3',value:3}], 'p');
+  s.body.appendChild(rows);
+  var out = el('div','readout'); s.body.appendChild(out);
+  var targetLine = el('div','stepline'); s.body.appendChild(targetLine);
+
+  function currentName(){
+    var deoxy = (pick.sugar === 'Deoxyribose');
+    var nuc = (deoxy ? 'deoxy' : '') + NUCLEOSIDE[pick.base];
+    if(pick.p === 0) return {cls:'Nucleoside', name:nuc, abbr:'\u2014'};
+    return {cls:'Nucleotide',
+            name:nuc+' '+COUNTWORD[pick.p]+'phosphate',
+            abbr:(deoxy ? 'd' : '')+LETTER[pick.base]+SUFFIX[pick.p]};
+  }
+  function matches(t){ return t.base === pick.base && t.sugar === pick.sugar && t.p === pick.p; }
+  function paint(){
+    [[lineBase,'base'],[lineSugar,'sugar'],[linePhos,'p']].forEach(function(pair){
+      pair[0].querySelectorAll('.chip').forEach(function(c){
+        c.classList.toggle('on', c.dataset.val === String(pick[pair[1]]));
+      });
+    });
+    var n = currentName();
+    TARGETS.forEach(function(t){ if(matches(t)) hit[t.label] = true; });
+    out.innerHTML =
+      '<div><div class="k">This molecule is a</div><div class="v">'+n.cls+'</div></div>'+
+      '<div><div class="k">Its name</div><div class="v">'+n.name+'</div></div>'+
+      '<div><div class="k">Abbreviation</div><div class="v">'+n.abbr+'</div></div>';
+    targetLine.innerHTML = '<span class="tray-note">Targets</span>';
+    TARGETS.forEach(function(t){
+      var c = el('span','chip'+(hit[t.label] ? ' on' : ''), (hit[t.label] ? '\u2713 ' : '')+'Build '+t.label);
+      targetLine.appendChild(c);
+    });
+  }
+  s.check.onclick = function(){
+    var n = Object.keys(hit).length;
+    s.cap.textContent = n+' of 3 targets built. Currently showing: '+currentName().name+'.';
+    saveAct('builder', {hit:hit, done:true});
+  };
+  s.reset.onclick = function(){ hit = {}; pick = {base:'Adenine', sugar:'Ribose', p:0};
+    s.cap.textContent = ''; clearAct('builder'); paint(); };
+  paint();
+  if(saved.done) s.cap.textContent = Object.keys(hit).length+' of 3 targets built.';
+})();
+
+/* --- M1S3: the 2 prime toggle --- */
+(function(){
+  var host = document.getElementById('act-sugarToggle'); if(!host) return;
+  var saved = state.activities.sugarToggle || {};
+  var predicted = saved.predicted || null;
+  var seen = saved.seen || {};
+  var isRibose = true;
+  var s = actBox('act-sugarToggle', 'PREDICT \u2192 INTERACT \u2192 EXPLAIN',
+    'First commit to a prediction. The toggle unlocks once you have.');
+
+  var pWrap = el('div'), tWrap = el('div');
+  s.body.appendChild(pWrap); s.body.appendChild(tWrap);
+
+  var PRED = ['It makes the backbone more vulnerable to being broken',
+              'It makes the backbone more resistant to being broken',
+              'It has no measurable effect on the backbone'];
+  function paintPrediction(){
+    pWrap.innerHTML = '';
+    pWrap.appendChild(el('p', null,
+      '<strong>Predict:</strong> adding a reactive hydroxyl group right next to the phosphodiester '+
+      'linkage would do what to the polymer?'));
+    var ch = el('div','choices');
+    PRED.forEach(function(t, i){
+      var b = el('button','choice','<span class="mark">'+LETTERS[i]+'</span>'+t);
+      if(predicted !== null){ b.disabled = true; if(predicted === i) b.classList.add('picked'); }
+      b.onclick = function(){ predicted = i; paintPrediction(); paintToggle(); };
+      ch.appendChild(b);
+    });
+    pWrap.appendChild(ch);
+  }
+  function paintToggle(){
+    tWrap.innerHTML = '';
+    if(predicted === null){
+      tWrap.appendChild(el('p','tray-note','Make a prediction above to unlock the toggle.'));
+      return;
+    }
+    seen[isRibose ? 'ribose' : 'deoxy'] = true;
+    var line = el('div','stepline');
+    line.appendChild(el('span','tray-note','Group at C2 prime'));
+    [['2 prime hydroxyl (OH)', true], ['2 prime hydrogen (H)', false]].forEach(function(o){
+      var c = el('button','chip'+(isRibose === o[1] ? ' on' : ''), o[0]);
+      c.onclick = function(){ isRibose = o[1]; paintToggle(); };
+      line.appendChild(c);
+    });
+    tWrap.appendChild(line);
+
+    var svg = '<svg viewBox="0 0 420 150" role="img" aria-label="Sugar with the 2 prime position highlighted">'+
+      '<polygon points="210,30 285,80 258,140 162,140 135,80" fill="#FFFFFF" stroke="'+C_MID+'" stroke-width="2"/>'+
+      '<text x="285" y="76" font-size="11" fill="'+C_SOFT+'">C1\u2032</text>'+
+      '<text x="252" y="158" font-size="11" fill="'+C_SOFT+'">C2\u2032</text>'+
+      '<text x="150" y="158" font-size="11" fill="'+C_SOFT+'">C3\u2032</text>'+
+      '<text x="330" y="60" font-size="12" fill="'+C_MID+'">base attaches here</text>'+
+      '<line x1="285" y1="80" x2="325" y2="62" stroke="'+C_LINE+'" stroke-width="1.5"/>'+
+      '<text x="20" y="60" font-size="12" fill="'+C_MID+'">backbone (C5\u2032, C3\u2032)</text>'+
+      '<line x1="135" y1="80" x2="100" y2="66" stroke="'+C_LINE+'" stroke-width="1.5"/>'+
+      '<line x1="258" y1="140" x2="290" y2="120" stroke="'+(isRibose ? '#D4536B' : C_MID)+'" stroke-width="2.5"/>'+
+      '<circle cx="300" cy="115" r="16" fill="'+(isRibose ? '#FDECEF' : '#FFFFFF')+
+        '" stroke="'+(isRibose ? '#D4536B' : C_MID)+'" stroke-width="2"/>'+
+      '<text x="300" y="120" text-anchor="middle" font-size="12" font-weight="700" fill="'+
+        (isRibose ? '#D4536B' : C_MID)+'">'+(isRibose ? 'OH' : 'H')+'</text>'+
+      '</svg>';
+    var fig = el('div','figure'); fig.innerHTML = svg +
+      '<p class="caption">The only position that differs between the two sugars.</p>';
+    tWrap.appendChild(fig);
+
+    var r = el('div','readout');
+    r.innerHTML =
+      '<div><div class="k">Sugar</div><div class="v">'+(isRibose ? 'Ribose' : 'Deoxyribose')+'</div></div>'+
+      '<div><div class="k">Polymer</div><div class="v">'+(isRibose ? 'RNA' : 'DNA')+'</div></div>'+
+      '<div><div class="k">Backbone</div><div class="v">'+(isRibose ? 'More labile' : 'More stable')+'</div></div>'+
+      '<div><div class="k">Folding</div><div class="v">'+(isRibose ? 'More versatile' : 'More uniform')+'</div></div>';
+    tWrap.appendChild(r);
+
+    if(seen.ribose && seen.deoxy){
+      var ex = el('div','feedback show');
+      ex.innerHTML = '<strong>Explain</strong>The 2 prime hydroxyl sits one carbon away from the '+
+        'phosphodiester linkage and is positioned to attack it, so RNA is intrinsically more prone to '+
+        'cleavage than DNA. That is a liability for a molecule meant to last, which is why the long-term '+
+        'genetic template gives the group up. It is an asset for a molecule meant to fold, act, and be '+
+        'replaced, which is why RNA keeps it.'+
+        (predicted === 0 ? ' Your prediction matched.' : ' Compare that against the prediction you made.');
+      tWrap.appendChild(ex);
+    }
+  }
+  s.check.onclick = function(){
+    if(predicted === null){ s.cap.textContent = 'Make a prediction first.'; return; }
+    if(!(seen.ribose && seen.deoxy)){ s.cap.textContent = 'View both settings of the toggle before checking.'; return; }
+    s.cap.textContent = 'Prediction recorded and both structures compared.';
+    saveAct('sugarToggle', {predicted:predicted, seen:seen, done:true});
+  };
+  s.reset.onclick = function(){ predicted = null; seen = {}; isRibose = true;
+    s.cap.textContent = ''; clearAct('sugarToggle'); paintPrediction(); paintToggle(); };
+  paintPrediction(); paintToggle();
+  if(saved.done) s.cap.textContent = 'Prediction recorded and both structures compared.';
+})();
+
+/* --- M1S4: build the complementary strand --- */
+(function(){
+  var host = document.getElementById('act-strand'); if(!host) return;
+  var TEMPLATE = ['A','T','G','C','G','A'];
+  var PARTNER  = {A:'T', T:'A', G:'C', C:'G'};
+  var HBONDS   = {A:2, T:2, G:3, C:3};
+  var saved = state.activities.strand || {};
+  var built = saved.built || [];
+  var revealed = !!saved.done;
+
+  var s = actBox('act-strand', 'BUILD IT',
+    'The template strand is fixed. Tap a base under each position to build the partner. '+
+    'The hydrogen-bond total updates as you go.');
+  var view = el('div'); s.body.appendChild(view);
+
+  function render(){
+    view.innerHTML = '';
+    var top = el('div','stepline');
+    top.appendChild(el('span','tray-note','5\u2032'));
+    TEMPLATE.forEach(function(b){ top.appendChild(el('span','chip on', b)); });
+    top.appendChild(el('span','tray-note','3\u2032 &nbsp; template'));
+    view.appendChild(top);
+
+    var mid = el('div','stepline');
+    mid.appendChild(el('span','tray-note','&nbsp;&nbsp;'));
+    TEMPLATE.forEach(function(b, i){
+      var n = built[i] ? HBONDS[built[i]] : 0;
+      mid.appendChild(el('span','tray-note', n ? new Array(n+1).join('\u00b7') : '&nbsp;'));
+    });
+    view.appendChild(mid);
+
+    var bot = el('div','stepline');
+    bot.appendChild(el('span','tray-note','3\u2032'));
+    TEMPLATE.forEach(function(t, i){
+      var cur = built[i];
+      var c = el('button','chip'+(cur ? (revealed ? (cur === PARTNER[t] ? ' on' : ' bad') : ' on') : ''),
+                 cur || '?');
+      c.onclick = function(){
+        if(revealed) return;
+        var opts = ['A','T','G','C'];
+        var idx = cur ? (opts.indexOf(cur)+1) % 4 : 0;
+        built[i] = opts[idx]; render();
+      };
+      bot.appendChild(c);
+    });
+    bot.appendChild(el('span','tray-note','5\u2032 &nbsp; your strand'));
+    view.appendChild(bot);
+    view.appendChild(el('p','tray-note','Tap a position repeatedly to cycle through A, T, G, and C. '+
+      'The dots between the strands show hydrogen bonds for each pair.'));
+
+    var total = 0, done = 0;
+    TEMPLATE.forEach(function(t, i){ if(built[i]){ done++; total += HBONDS[built[i]]; } });
+    var r = el('div','readout');
+    r.innerHTML =
+      '<div><div class="k">Positions filled</div><div class="v">'+done+' of '+TEMPLATE.length+'</div></div>'+
+      '<div><div class="k">Hydrogen bonds</div><div class="v">'+total+'</div></div>'+
+      '<div><div class="k">Your strand runs</div><div class="v">3\u2032 \u2192 5\u2032</div></div>';
+    view.appendChild(r);
+  }
+  s.check.onclick = function(){
+    if(built.filter(Boolean).length < TEMPLATE.length){
+      s.cap.textContent = 'Fill every position first.'; return;
+    }
+    revealed = true; render();
+    var right = TEMPLATE.filter(function(t, i){ return built[i] === PARTNER[t]; }).length;
+    s.cap.textContent = right+' of '+TEMPLATE.length+' correct. A correct partner strand here gives 15 hydrogen bonds.';
+    saveAct('strand', {built:built, done:true});
+  };
+  s.reset.onclick = function(){ built = []; revealed = false; s.cap.textContent = '';
+    clearAct('strand'); render(); };
+  render();
+  if(revealed){
+    var right = TEMPLATE.filter(function(t, i){ return built[i] === PARTNER[t]; }).length;
+    s.cap.textContent = right+' of '+TEMPLATE.length+' correct.';
+  }
+})();
+
+/* --- M2S1: match the players --- */
+sortActivity('act-sourceMatch', 'sourceMatch', 'MATCH IT',
+  'Each description belongs to one of the molecules or pathways from this section.',
+  [{text:'The pathway that supplies the five-carbon sugar for nucleotide synthesis', ans:'Pentose phosphate pathway'},
+   {text:'The sugar phosphate that PRPP synthetase acts on', ans:'Ribose-5-phosphate'},
+   {text:'The activated sugar phosphate required by both nucleotide pathways', ans:'PRPP'},
+   {text:'The enzyme that transfers a pyrophosphate group from ATP', ans:'PRPP synthetase'},
+   {text:'The source that contributes roughly five percent of circulating nucleotides', ans:'Dietary nucleotides'}],
+  ['Pentose phosphate pathway','Ribose-5-phosphate','PRPP','PRPP synthetase','Dietary nucleotides']);
+
+/* --- M2S2: build the purine ring --- */
+(function(){
+  var GROUPS = [['N1'], ['C2','C8'], ['N3','N9'], ['C4','C5','N7'], ['C6']];
+  dndActivity('act-ringBuild', 'ringBuild', 'BUILD THE RING',
+    'Five donors supply every atom in the purine ring. Place each one on the positions it contributes. '+
+    'The ring drawing fills in as you go.',
+    [{desc:'<strong>N1</strong> &#8212; one nitrogen, donated by a molecule that then leaves as fumarate', ans:'Aspartate'},
+     {desc:'<strong>C2 and C8</strong> &#8212; two separate one-carbon additions', ans:'10-formyltetrahydrofolate'},
+     {desc:'<strong>N3 and N9</strong> &#8212; two separate nitrogen additions from an amide side chain', ans:'Glutamine'},
+     {desc:'<strong>C4, C5 and N7</strong> &#8212; three atoms added as one intact unit', ans:'Glycine'},
+     {desc:'<strong>C6</strong> &#8212; one carbon, inserted from an inorganic source', ans:'Bicarbonate'}],
+    ['Glycine','Glutamine','10-formyltetrahydrofolate','Aspartate','Bicarbonate'],
+    function(placed){
+      var fills = {};
+      Object.keys(placed).forEach(function(k){
+        var color = DONOR_COLOR[placed[k]];
+        GROUPS[Number(k)].forEach(function(pos){ fills[pos] = color; });
+      });
+      var legend = '';
+      Object.keys(DONOR_COLOR).forEach(function(d, i){
+        legend += '<circle cx="270" cy="'+(28+i*24)+'" r="7" fill="'+DONOR_COLOR[d]+'"/>'+
+                  '<text x="284" y="'+(32+i*24)+'" font-size="11" fill="'+C_MID+'">'+d+'</text>';
+      });
+      return '<div class="figure"><svg viewBox="0 0 560 180" role="img" '+
+             'aria-label="Purine ring with donor origins colored in">'+
+             purineSVG(fills, 120, 90) + legend +
+             '</svg><p class="caption">The purine ring, colored by where each atom came from.</p></div>';
+    });
+})();
+
+/* --- M2S3: order the pathway --- */
+seqActivity('act-pathOrder', 'pathOrder', 'ORDER IT',
+  'Place the milestones of purine synthesis in the order they occur. You do not need every abbreviation '+
+  '&#8212; you need the shape of the route.',
+  ['PRPP','5-phosphoribosyl-1-amine','GAR','AIR','CAIR','AICAR','IMP'],
+  'Notice how much of the route is a single unbranched line. The committed step is the second arrow, '+
+  'PRPP to 5-phosphoribosyl-1-amine, and everything after it is dedicated to making a purine.');
+
+/* --- M2S4: run the branch --- */
+(function(){
+  var host = document.getElementById('act-branch'); if(!host) return;
+  var saved = state.activities.branch || {};
+  var pools = {ATP:10, GTP:10, AMP:0, GMP:0};
+  var runs = saved.runs || 0;
+  var s = actBox('act-branch', 'RUN IT',
+    'Both branches start from IMP. Run each one a few times and watch what it costs. '+
+    'Start with ten ATP and ten GTP.');
+  var view = el('div'); s.body.appendChild(view);
+  var log = el('div'); s.body.appendChild(log);
+
+  function render(msg){
+    view.innerHTML = '';
+    var line = el('div','stepline');
+    var a = el('button','btn','Run IMP \u2192 AMP');
+    var g = el('button','btn','Run IMP \u2192 GMP');
+    a.onclick = function(){
+      if(pools.GTP <= 0){ render('The branch to AMP has stalled: there is no GTP left to pay for it.'); return; }
+      pools.GTP--; pools.AMP++; runs++; render('');
+    };
+    g.onclick = function(){
+      if(pools.ATP <= 0){ render('The branch to GMP has stalled: there is no ATP left to pay for it.'); return; }
+      pools.ATP--; pools.GMP++; runs++; render('');
+    };
+    line.appendChild(a); line.appendChild(g);
+    view.appendChild(line);
+    var r = el('div','readout');
+    r.innerHTML =
+      '<div><div class="k">ATP pool</div><div class="v">'+pools.ATP+'</div></div>'+
+      '<div><div class="k">GTP pool</div><div class="v">'+pools.GTP+'</div></div>'+
+      '<div><div class="k">AMP made</div><div class="v">'+pools.AMP+'</div></div>'+
+      '<div><div class="k">GMP made</div><div class="v">'+pools.GMP+'</div></div>'+
+      '<div><div class="k">Cycles run</div><div class="v">'+runs+'</div></div>';
+    view.appendChild(r);
+    log.innerHTML = msg ? '<div class="feedback show miss"><strong>Stalled.</strong>'+msg+
+      ' This is the reciprocal design doing its job: neither purine can run away from the other.</div>' : '';
+  }
+  s.check.onclick = function(){
+    if(runs < 6){ s.cap.textContent = 'Run at least six cycles before checking (you have run '+runs+').'; return; }
+    s.cap.textContent = 'Six or more cycles run.';
+    log.innerHTML = '<div class="feedback show"><strong>What you just saw.</strong>'+
+      'Making AMP spends GTP, and making GMP spends ATP. Over-producing either purine drains the '+
+      'nucleotide that pays for the other branch, so the two pools restrain each other. The cell gets '+
+      'balance out of the pathway\u2019s own architecture, with no extra regulatory protein required.</div>';
+    saveAct('branch', {runs:runs, done:true});
+  };
+  s.reset.onclick = function(){ pools = {ATP:10, GTP:10, AMP:0, GMP:0}; runs = 0;
+    s.cap.textContent = ''; clearAct('branch'); render(''); };
+  render('');
+  if(saved.done) s.cap.textContent = 'Six or more cycles run.';
+})();
+
+/* --- M3S1: sort the two strategies --- */
+sortActivity('act-strategySort', 'strategySort', 'SORT IT',
+  'Assign each feature to the pathway it describes. One of them belongs to both.',
+  [{text:'The ring is assembled directly on a ribose phosphate', ans:'Purine synthesis'},
+   {text:'The ring is completed before the sugar is attached', ans:'Pyrimidine synthesis'},
+   {text:'PRPP supplies the ribose phosphate', ans:'Both pathways'},
+   {text:'Glycine is incorporated intact into the ring', ans:'Purine synthesis'},
+   {text:'Carbamoyl phosphate is an early intermediate', ans:'Pyrimidine synthesis'},
+   {text:'The first product is IMP', ans:'Purine synthesis'},
+   {text:'The first product is UMP', ans:'Pyrimidine synthesis'}],
+  ['Purine synthesis','Pyrimidine synthesis','Both pathways']);
+
+/* --- M3S2: the CAD assembly line --- */
+seqActivity('act-cad', 'cad', 'RUN THE ASSEMBLY LINE',
+  'CAD carries three activities on one polypeptide chain. Pass the intermediate through them in order.',
+  ['Carbamoyl phosphate synthetase II','Aspartate transcarbamoylase','Dihydroorotase'],
+  'Bicarbonate and a glutamine nitrogen become carbamoyl phosphate; aspartate is added; the ring closes '+
+  'to give dihydroorotate. Three reactions, one protein, and the intermediate never has to find its way '+
+  'across the cytosol between them.');
+
+/* --- M3S3: match the enzymes --- */
+dndActivity('act-orotateMatch', 'orotateMatch', 'MATCH IT',
+  'Four reactions carry the pathway from dihydroorotate to CTP. Place the enzyme responsible for each.',
+  [{desc:'Oxidizes dihydroorotate to orotate, passing electrons to ubiquinone in the mitochondrion', ans:'Dihydroorotate dehydrogenase'},
+   {desc:'Attaches the ribose phosphate from PRPP to orotate, giving OMP', ans:'Orotate phosphoribosyltransferase'},
+   {desc:'Removes a carboxyl group from OMP, giving UMP', ans:'OMP decarboxylase'},
+   {desc:'Converts UTP to CTP using the glutamine amide nitrogen', ans:'CTP synthase'}],
+  ['Dihydroorotate dehydrogenase','Orotate phosphoribosyltransferase','OMP decarboxylase','CTP synthase']);
+
+/* --- M3S4: the phosphate ladder --- */
+(function(){
+  var host = document.getElementById('act-kinase'); if(!host) return;
+  var RUNGS = [
+    {from:'UMP', to:'UDP', ans:'UMP kinase',
+     options:['UMP kinase','Nucleoside diphosphate kinase','CTP synthase'],
+     why:'Each nucleotide has its own monophosphate kinase, and ATP is the phosphate donor.'},
+    {from:'UDP', to:'UTP', ans:'Nucleoside diphosphate kinase',
+     options:['UDP kinase','Nucleoside diphosphate kinase','CTP synthase'],
+     why:'One shared enzyme handles every diphosphate-to-triphosphate step, whichever nucleotide it is.'},
+    {from:'UTP', to:'CTP', ans:'CTP synthase',
+     options:['Nucleoside diphosphate kinase','CTP synthase','OMP decarboxylase'],
+     why:'CTP synthase acts at the triphosphate level and takes its nitrogen from the glutamine amide. '+
+          'This is why no CMP is produced directly by the pyrimidine pathway.'}
+  ];
+  var saved = state.activities.kinase || {};
+  var rung = saved.rung || 0;
+  var s = actBox('act-kinase', 'CLIMB IT',
+    'Start at UMP. Choose the enzyme that carries out each step. A wrong choice simply lets you try again.');
+  var view = el('div'); s.body.appendChild(view);
+
+  function render(feedback, miss){
+    view.innerHTML = '';
+    var line = el('div','stepline');
+    line.appendChild(el('span','chip on','UMP'));
+    RUNGS.forEach(function(r, i){
+      line.appendChild(el('span','tray-note','\u2192'));
+      line.appendChild(el('span','chip'+(i < rung ? ' on' : ''), i < rung ? r.to : '?'));
+    });
+    view.appendChild(line);
+
+    if(rung < RUNGS.length){
+      var r = RUNGS[rung];
+      view.appendChild(el('p', null, 'Which enzyme converts <strong>'+r.from+'</strong> to <strong>'+
+        r.to+'</strong>?'));
+      var ch = el('div','choices');
+      shuffle(r.options).forEach(function(o, i){
+        var b = el('button','choice','<span class="mark">'+LETTERS[i]+'</span>'+o);
+        b.onclick = function(){
+          if(o === r.ans){ rung++; render('<strong>Correct.</strong>'+r.why, false); }
+          else{ render('<strong>Not quite &#8212; try again.</strong>', true); }
+        };
+        ch.appendChild(b);
+      });
+      view.appendChild(ch);
+    }else{
+      view.appendChild(el('p', null,
+        'The ladder is complete: UMP to UDP to UTP, and then across to CTP.'));
+    }
+    if(feedback){
+      var fb = el('div','feedback show'+(miss ? ' miss' : '')); fb.innerHTML = feedback;
+      view.appendChild(fb);
+    }
+  }
+  s.check.onclick = function(){
+    if(rung < RUNGS.length){ s.cap.textContent = 'Finish the ladder first.'; return; }
+    s.cap.textContent = 'Ladder complete.';
+    saveAct('kinase', {rung:rung, done:true});
+  };
+  s.reset.onclick = function(){ rung = 0; s.cap.textContent = ''; clearAct('kinase'); render('', false); };
+  render('', false);
+  if(saved.done) s.cap.textContent = 'Ladder complete.';
+})();
+
+/* --- M4S1: the electron relay --- */
+seqActivity('act-electron', 'electron', 'FOLLOW THE ELECTRONS',
+  'Your cell has UDP and needs dUDP. Arrange the components so the electrons flow in the right direction, '+
+  'from their original source to the substrate.',
+  ['NADPH','Thioredoxin reductase','Thioredoxin','Ribonucleotide reductase','UDP becomes dUDP'],
+  'Reading the enzyme names in order is the shortcut: a reductase reduces the thing it is named after, '+
+  'so thioredoxin reductase must come before thioredoxin. The chemistry at the end is a reduction &#8212; '+
+  'the 2 prime hydroxyl is replaced by a hydrogen, which is a gain of electrons at that carbon.');
+
+/* --- M4S2: the thymidylate cycle --- */
+dndActivity('act-folate', 'folate', 'MAP THE CYCLE',
+  'Four players make dTMP possible. Place each one against its role. The two enzymes here are the two '+
+  'drug targets in Module 5.',
+  [{desc:'Transfers a one-carbon unit onto dUMP, producing dTMP', ans:'Thymidylate synthase'},
+   {desc:'Carries the one-carbon unit into that reaction', ans:'Tetrahydrofolate derivative'},
+   {desc:'The more oxidized folate left behind once the carbon is transferred', ans:'Dihydrofolate'},
+   {desc:'Returns that oxidized folate to a usable form', ans:'Dihydrofolate reductase'}],
+  ['Thymidylate synthase','Tetrahydrofolate derivative','Dihydrofolate','Dihydrofolate reductase']);
+
+/* --- M4S3: the whole route --- */
+seqActivity('act-whyT', 'whyT', 'ASSEMBLE THE ROUTE',
+  'Build the path from UDP to dTTP. Watch what happens to the number of phosphates along the way.',
+  ['UDP','dUDP','dUMP','dTMP','dTDP','dTTP'],
+  'The dip is not arbitrary. Ribonucleotide reductase works at the diphosphate level, so the sugar is '+
+  'changed there. Thymidylate synthase works at the monophosphate level, so the phosphate count has to '+
+  'come down for the methyl transfer, and then climb back up because DNA polymerase needs triphosphates.');
+
+/* --- M5S1: the perturbation lab --- */
+caseActivity('act-inhibitor', 'inhibitor', 'PREDICT \u2192 REVEAL',
+  'Three rounds. In each one an enzyme is removed from the pathway. Predict the consequence, and the drug '+
+  'that does it will be named afterward.',
+  [
+   {setup:'Round 1 \u00b7 dihydroorotate dehydrogenase is blocked',
+    prompt:'Dihydroorotate can no longer be oxidized to orotate. What is the immediate consequence?',
+    options:['Pyrimidine nucleotide production falls while purine production continues',
+             'Purine nucleotide production falls while pyrimidine production continues',
+             'Both pathways decline to a similar extent',
+             'Deoxynucleotide production falls while ribonucleotide production continues'],
+    ans:0,
+    verdict:'That is the consequence.',
+    nudge:'Look at where this enzyme sits. Does anything in purine synthesis pass through it?',
+    why:'DHODH belongs to the pyrimidine arm and nowhere else, so the block is confined there. '+
+        'The drug is <strong>leflunomide</strong>, used in rheumatoid arthritis: rapidly dividing '+
+        'lymphocytes cannot keep up their pyrimidine supply, which produces the immunosuppressive effect. '+
+        'The mitochondrial location and the ubiquinone electron acceptor from Module 3 are what make this '+
+        'enzyme an attractive and reasonably selective target.'},
+   {setup:'Round 2 \u00b7 dihydrofolate reductase is blocked',
+    prompt:'Dihydrofolate can no longer be returned to tetrahydrofolate. What happens to dTMP production?',
+    options:['It falls, because thymidylate synthase runs out of its one-carbon donor',
+             'It rises, because more dUMP accumulates as substrate',
+             'It is unchanged, because thymidylate synthase itself is untouched',
+             'It falls, because dUMP is degraded before it can be methylated'],
+    ans:0,
+    verdict:'That is the consequence.',
+    nudge:'Thymidylate synthase leaves the folate more oxidized than it found it. What has to happen next?',
+    why:'Thymidylate synthase consumes the reduced folate every time it runs, so the reaction depends '+
+        'on regeneration to continue. The drug is <strong>methotrexate</strong>, a competitive inhibitor '+
+        'of dihydrofolate reductase. Note where the block sits relative to the missing product: one step '+
+        'upstream of the enzyme whose output actually disappears. Because purine ring construction also '+
+        'draws on folate, this drug reaches more than thymidylate alone.'},
+   {setup:'Round 3 \u00b7 thymidylate synthase is occupied by a look-alike substrate',
+    prompt:'A molecule closely resembling dUMP binds thymidylate synthase but cannot be processed to '+
+           'completion. What follows?',
+    options:['dTTP supply falls and DNA synthesis is impaired',
+             'dUTP supply falls and RNA synthesis is impaired',
+             'Purine synthesis stops because IMP cannot be made',
+             'Ribonucleotide reductase loses its electron donor'],
+    ans:0,
+    verdict:'That is the consequence.',
+    nudge:'Follow the product: what does dTMP become, and what needs it?',
+    why:'The enzyme is left occupied and dTMP output falls, taking dTTP with it. The drug is '+
+        '<strong>fluorouracil</strong>, given as a prodrug and converted by the cell to F-dUMP &#8212; '+
+        'the pattern known as suicide inhibition. Compare it with round 2: two different drugs, two '+
+        'different points of attack, and the same missing molecule at the end.'}
+  ]);
+
+/* --- M5S2: sort the catabolic facts --- */
+sortActivity('act-catab', 'catab', 'SORT IT',
+  'Assign each statement to the class of nucleotide it describes.',
+  [{text:'Ends at uric acid, which is excreted in the urine', ans:'Purine catabolism'},
+   {text:'Ends at ammonium, carbon dioxide, and water', ans:'Pyrimidine catabolism'},
+   {text:'Begins by removing the phosphate and the sugar', ans:'Both pathways'},
+   {text:'Releases a sugar that can be recycled or oxidized for energy', ans:'Both pathways'},
+   {text:'Produces the end product measured when assessing gout risk', ans:'Purine catabolism'}],
+  ['Purine catabolism','Pyrimidine catabolism','Both pathways']);
+
+/* --- M5S3: the gout case --- */
+caseActivity('act-gout', 'gout', 'WORK THE CASE',
+  'A 54-year-old presents with sudden severe pain, redness, and swelling in the first '+
+  'metatarsophalangeal joint that woke him overnight. Serum urate is elevated. Joint aspiration shows '+
+  'needle-shaped crystals.',
+  [
+   {setup:'Step 1 \u00b7 where the urate came from',
+    prompt:'Breakdown of which class of nucleotide raised this patient\u2019s serum urate?',
+    options:['Purine nucleotides','Pyrimidine nucleotides','Both classes equally','Neither class'],
+    ans:0,
+    verdict:'Correct.',
+    nudge:'Think about the two different end products of nucleotide catabolism.',
+    why:'Uric acid is the end point of purine catabolism only. Pyrimidines are degraded to ammonium, '+
+        'carbon dioxide, and water, so they contribute nothing to the urate pool.'},
+   {setup:'Step 2 \u00b7 why the joint hurts',
+    prompt:'What links the elevated serum urate to the inflammation in this joint?',
+    options:['Urate exceeded its solubility, crystallized, and the crystals provoked inflammation',
+             'Urate bound directly to joint collagen and weakened the cartilage',
+             'Urate was taken up by synovial cells and blocked their nucleotide synthesis',
+             'Urate raised the pH of the joint fluid and denatured synovial proteins'],
+    ans:0,
+    verdict:'Correct.',
+    nudge:'The aspiration result is the clue. What did it show?',
+    why:'Uric acid is poorly soluble. Above its solubility limit it forms crystals, and crystals in a '+
+        'joint space trigger an acute inflammatory response. This is why a raised serum urate on its own '+
+        'is a risk factor rather than a diagnosis &#8212; the crystal deposition is the disease.'},
+   {setup:'Step 3 \u00b7 choosing where to intervene',
+    prompt:'Allopurinol inhibits xanthine oxidase, the enzyme catalyzing the final oxidations to uric '+
+           'acid. What does that achieve for this patient over time?',
+    options:['Less uric acid is produced, so the urate load falls',
+             'Uric acid is converted into urea and cleared by a different route',
+             'Existing crystals are dissolved directly by the drug',
+             'Purine synthesis is blocked at the committed step'],
+    ans:0,
+    verdict:'Correct.',
+    nudge:'The enzyme sits at the end of the catabolic route. What happens when you block a final step?',
+    why:'Blocking the last oxidations lowers urate production and leaves more soluble precursors to be '+
+        'excreted instead. This is a treatment aimed at the pathway rather than at the inflammation, '+
+        'which is why it is used to prevent future attacks rather than to relieve the one in front of '+
+        'you. The whole reasoning chain here runs from a solubility limit back through the catabolic '+
+        'pathway you learned in the previous section.'}
+  ]);
+
+/* ---------- Part 5: figures and the metabolic map ---------- */
+
+figure('figRings', '0 0 620 210',
+  purineSVG({}, 150, 100) + pyrimidineSVG(455, 100) +
+  '<text x="150" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="'+C_INK+'">PURINE &#8212; adenine, guanine</text>'+
+  '<text x="455" y="196" text-anchor="middle" font-size="13" font-weight="700" fill="'+C_INK+'">PYRIMIDINE &#8212; cytosine, thymine, uracil</text>',
+  'The two ring systems, with every position numbered. The purine has nine; the pyrimidine has six. '+
+  'The base attaches to the sugar at N9 in a purine and at N1 in a pyrimidine.');
+
+figure('figStages', '0 0 700 150',
+  box(30, 50, 110, 50, 'Base', '#FFFFFF') +
+  arrow(150, 75, 190, 75) +
+  '<text x="170" y="65" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">+ sugar</text>' +
+  box(200, 50, 150, 50, 'Nucleoside', '#EAF0F5', C_ACC) +
+  arrow(360, 75, 400, 75) +
+  '<text x="380" y="65" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">+ phosphate</text>' +
+  box(410, 50, 150, 50, 'Nucleotide', '#EAF0F5', C_ACC) +
+  '<text x="255" y="122" text-anchor="middle" font-size="11" fill="'+C_MID+'">adenine &#8594; adenosine</text>'+
+  '<text x="485" y="122" text-anchor="middle" font-size="11" fill="'+C_MID+'">adenosine &#8594; AMP</text>',
+  'Two additions, two name changes. A nucleotide carries one, two, or three phosphates.');
+
+figure('figBackbone', '0 0 660 200',
+  '<text x="30" y="40" font-size="13" font-weight="700" fill="'+C_INK+'">5&#8242; end</text>' +
+  '<circle cx="90" cy="90" r="20" fill="#EAF0F5" stroke="'+C_ACC+'" stroke-width="2"/>' +
+  '<text x="90" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="'+C_ACC+'">P</text>' +
+  box(130, 65, 110, 50, 'Sugar', '#FFFFFF') +
+  '<text x="185" y="135" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">3&#8242;-OH</text>' +
+  '<circle cx="280" cy="90" r="20" fill="#EAF0F5" stroke="'+C_ACC+'" stroke-width="2"/>' +
+  '<text x="280" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="'+C_ACC+'">P</text>' +
+  '<text x="280" y="135" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">phosphodiester</text>' +
+  box(320, 65, 110, 50, 'Sugar', '#FFFFFF') +
+  '<text x="375" y="135" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">5&#8242;-OH joined here</text>' +
+  '<circle cx="470" cy="90" r="20" fill="#EAF0F5" stroke="'+C_ACC+'" stroke-width="2"/>' +
+  '<text x="470" y="95" text-anchor="middle" font-size="12" font-weight="700" fill="'+C_ACC+'">P</text>' +
+  box(510, 65, 110, 50, 'Sugar', '#FFFFFF') +
+  '<line x1="110" y1="90" x2="130" y2="90" stroke="'+C_MID+'" stroke-width="2"/>' +
+  '<line x1="240" y1="90" x2="260" y2="90" stroke="'+C_MID+'" stroke-width="2"/>' +
+  '<line x1="300" y1="90" x2="320" y2="90" stroke="'+C_MID+'" stroke-width="2"/>' +
+  '<line x1="430" y1="90" x2="450" y2="90" stroke="'+C_MID+'" stroke-width="2"/>' +
+  '<line x1="490" y1="90" x2="510" y2="90" stroke="'+C_MID+'" stroke-width="2"/>' +
+  '<text x="620" y="40" text-anchor="end" font-size="13" font-weight="700" fill="'+C_INK+'">3&#8242; end</text>' +
+  '<text x="330" y="175" text-anchor="middle" font-size="12" fill="'+C_MID+'">Sequences are written in this direction, 5&#8242; to 3&#8242;</text>',
+  'Each phosphate bridges the 5 prime position of one sugar and the 3 prime position of the next, '+
+  'which is what gives the strand a direction.');
+
+figure('figPrpp', '0 0 700 200',
+  box(20, 20, 190, 46, 'Pentose phosphate pathway', '#FFFFFF') +
+  arrow(115, 66, 115, 92) +
+  box(35, 92, 160, 46, 'Ribose-5-phosphate', '#FFFFFF') +
+  arrow(195, 115, 245, 115) +
+  '<text x="222" y="106" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">+ ATP</text>' +
+  box(250, 92, 120, 46, 'PRPP', '#EAF0F5', C_ACC) +
+  '<text x="310" y="80" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">PRPP synthetase</text>' +
+  arrow(370, 105, 440, 70) + arrow(370, 128, 440, 160) +
+  box(445, 44, 215, 46, 'Purine nucleotides', '#FFFFFF') +
+  box(445, 138, 215, 46, 'Pyrimidine nucleotides', '#FFFFFF'),
+  'One molecule, PRPP, opens both routes. Its sugar comes from the pentose phosphate pathway and its '+
+  'pyrophosphate group comes from ATP.');
+
+figure('figPurinePath', '0 0 700 130',
+  box(15, 45, 90, 44, 'PRPP', '#EAF0F5', C_ACC) +
+  arrow(105, 67, 140, 67) +
+  '<text x="122" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#B57614">committed</text>' +
+  '<text x="122" y="50" text-anchor="middle" font-size="10" font-weight="700" fill="#B57614">step</text>' +
+  box(145, 45, 110, 44, 'PRA', '#FFFFFF') +
+  arrow(255, 67, 290, 67) +
+  box(295, 45, 200, 44, 'eight further steps', '#FFFFFF') +
+  arrow(495, 67, 530, 67) +
+  box(535, 45, 100, 44, 'IMP', '#EAF0F5', C_ACC) +
+  '<text x="395" y="112" text-anchor="middle" font-size="11" fill="'+C_MID+'">every intermediate is already a nucleotide</text>',
+  'The route from PRPP to IMP. Only the first arrow commits the molecule to becoming a purine.');
+
+figure('figStrategy', '0 0 700 210',
+  '<text x="20" y="30" font-size="13" font-weight="700" fill="'+C_INK+'">PURINE</text>' +
+  box(20, 44, 130, 42, 'PRPP', '#EAF0F5', C_ACC) + arrow(150, 65, 185, 65) +
+  box(190, 44, 220, 42, 'ring built onto the sugar', '#FFFFFF') + arrow(410, 65, 445, 65) +
+  box(450, 44, 110, 42, 'IMP', '#EAF0F5', C_ACC) +
+  '<text x="20" y="140" font-size="13" font-weight="700" fill="'+C_INK+'">PYRIMIDINE</text>' +
+  box(20, 152, 150, 42, 'ring built first', '#FFFFFF') + arrow(170, 173, 205, 173) +
+  box(210, 152, 110, 42, 'orotate', '#FFFFFF') + arrow(320, 173, 355, 173) +
+  '<text x="338" y="164" text-anchor="middle" font-size="10" fill="'+C_SOFT+'">+ PRPP</text>' +
+  box(360, 152, 110, 42, 'OMP', '#FFFFFF') + arrow(470, 173, 505, 173) +
+  box(510, 152, 110, 42, 'UMP', '#EAF0F5', C_ACC),
+  'The same destination reached two different ways. PRPP enters at the start of one route and near the '+
+  'end of the other.');
+
+figure('figOrotate', '0 0 700 230',
+  '<rect x="15" y="15" width="670" height="200" rx="12" fill="#FAFCFD" stroke="'+C_LINE+'" stroke-dasharray="5 4"/>' +
+  '<text x="30" y="36" font-size="11" font-weight="700" fill="'+C_SOFT+'">CYTOSOL</text>' +
+  '<rect x="230" y="60" width="250" height="110" rx="12" fill="#EAF0F5" stroke="'+C_ACC+'" stroke-width="1.5"/>' +
+  '<text x="245" y="80" font-size="11" font-weight="700" fill="'+C_ACC+'">MITOCHONDRION</text>' +
+  box(30, 92, 170, 44, 'Dihydroorotate', '#FFFFFF') +
+  arrow(200, 114, 245, 114) +
+  box(250, 92, 210, 44, 'DHODH \u2192 ubiquinone', '#FFFFFF', C_ACC) +
+  arrow(460, 114, 505, 114) +
+  box(510, 92, 150, 44, 'Orotate', '#FFFFFF') +
+  '<text x="355" y="158" text-anchor="middle" font-size="11" fill="'+C_MID+'">electrons join the electron transport chain here</text>',
+  'The one step of pyrimidine synthesis that leaves the cytosol, and the reason this enzyme becomes a '+
+  'drug target in Module 5.');
+
+figure('figCatab', '0 0 700 210',
+  box(255, 15, 190, 42, 'Nucleotide', '#EAF0F5', C_ACC) +
+  arrow(350, 57, 350, 82) +
+  box(240, 82, 220, 42, 'phosphate and sugar removed', '#FFFFFF') +
+  arrow(300, 124, 190, 150) + arrow(400, 124, 510, 150) +
+  box(30, 150, 290, 46, 'PURINE base \u2192 uric acid \u2192 urine', '#FFFFFF', '#B57614') +
+  box(380, 150, 290, 46, 'PYRIMIDINE base \u2192 NH\u2084\u207a, CO\u2082, H\u2082O', '#FFFFFF', C_ACC),
+  'A shared opening move, then two completely different end points. The end product tells you which class '+
+  'the nucleotide belonged to.');
+
+/* --- The metabolic map --- */
+(function(){
+  var mount = document.getElementById('mapMount');
+  var readout = document.getElementById('mapReadout');
+  if(!mount) return;
+
+  /* Each node names the module that reveals it. */
+  var NODES = [
+    {x:290, y:14,  w:180, h:36, t:'Pentose phosphate pathway', mod:'m2'},
+    {x:305, y:74,  w:150, h:36, t:'Ribose-5-phosphate',        mod:'m2'},
+    {x:325, y:134, w:110, h:36, t:'PRPP',                      mod:'m2', key:true},
+    {x:110, y:200, w:170, h:36, t:'Purine ring on PRPP',       mod:'m2'},
+    {x:150, y:258, w:90,  h:36, t:'IMP',                       mod:'m2', key:true},
+    {x:70,  y:316, w:90,  h:36, t:'AMP',                       mod:'m2'},
+    {x:198, y:316, w:90,  h:36, t:'GMP',                       mod:'m2'},
+    {x:480, y:200, w:170, h:36, t:'Carbamoyl phosphate',       mod:'m3'},
+    {x:495, y:258, w:140, h:36, t:'Orotate \u2192 OMP',         mod:'m3'},
+    {x:520, y:316, w:90,  h:36, t:'UMP',                       mod:'m3', key:true},
+    {x:625, y:316, w:120, h:36, t:'UTP \u2192 CTP',             mod:'m3'},
+    {x:255, y:374, w:250, h:36, t:'Diphosphate nucleotides',   mod:'m4'},
+    {x:245, y:428, w:270, h:36, t:'RNR \u2192 deoxynucleotides', mod:'m4', key:true},
+    {x:70,  y:428, w:150, h:36, t:'dUMP \u2192 dTMP',           mod:'m4'}
+  ];
+  var EDGES = [
+    [380,50,380,74],[380,110,380,134],
+    [340,170,200,200],[420,170,560,200],
+    [195,236,195,258],[180,294,115,316],[210,294,243,316],
+    [565,236,565,258],[565,294,565,316],[610,334,625,334],
+    [115,352,300,374],[243,352,330,374],[565,352,440,374],
+    [380,410,380,428],[245,446,220,446]
+  ];
+  var BLOCKS = [
+    {x:565, y:230, label:'Leflunomide \u2715 DHODH'},
+    {x:145, y:410, label:'5-FU \u2715 thymidylate synthase'},
+    {x:145, y:474, label:'Methotrexate \u2715 DHFR'}
+  ];
+
+  function moduleDone(id){
+    var m = MANIFEST.modules.filter(function(x){ return x.id === id; })[0];
+    if(!m) return false;
+    var gradable = m.sections.filter(function(s){ return s.checks || s.activity || s.quiz; });
+    if(!gradable.length) return false;
+    return gradable.every(function(s){
+      if(s.quiz) return state.best[s.quiz] !== undefined;
+      var checksOK = (s.checks || []).every(function(id2){
+        return state.checks[id2] !== undefined && state.checks[id2] === CHECKPOINTS[id2].answer;
+      });
+      var actOK = !s.activity || (state.activities[s.activity] !== null &&
+                                  state.activities[s.activity] !== undefined);
+      return checksOK && actOK;
+    });
+  }
+
+  function draw(){
+    var svg = '<svg viewBox="0 0 760 500" role="img" aria-label="Map of nucleotide metabolism">'+ARROW_DEF;
+    EDGES.forEach(function(e){
+      svg += '<line x1="'+e[0]+'" y1="'+e[1]+'" x2="'+e[2]+'" y2="'+e[3]+
+             '" stroke="#DCE4EB" stroke-width="1.8"/>';
+    });
+    NODES.forEach(function(n){
+      var on = moduleDone(n.mod);
+      var fill   = on ? (n.key ? '#EAF0F5' : '#FFFFFF') : '#F4F6F8';
+      var stroke = on ? (n.key ? C_ACC : C_LINE) : '#E4EAEE';
+      var txt    = on ? C_INK : '#C3CDD5';
+      svg += box(n.x, n.y, n.w, n.h, n.t, fill, stroke, txt);
+    });
+    if(moduleDone('m5')){
+      BLOCKS.forEach(function(b){
+        svg += '<text x="'+b.x+'" y="'+b.y+'" text-anchor="middle" font-size="11" '+
+               'font-weight="700" fill="#D4536B">'+b.label+'</text>';
+      });
+    }
+    svg += '</svg>';
+    mount.innerHTML = '<div class="figure">'+svg+'</div>';
+
+    var done = ['m1','m2','m3','m4','m5'].filter(moduleDone).length;
+    if(readout){
+      readout.innerHTML =
+        '<div><div class="k">Modules complete</div><div class="v">'+done+' of 5</div></div>'+
+        '<div><div class="k">Map revealed</div><div class="v">'+
+          Math.round(NODES.filter(function(n){ return moduleDone(n.mod); }).length / NODES.length * 100)+
+          '%</div></div>'+
+        '<div><div class="k">Drug targets shown</div><div class="v">'+
+          (moduleDone('m5') ? 'Yes' : 'After Module 5')+'</div></div>';
+    }
+  }
+  draw();
+  /* Redraw after any interaction, so the map is current whenever the
+     student navigates back to it. Cheap enough to do unconditionally. */
+  document.addEventListener('click', function(){ setTimeout(draw, 80); });
+})();
+</script>
+<script src="shared/engine.js"></script>
+
+</body>
+</html>

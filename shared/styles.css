@@ -1,0 +1,319 @@
+/* ============================================================
+   DESIGN TOKENS — change a value here and it updates everywhere
+   ============================================================ */
+:root{
+  --green:#2FA97A; --green-bright:#38C48D; --green-soft:#E7F6EF; --green-line:#BFE6D4;
+  --violet:#6B4FD8; --violet-soft:#EFEBFC;
+  --amber:#B57614; --amber-soft:#FFF4E0;
+  --rose:#D4536B; --rose-soft:#FDECEF;
+  --blue:#2E7DA8; --blue-soft:#E6F2F8;
+  --ink:#1D2B33; --ink-mid:#4A5C68; --ink-soft:#7E8F9B;
+  --page:#F2F5F7; --card:#FFFFFF; --line:#E4EAEE;
+  --r-lg:20px; --r-md:14px; --r-sm:10px;
+  --shadow:0 2px 14px rgba(29,43,51,.07);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font); color:var(--ink); line-height:1.6; font-size:16px;
+  background:
+    radial-gradient(900px 420px at 88% -8%, #F3EAFB 0%, rgba(243,234,251,0) 62%),
+    radial-gradient(760px 380px at 4% -4%, #E7F6EF 0%, rgba(231,246,239,0) 60%),
+    var(--page);
+  background-attachment:fixed;
+}
+h1,h2,h3,h4{line-height:1.3;margin:0 0 .5em}
+h2{font-size:1.5rem;letter-spacing:-.01em}
+h3{font-size:1.12rem}
+p{margin:0 0 1em;max-width:68ch}
+ul,ol{margin:0 0 1em;padding-left:1.15em;max-width:68ch}
+li{margin-bottom:.4em}
+button{font-family:inherit;font-size:1rem;cursor:pointer}
+:focus-visible{outline:3px solid var(--green-bright);outline-offset:2px;border-radius:6px}
+code{background:#F1F5F7;padding:1px 5px;border-radius:5px;font-size:.92em}
+
+.app{display:flex;min-height:100vh;gap:24px;padding:24px;max-width:1340px;margin:0 auto}
+.sidebar{width:280px;flex:0 0 280px;background:var(--card);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);padding:22px 18px;align-self:flex-start;position:sticky;top:24px;
+  max-height:calc(100vh - 48px);overflow-y:auto}
+.back-to-hub{display:inline-flex;align-items:center;gap:6px;margin-bottom:16px;
+  font-size:.82rem;font-weight:650;text-decoration:none;
+  color:var(--green);transition:opacity .15s}
+.back-to-hub:hover{opacity:.7}
+.back-to-hub .arrow{font-size:.95rem;line-height:1}
+
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.brand-mark{width:36px;height:36px;border-radius:11px;flex:0 0 36px;
+  background:linear-gradient(140deg,var(--green-bright),var(--green));
+  color:#fff;font-weight:700;display:grid;place-items:center;font-size:1.05rem}
+.brand-title{font-weight:650;font-size:.95rem;line-height:1.25}
+.brand-sub{font-size:.72rem;color:var(--ink-soft)}
+
+.mod-head{width:100%;text-align:left;border:0;background:transparent;padding:9px 8px;
+  display:flex;align-items:center;gap:9px;border-radius:var(--r-sm);
+  font-size:.86rem;font-weight:650;color:var(--ink);margin-top:4px}
+.mod-head:hover{background:#F5F8F9}
+.mod-row{display:flex;align-items:center;gap:2px;margin-top:4px}
+.mod-row .mod-head{margin-top:0;flex:1;min-width:0}
+.mod-head .mod-title-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chev-btn{flex:0 0 auto;border:0;background:transparent;color:var(--ink-soft);width:28px;height:28px;
+  border-radius:var(--r-sm);font-size:.72rem;transition:transform .2s}
+.chev-btn:hover{background:#F5F8F9;color:var(--ink)}
+.chev-btn.open{transform:rotate(90deg)}
+.mod-badge{width:22px;height:22px;border-radius:7px;flex:0 0 22px;display:grid;place-items:center;
+  font-size:.7rem;background:#EEF3F5;color:var(--ink-soft)}
+.mod-head.current .mod-badge,.mod-badge.done{background:var(--green-soft);color:#1C7554}
+.mod-head.current{background:var(--green-soft);color:#1C7554}
+.sub{list-style:none;margin:0 0 4px;padding:0 0 0 8px;display:none}
+.sub.open{display:block}
+.sub button{width:100%;text-align:left;border:0;background:transparent;color:var(--ink-mid);
+  padding:7px 10px;border-radius:var(--r-sm);display:flex;align-items:center;gap:9px;
+  font-size:.85rem;margin-bottom:1px}
+.sub button:hover{background:#F5F8F9;color:var(--ink)}
+.sub button.current{background:var(--green-soft);color:#1C7554;font-weight:600}
+.dot{width:7px;height:7px;border-radius:50%;background:#DDE5E9;flex:0 0 7px}
+.sub button.done .dot{background:var(--green-bright)}
+.nav-lock{flex:0 0 auto;margin-left:2px;font-size:.7rem;color:var(--ink-soft)}
+.sub button.current .dot{background:var(--green)}
+
+.ring-wrap{display:flex;align-items:center;gap:13px;padding:14px;background:var(--green-soft);
+  border-radius:var(--r-md);margin-top:16px}
+.ring{width:56px;height:56px;flex:0 0 56px}
+.ring-num{font-weight:700;font-size:1.02rem;color:#1C7554}
+.ring-cap{font-size:.74rem;color:#3E7F66;line-height:1.35}
+.reset{margin-top:12px;width:100%;border:1px solid var(--line);background:#fff;color:var(--ink-soft);
+  padding:8px;border-radius:var(--r-sm);font-size:.78rem}
+.reset:hover{color:var(--rose);border-color:#F0C9D1}
+
+.main{flex:1;min-width:0}
+.topbar{background:var(--card);border-radius:var(--r-lg);box-shadow:var(--shadow);
+  padding:18px 24px;margin-bottom:20px;display:flex;justify-content:space-between;
+  align-items:center;gap:16px;flex-wrap:wrap}
+.topbar h1{font-size:1.28rem;margin:0}
+.topbar .meta{font-size:.82rem;color:var(--ink-soft);margin-top:2px}
+.pill{background:var(--green-soft);color:#1C7554;border-radius:999px;padding:6px 14px;
+  font-size:.8rem;font-weight:600;white-space:nowrap}
+
+.card{background:var(--card);border-radius:var(--r-lg);box-shadow:var(--shadow);
+  padding:28px 30px;margin-bottom:20px}
+.card > h2:first-child,.card > .eyebrow:first-child{margin-top:0}
+.eyebrow{font-size:.78rem;color:var(--green);font-weight:650;margin-bottom:4px}
+.section{display:none}
+.section.active{display:block}
+.keypoints{background:#F7FAFB;border-radius:var(--r-md);padding:16px 20px 4px;margin:0 0 20px}
+.keypoints h4{margin:0 0 8px;font-size:.86rem;color:var(--ink-mid)}
+
+.box{border-radius:var(--r-md);padding:20px 22px;margin:24px 0}
+.box h3{margin-top:0;display:flex;align-items:center;gap:9px;font-size:1rem;flex-wrap:wrap}
+.cp-item{padding-top:16px;margin-top:16px;border-top:1px solid rgba(29,43,51,.08)}
+.cp-item:first-of-type{padding-top:0;margin-top:0;border-top:0}
+.cp-item > p{font-weight:500}
+.tag{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:999px;letter-spacing:.03em}
+.predict{background:var(--amber-soft)}
+.predict .tag{background:#F6E0B8;color:var(--amber)}
+.clinical{background:var(--violet-soft)}
+.clinical .tag{background:#DED3FA;color:var(--violet)}
+.clinical p:last-child{margin-bottom:0}
+.apply{background:var(--green-soft)}
+.apply .tag{background:#C7EBDA;color:#1C7554}
+
+.choices{display:grid;gap:9px;margin:14px 0}
+.choice{text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:12px 15px;color:var(--ink);line-height:1.45;transition:border-color .12s,background .12s}
+.choice:hover:not(:disabled){border-color:var(--green-line);background:#FBFEFC}
+.choice:disabled{cursor:default}
+.choice.picked{border-color:var(--ink-soft);background:#F7FAFB}
+.choice.right{border-color:var(--green);background:var(--green-soft)}
+.choice.wrong{border-color:var(--rose);background:var(--rose-soft)}
+.mark{font-weight:700;margin-right:6px}
+.feedback{display:none;margin-top:12px;padding:14px 16px;border-radius:var(--r-sm);
+  background:#fff;border-left:4px solid var(--green);font-size:.94rem}
+.feedback.show{display:block}
+.feedback.miss{border-left-color:var(--rose)}
+.feedback strong{display:block;margin-bottom:3px}
+
+.figure{background:#FAFCFD;border:1px solid var(--line);border-radius:var(--r-md);padding:20px;margin:22px 0}
+.figure svg{width:100%;height:auto;display:block}
+.figure h3{margin-top:0}
+
+/* Module lock (engine.js, "MODULE LOCKING") — built once here so any
+   companion that opts a module in via `unlockAfter` gets the same look
+   for free, themed automatically by that companion's own --green tokens. */
+.lock-card{border:1.5px dashed var(--line);text-align:left}
+.lock-icon{font-size:1.5rem;line-height:1}
+.lock-card h2{margin:10px 0 4px;font-size:1.15rem}
+.lock-card > p{color:var(--ink-mid);max-width:60ch}
+.lock-list{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:8px}
+.lock-list li{display:flex;align-items:center;gap:9px;font-size:.9rem;color:var(--ink-mid)}
+.lock-dot{width:9px;height:9px;border-radius:50%;flex:0 0 9px;background:var(--line)}
+.lock-dot.done{background:var(--green)}
+.lock-list li.done{color:var(--ink)}
+.lock-go{margin-top:16px}
+
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.btn{border:0;background:var(--green);color:#fff;padding:10px 18px;border-radius:var(--r-sm);
+  font-weight:600;font-size:.9rem}
+.btn:hover{background:#26906A}
+.btn.ghost{background:#fff;color:var(--ink-mid);border:1.5px solid var(--line)}
+.btn.ghost:hover{background:#F5F8F9;color:var(--ink)}
+.btn.ghost.on{background:var(--green-soft);border-color:var(--green-line);color:#1C7554}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.caption{font-size:.85rem;color:var(--ink-soft);margin:12px 0 0;max-width:70ch}
+.hidden{display:none !important}
+.fade{transition:opacity .45s ease}
+.o0{opacity:0}
+
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;
+  background:linear-gradient(90deg,var(--green-line),var(--green));outline:none;margin:6px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:#fff;border:3px solid var(--green);cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.18)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;
+  border:3px solid var(--green);cursor:pointer}
+.readout{display:flex;gap:20px;flex-wrap:wrap;margin-top:10px}
+.readout div{background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 14px;min-width:120px}
+.readout .k{font-size:.72rem;color:var(--ink-soft)}
+.readout .v{font-weight:650;font-size:1.05rem}
+
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:.92rem}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{font-size:.78rem;color:var(--ink-soft);font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+.cellopts{display:flex;gap:5px;flex-wrap:wrap}
+
+.sort-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  padding:13px 0;border-bottom:1px solid var(--line)}
+.sort-row:last-of-type{border-bottom:0}
+.sort-text{flex:1 1 250px;font-size:.93rem}
+.sort-opts{display:flex;gap:6px;flex-wrap:wrap}
+.opt{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;
+  font-size:.8rem;color:var(--ink-mid)}
+.opt:hover:not(:disabled){border-color:var(--green-line)}
+.opt.sel{background:var(--green-soft);border-color:var(--green);color:#1C7554;font-weight:600}
+.opt.sel.bad{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+.opt.reveal{border-color:var(--green);color:var(--green);font-weight:600}
+.opt:disabled{cursor:default}
+
+.dnd-board{display:grid;gap:10px;margin:6px 0}
+.dnd-row{display:flex;align-items:center;gap:14px;padding:11px 14px;background:#F7FAFB;
+  border:1.5px dashed var(--line);border-radius:var(--r-md);transition:border-color .15s,background .15s}
+.dnd-desc{flex:1;font-size:.92rem;color:var(--ink-mid)}
+.dnd-slot{flex:0 0 200px;min-height:42px;border:2px dashed var(--green-line);border-radius:999px;
+  display:flex;align-items:center;justify-content:center;background:#fff;transition:background .15s,border-color .15s}
+.dnd-slot.over{background:var(--green-soft);border-color:var(--green)}
+.dnd-row.correct{border-color:var(--green);background:var(--green-soft)}
+.dnd-row.correct .dnd-slot{border-style:solid;border-color:var(--green)}
+.dnd-row.incorrect{border-color:var(--rose);background:var(--rose-soft)}
+.dnd-row.incorrect .dnd-slot{border-style:solid;border-color:var(--rose)}
+.dnd-tray{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;padding:14px;background:#FAFCFD;
+  border:1px solid var(--line);border-radius:var(--r-md);min-height:58px}
+.dnd-pill{padding:9px 16px;border-radius:999px;background:#fff;border:1.5px solid var(--green-line);
+  color:#1C7554;font-weight:600;font-size:.85rem;cursor:grab;touch-action:none;user-select:none;
+  box-shadow:0 1px 4px rgba(29,43,51,.06)}
+.dnd-pill:active{cursor:grabbing}
+.dnd-pill.placed{cursor:grab}
+.dnd-pill.locked{cursor:default;opacity:.9}
+.dnd-ghost{position:fixed;pointer-events:none;z-index:999;padding:9px 16px;border-radius:999px;
+  background:#fff;border:1.5px solid var(--green);color:#1C7554;font-weight:600;font-size:.85rem;
+  box-shadow:0 8px 20px rgba(29,43,51,.2);transform:translate(-50%,-50%);opacity:.95}
+.dnd-pill.dragging{opacity:.3}
+
+.fc-stage{perspective:1200px;margin:18px 0 10px}
+.fc{position:relative;height:215px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.fc.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r-md);
+  display:grid;place-items:center;text-align:center;padding:26px}
+.fc-front{background:linear-gradient(140deg,#EDF9F4,#E2F2FB);border:1px solid var(--green-line)}
+.fc-back{background:#fff;border:1px solid var(--line);transform:rotateY(180deg)}
+.fc-term{font-size:1.3rem;font-weight:650}
+.fc-hint{font-size:.78rem;color:var(--ink-soft);margin-top:10px}
+.fc-def{font-size:.99rem;color:var(--ink-mid);max-width:48ch}
+.fc-bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fc-count{font-size:.85rem;color:var(--ink-soft)}
+
+.q{border-bottom:1px solid var(--line);padding:24px 0}
+.q:first-of-type{padding-top:6px}
+.q:last-of-type{border-bottom:0}
+.q-num{font-size:.76rem;color:var(--ink-soft);margin-bottom:6px}
+.q-stem{font-weight:600;margin-bottom:2px;max-width:72ch}
+.q-level{background:#EEF3F5;color:var(--ink-soft);border-radius:99px;padding:2px 8px;
+  font-size:.68rem;margin-left:8px;font-weight:600}
+
+/* Applied by engine.js on a failed submit attempt, to every question
+   still missing an answer, and removed the instant that question is
+   answered — a "needs attention" amber, distinct from the .choice.wrong
+   rose used only after grading, since an unanswered question hasn't
+   been marked incorrect yet. */
+.q.q-missing{background:var(--amber-soft);border-radius:var(--r-sm);
+  padding-left:16px;padding-right:16px;margin:0 -16px;outline:2px solid var(--amber)}
+.q.q-missing:focus{outline-width:3px}
+
+.score-hero{background:linear-gradient(135deg,#38C48D,#2A9C86);color:#fff;border-radius:var(--r-md);
+  padding:24px 26px;margin-bottom:20px}
+.score-hero .big{font-size:2.4rem;font-weight:700;line-height:1.1}
+.score-hero p{color:rgba(255,255,255,.92);margin:6px 0 0;max-width:60ch}
+
+/* "Questions to review" — the list of individually missed questions
+   shown right under the score, before the concept-area breakdown, so a
+   student can jump straight to a specific question instead of scrolling
+   back up through the whole quiz to find what they got wrong. */
+.missed-list{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:2px 0 22px}
+.missed-row{display:flex;align-items:center;gap:12px;width:100%;min-width:0;max-width:100%;
+  box-sizing:border-box;text-align:left;
+  border:1px solid var(--rose);background:var(--rose-soft);border-radius:var(--r-sm);
+  padding:11px 14px;font:inherit;color:var(--ink);transition:transform .12s ease,box-shadow .12s ease}
+.missed-row:hover{transform:translateX(2px);box-shadow:var(--shadow)}
+.missed-num{flex:0 0 auto;font-weight:700;font-size:.78rem;color:var(--rose);
+  background:#fff;border-radius:99px;padding:3px 9px}
+.missed-stem{flex:1 1 auto;min-width:0;font-size:.88rem;color:var(--ink-mid);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.missed-area{flex:0 1 auto;min-width:0;max-width:170px;font-size:.72rem;font-weight:600;color:var(--ink-soft);
+  background:#fff;border-radius:99px;padding:3px 9px;display:none;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.missed-arrow{flex:0 0 auto;font-size:.78rem;font-weight:650;color:var(--rose);white-space:nowrap}
+@media (min-width:640px){.missed-area{display:inline-block}}
+
+/* Applied for ~1.6s to a question block when a student clicks a row in
+   the "Questions to review" list above, so the question they land on is
+   unmistakable. Uses --green-bright rather than a fixed color, since
+   every companion redefines that token to its own accent — the pulse
+   automatically matches whichever companion this is. */
+.q-jumped{animation:qJumpPulse 1.6s ease;border-radius:var(--r-sm)}
+@keyframes qJumpPulse{
+  0%{box-shadow:0 0 0 3px var(--green-bright);background:var(--green-soft)}
+  70%{box-shadow:0 0 0 3px var(--green-bright);background:var(--green-soft)}
+  100%{box-shadow:0 0 0 0 transparent;background:transparent}
+}
+
+.bd{display:grid;gap:10px;margin-bottom:18px}
+.bd-row{display:flex;align-items:center;gap:14px;padding:12px 16px;background:#FAFCFD;
+  border-radius:var(--r-sm);flex-wrap:wrap}
+.bd-name{flex:1 1 210px;font-weight:600;font-size:.94rem}
+.bd-bar{flex:1 1 120px;height:8px;background:#E9EFF2;border-radius:99px;overflow:hidden;min-width:100px}
+.bd-fill{display:block;height:100%;border-radius:99px}
+.bd-state{font-size:.8rem;font-weight:650;white-space:nowrap}
+.s-strong{color:#1C7554}.s-dev{color:var(--amber)}.s-review{color:var(--rose)}
+.next-step{background:var(--amber-soft);border-radius:var(--r-md);padding:16px 20px;font-size:.94rem}
+.next-step a{color:var(--amber);font-weight:600;cursor:pointer;text-decoration:underline}
+.next-step ul{margin:8px 0 0}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px}
+
+.home-list{display:grid;gap:10px;margin:20px 0 4px}
+.home-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:#FAFCFD;
+  border:1px solid var(--line);border-radius:var(--r-md);text-align:left;width:100%}
+.home-item:hover{border-color:var(--green-line);background:#fff}
+.home-num{width:30px;height:30px;border-radius:9px;background:#EEF3F5;color:var(--ink-soft);
+  display:grid;place-items:center;font-weight:700;font-size:.85rem;flex:0 0 30px}
+.home-num.done{background:var(--green-soft);color:#1C7554}
+.home-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.home-title{font-weight:650;font-size:.94rem}
+.home-desc{font-size:.82rem;color:var(--ink-soft)}
+.home-status{font-size:.72rem;font-weight:650;color:var(--ink-soft);white-space:nowrap}
+.home-status.done{color:#1C7554}
+
+@media (max-width:900px){
+  .app{flex-direction:column;padding:14px;gap:14px}
+  .sidebar{width:auto;flex:none;position:static;max-height:none;align-self:stretch}
+  .card{padding:22px 18px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}

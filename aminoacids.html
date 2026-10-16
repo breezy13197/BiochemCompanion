@@ -1,0 +1,2736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amino Acids &amp; Protein Structure — Interactive Companion</title>
+<link rel="stylesheet" href="shared/styles.css">
+
+<!-- This companion's accent color. Overrides only the primary token family,
+     plus the few places shared/styles.css hardcodes a green hex. -->
+<style>
+  :root{
+    --green:#0D8C80; --green-bright:#14B8A6; --green-soft:#DDF5F1; --green-line:#A6E3DA;
+  }
+  .opt.sel{color:#0A6B62}
+  .dnd-pill,.dnd-ghost{color:#0A6B62}
+  .bd-fill{background:var(--green)!important}
+
+  /* shared/styles.css only sizes <svg> inside .figure; these three sections
+     use photographed/rendered diagrams instead, so extend the same rule to <img> */
+  .figure img{width:100%;height:auto;display:block;border-radius:var(--r-sm)}
+
+  /* ---- build-the-framework (1.1) ----
+     Reuses .dnd-tray / .dnd-pill / .dnd-ghost from shared/styles.css for the
+     draggable labels themselves. The only genuinely new shape here is the
+     four drop targets sitting at the end of each bond line in the SVG, which
+     .dnd-slot (built for a fixed-width row layout) can't position, so this
+     is a small, separate class rather than a repurposed one. */
+  .baa-wrap{position:relative;max-width:460px;margin:0 auto}
+  .baa-wrap svg{width:100%;height:auto;display:block}
+  .baa-slot{position:absolute;transform:translate(-50%,-50%);min-width:52px;min-height:36px;
+    display:flex;align-items:center;justify-content:center;padding:2px 12px;
+    border:2px dashed var(--green-line);border-radius:999px;background:#fff;
+    font-size:.85rem;color:var(--ink-soft);transition:border-color .15s,background .15s}
+  .baa-slot.over{background:var(--green-soft);border-color:var(--green)}
+  .baa-slot.filled{border-style:solid;border-color:var(--green-line)}
+  .baa-slot.correct{border-style:solid;border-color:var(--green);background:var(--green-soft)}
+  .baa-slot.incorrect{border-style:solid;border-color:var(--rose);background:var(--rose-soft)}
+  .baa-slot .dnd-pill{border:0;box-shadow:none;background:transparent;padding:2px 0}
+  .baa-note{position:absolute;left:50%;top:94%;transform:translate(-50%,0);
+    font-size:.72rem;color:var(--ink-soft);white-space:nowrap}
+  .dnd-pill.accent{color:var(--green);font-weight:700}
+  .dnd-pill.picked{border-color:var(--green);box-shadow:0 0 0 2px var(--green-soft)}
+  .baa-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center}
+  @media (max-width:640px){.baa-slot{min-width:44px;min-height:32px;padding:2px 8px;font-size:.78rem}}
+
+  /* ---- charge state practice (2.1, 2.2) ----
+     Rows reuse .sort-row / .sort-text / .sort-opts from shared/styles.css.
+     What's new here is the live readout strip: as the student picks a form
+     for each group, the assembled molecule and its running net charge
+     update immediately, so the pH-vs-pKa rule has a visible consequence
+     rather than only being graded at the end. */
+  .chg-wrap{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;background:#fff;margin:6px 0}
+  .chg-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;
+    justify-content:space-between;margin-bottom:4px}
+  .chg-res{font-weight:700;font-size:1rem}
+  .chg-ph{font-size:.85rem;color:var(--ink-mid)}
+  .chg-ph b{color:var(--green);font-size:1.05rem;font-variant-numeric:tabular-nums}
+  .chg-readout{display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+    background:var(--green-soft);border:1px solid var(--green-line);border-radius:var(--r-sm);
+    padding:11px 14px;margin-top:14px}
+  .chg-piece{font-size:.9rem;color:var(--ink);font-weight:600}
+  .chg-piece.pending{color:var(--ink-soft);font-weight:400;font-style:italic}
+  .chg-plus{color:var(--ink-soft);font-size:.85rem}
+  .chg-net{margin-left:auto;font-size:.85rem;color:var(--ink-mid);white-space:nowrap}
+  .chg-net b{font-size:1.1rem;color:var(--ink);font-variant-numeric:tabular-nums;margin-left:4px}
+  .chg-net b.neg{color:var(--rose)} .chg-net b.pos{color:var(--violet)} .chg-net b.zero{color:var(--green)}
+  .chg-rule{font-size:.8rem;color:var(--ink-soft);margin-top:10px}
+
+  /* ---- pathway ordering (5.1) ----
+     A vertical drag-to-reorder list. Uses the same pointer-based drag as the
+     1.1 builder (works with mouse, touch and pen alike) plus arrow buttons,
+     so the ordering can always be completed without dragging at all. */
+  .ord-list{list-style:none;margin:6px 0 0;padding:0;max-width:none}
+  .ord-item{display:flex;align-items:center;gap:12px;margin:0 0 8px;
+    border:1.5px solid var(--line);border-radius:var(--r-sm);background:#fff;
+    padding:11px 13px;transition:border-color .15s,background .15s,box-shadow .15s}
+  .ord-item.dragging{opacity:.45}
+  .ord-item.over{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+  .ord-item.correct{border-color:var(--green);background:var(--green-soft)}
+  .ord-item.incorrect{border-color:var(--rose);background:var(--rose-soft)}
+  .ord-num{flex:0 0 26px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+    background:var(--green-soft);color:#0A6B62;font-size:.8rem;font-weight:700;
+    font-variant-numeric:tabular-nums}
+  .ord-item.correct .ord-num{background:var(--green);color:#fff}
+  .ord-item.incorrect .ord-num{background:var(--rose);color:#fff}
+  .ord-body{flex:1 1 auto;min-width:0}
+  .ord-title{font-weight:600;font-size:.93rem}
+  .ord-sub{font-size:.78rem;color:var(--ink-mid);margin-top:2px}
+  .ord-handle{flex:0 0 auto;display:flex;gap:2px}
+  .ord-handle button{border:1px solid var(--line);background:#fff;border-radius:6px;
+    width:26px;height:26px;line-height:1;color:var(--ink-mid);font-size:.8rem;padding:0}
+  .ord-handle button:hover:not(:disabled){border-color:var(--green-line);color:var(--green)}
+  .ord-handle button:disabled{opacity:.35;cursor:default}
+  .ord-grip{flex:0 0 auto;color:var(--ink-soft);font-size:1rem;cursor:grab;
+    touch-action:none;user-select:none;padding:0 2px}
+  .ord-item.locked .ord-grip{cursor:default;color:var(--line)}
+
+  /* ---- helical wheel (4.2) ---- */
+  .wheel-wrap{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;background:#fff;margin:6px 0}
+  .wheel-pick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .wheel-grid{display:grid;grid-template-columns:minmax(0,300px) 1fr;gap:18px;align-items:center}
+  .wheel-grid svg{width:100%;height:auto;display:block}
+  .wheel-seq{display:flex;flex-wrap:wrap;gap:5px}
+  .wheel-res{border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);
+             padding:5px 0;width:34px;text-align:center;font:inherit;font-size:.76rem;cursor:pointer}
+  .wheel-res:hover{border-color:var(--green)}
+  .wh-verdict{font-weight:700;font-size:1rem;margin-bottom:4px}
+  .wh-stat{display:flex;justify-content:space-between;gap:12px;font-size:.8rem;
+           color:var(--ink-mid);padding:5px 0;border-bottom:1px solid var(--line)}
+  .wh-stat b{color:var(--ink);font-variant-numeric:tabular-nums}
+  @media (max-width:640px){.wheel-grid{grid-template-columns:1fr}}
+
+  /* ---- four-level stepper (4.1) ---- */
+  .lvl-dots{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+  .lvl-dot{font-size:.72rem;padding:4px 11px;border-radius:999px;border:1.5px solid var(--line);color:var(--ink-soft)}
+  .lvl-dot.on{border-color:var(--green);background:var(--green-soft);color:#0A6B62;font-weight:700}
+  .lvl-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+  .lvl-stage{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;background:#fff}
+  .lvl-stage svg{width:100%;max-width:420px;height:auto;display:block;margin:0 auto 6px}
+  .lvl-q{margin-top:16px}
+  .lvl-q > p{font-weight:600;margin-bottom:8px}
+
+  /* ---- Amino Acid Reference Lab ---- */
+  .aa-grid{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+  .aa-chip{border:1.5px solid var(--line);background:#fff;color:var(--ink-mid);
+           border-radius:999px;padding:6px 13px;font:inherit;font-size:.8rem;cursor:pointer}
+  .aa-chip:hover{border-color:var(--green-line)}
+  .aa-chip.sel{background:var(--green-soft);border-color:var(--green);color:#0A6B62;font-weight:600}
+  .aa-detail{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start;
+             border:1px solid var(--line);border-radius:var(--r-md);padding:16px;
+             background:#fff;min-height:140px}
+  .aa-art{width:100%;aspect-ratio:1/1;border-radius:var(--r-sm);background:var(--green-soft);
+          display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .aa-art img{width:100%;height:100%;object-fit:contain}
+  .aa-fallback{font-size:2rem;font-weight:700;color:var(--green)}
+  .aa-facts{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px}
+  .aa-fact{background:var(--green-soft);border:1px solid var(--green-line);
+           border-radius:999px;padding:4px 11px;font-size:.78rem;color:var(--ink-mid)}
+  @media (max-width:640px){.aa-detail{grid-template-columns:1fr}}
+
+  .aa-prac-row{display:grid;grid-template-columns:1fr 92px 1fr;gap:10px;align-items:center;
+               padding:9px 0;border-bottom:1px solid var(--line)}
+  .aa-prac-row:last-child{border-bottom:0}
+  .aa-prac-row input,.aa-prac-row select{font:inherit;font-size:.85rem;padding:6px 8px;
+               border:1.5px solid var(--line);border-radius:var(--r-sm);background:#fff;
+               color:var(--ink);width:100%}
+  .aa-prac-row.ok input,.aa-prac-row.ok select{border-color:var(--green);background:var(--green-soft)}
+  .aa-prac-row.no input,.aa-prac-row.no select{border-color:var(--rose);background:var(--rose-soft)}
+  @media (max-width:640px){.aa-prac-row{grid-template-columns:1fr}}
+
+  /* ---- pH explorer ---- */
+  .ph-wrap{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;background:#fff;margin:6px 0}
+  .ph-wrap input[type=range]{width:100%;accent-color:var(--green);margin:2px 0 4px}
+  .ph-pick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .ph-label{font-size:.85rem;color:var(--ink-mid);display:block;margin-top:6px}
+  .ph-label span{font-weight:700;color:var(--ink)}
+  .ph-chart{width:100%;height:auto;display:block;margin:4px 0 2px}
+  .ph-note{font-size:.85rem;color:var(--ink-mid);margin-top:12px}
+
+  /* species cards along the top, mirroring the lecture figure */
+  .ph-species{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  .ph-card{flex:1 1 130px;border:1.5px solid var(--line);border-radius:var(--r-sm);
+           padding:9px 11px;background:#fff;transition:.15s;opacity:.45}
+  .ph-card.dom{opacity:1;box-shadow:var(--shadow)}
+  .ph-chg{font-weight:700;font-size:1.05rem;line-height:1.1}
+  .ph-desc{font-size:.72rem;color:var(--ink-mid);margin-top:3px;line-height:1.3}
+  .ph-pctnum{font-size:.72rem;font-weight:700;color:var(--ink);margin-top:5px}
+
+  /* abundance bars under the chart */
+  .ph-read{display:grid;gap:6px;margin-top:14px}
+  .ph-row{display:grid;grid-template-columns:118px 1fr 52px;gap:10px;align-items:center;font-size:.78rem}
+  .ph-name{color:var(--ink-mid)}
+  .ph-track{display:block;background:#EEF3F5;border-radius:999px;height:9px;overflow:hidden}
+  .ph-fill{display:block;height:9px;border-radius:999px;transition:width .12s linear}
+  .ph-pct{text-align:right;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+  .ph-net{margin-top:10px;font-size:.88rem;font-weight:700;color:var(--ink)}
+  @media (max-width:640px){.ph-row{grid-template-columns:96px 1fr 46px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a class="back-to-hub" href="hub.html"><span class="arrow">&#8592;</span> Back to hub</a>
+    <div class="brand">
+      <div class="brand-mark">A</div>
+      <div>
+        <div class="brand-title">Amino Acids &amp; Proteins</div>
+        <div class="brand-sub">PHA3134 · Study Companion</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#A6E3DA" stroke-width="5"/>
+        <circle id="ringFill" cx="22" cy="22" r="18" fill="none" stroke="#0D8C80" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+                transform="rotate(-90 22 22)"/>
+      </svg>
+      <div><div class="ring-num" id="ringPct">0%</div>
+      <div class="ring-cap">of the companion<br>complete</div></div>
+    </div>
+    <button class="reset" id="resetBtn">Clear my saved progress</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="topTitle">Welcome</h1>
+        <div class="meta" id="topMeta">Reference lab, five modules, and a cumulative challenge</div>
+      </div>
+      <div class="pill" id="topPill">Not started</div>
+    </div>
+
+
+<!-- ============================ REFERENCE LAB ============================ -->
+<section class="section" data-key="labhome">
+  <div class="card">
+    <div class="eyebrow">Reference Lab</div>
+    <h2>Amino Acid Reference Lab</h2>
+    <p>Before anything else, you need the raw vocabulary: twenty amino acids, each with a name, a three-letter abbreviation, a one-letter abbreviation, and a side chain that determines everything it does inside a protein.</p>
+    <p>This lab is a lookup tool and a drill, not a lecture. Come back to it whenever a later module names a residue you can't picture. It is ungraded except for the three quick checks at the end.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="lab">
+        <span class="home-num">1</span>
+        <span class="home-body"><span class="home-title">Explorer &amp; practice mode</span><span class="home-desc">Browse all 20 amino acids, then hide the answers and test yourself.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="lab">
+  <div class="card">
+    <div class="eyebrow">Reference Lab</div>
+    <h2>Explorer</h2>
+    <p>Select any amino acid to see its abbreviations, classification, and side-chain feature. The colored edge on each chip shows its class at a glance.</p>
+
+    <div class="aa-grid" id="aaGrid"></div>
+    <div class="aa-detail" id="aaDetail"></div>
+
+    <div class="box clinical">
+      <h3><span class="tag">WHY THIS MATTERS</span></h3>
+      <p>Every later module assumes you can move between these three names without stopping to think. A question that says "the side chain with a pKa of 6.04" expects you to arrive at histidine, and a sequence written as a string of single letters expects you to read it as residues.</p>
+    </div>
+
+    <h2 style="margin-top:26px">Practice mode</h2>
+    <p>Eight amino acids at random. Supply the one-letter abbreviation and the classification from memory, then check your work. Reshuffle for a new set as many times as you like.</p>
+    <div class="card" style="box-shadow:none;border:1px solid var(--line)">
+      <div id="aaPracBody"></div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="aaPracCheck">Check</button>
+        <button class="btn ghost" id="aaPracNew">New set</button>
+      </div>
+      <span class="caption" id="aaPracScore" style="margin:0;display:block;margin-top:10px"></span>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU RECALL IT?</span></h3>
+      <div class="cp-item" data-check="cL1">
+        <p>Which three-letter abbreviation represents leucine?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="cL2">
+        <p>Which three-letter abbreviation represents tryptophan?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="cL3">
+        <p>The one-letter abbreviation Q represents which amino acid?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================== MODULE 1 ============================== -->
+<section class="section" data-key="m1home">
+  <div class="card">
+    <div class="eyebrow">Module 1</div>
+    <h2>Amino Acid Anatomy &amp; Classification</h2>
+    <p>The Reference Lab gave you the names. This module asks the more useful question: given a side chain, what will this amino acid <em>do</em>?</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m1s1">
+        <span class="home-num">1</span>
+        <span class="home-body"><span class="home-title">The alpha-amino acid framework</span><span class="home-desc">Build the framework yourself, then see why amino acids are chiral.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s2">
+        <span class="home-num">2</span>
+        <span class="home-body"><span class="home-title">Grouping the twenty</span><span class="home-desc">Proteinogenic versus non-proteinogenic, and the hydrophobic set.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s3">
+        <span class="home-num">3</span>
+        <span class="home-body"><span class="home-title">The polar amino acids</span><span class="home-desc">Neutral, acidic, and basic side chains, plus a sorting exercise.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body"><span class="home-title">Module 1 quiz</span><span class="home-desc">Eight questions drawn at random from the module bank.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s1">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 1</div>
+    <h2>The alpha-amino acid framework</h2>
+    <p>Every proteinogenic amino acid is built around one central carbon &mdash; the alpha carbon &mdash; carrying four attachments. Work out what they are before you read on.</p>
+
+    <div class="figure">
+      <p style="margin-top:0"><strong>Build it yourself.</strong> Drag each label into the bond it belongs on &mdash; or tap a label, then tap a slot. Not every label in the tray is used, so place them by what actually belongs on an alpha carbon, not by process of elimination. Get all four bonds right to reveal the explanation.</p>
+      <div class="baa-wrap" id="baaWrap">
+        <svg viewBox="0 0 460 208" role="img" aria-label="Alpha carbon with four empty bond positions to fill in" aria-hidden="true">
+          <line x1="230" y1="95" x2="120" y2="95" stroke="var(--ink-soft)" stroke-width="2"/>
+          <line x1="230" y1="95" x2="340" y2="95" stroke="var(--ink-soft)" stroke-width="2"/>
+          <line x1="230" y1="95" x2="230" y2="35"  stroke="var(--ink-soft)" stroke-width="2"/>
+          <line x1="230" y1="95" x2="230" y2="155" stroke="var(--ink-soft)" stroke-width="2"/>
+          <circle cx="230" cy="95" r="24" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>
+          <text x="230" y="101" text-anchor="middle" font-size="16" font-weight="700" fill="var(--green)">C&#945;</text>
+        </svg>
+        <div class="baa-slot" id="baaSlot-left"   data-slot="left"   style="left:26.1%;top:45.7%" aria-label="Left bond, empty"></div>
+        <div class="baa-slot" id="baaSlot-right"  data-slot="right"  style="left:73.9%;top:45.7%" aria-label="Right bond, empty"></div>
+        <div class="baa-slot" id="baaSlot-top"    data-slot="top"    style="left:50%;  top:16.8%" aria-label="Top bond, empty"></div>
+        <div class="baa-slot" id="baaSlot-bottom" data-slot="bottom" style="left:50%;  top:74.5%" aria-label="Bottom bond, empty"></div>
+        <div class="baa-note" id="baaNote" style="display:none">the only part that varies</div>
+      </div>
+
+      <div class="dnd-tray" id="baaTray" aria-label="Labels to place"></div>
+      <div class="baa-controls">
+        <button class="btn" id="baaCheck" disabled>Check placement</button>
+        <button class="btn ghost" id="baaReset" style="display:none">Reset</button>
+      </div>
+      <p class="caption" id="baaFeedback" aria-live="polite" style="margin-top:10px"></p>
+    </div>
+
+    <div id="m1s1Explain" style="display:none">
+      <p>All twenty proteinogenic amino acids are <strong>alpha-amino acids</strong>, meaning the same four things hang off a single carbon &mdash; the alpha carbon:</p>
+      <ul>
+        <li>an amino group, NH<sub>2</sub></li>
+        <li>a carboxylic acid, COOH</li>
+        <li>a hydrogen atom, H</li>
+        <li>a side chain, R</li>
+      </ul>
+      <p>Three of those four are identical in every amino acid. Only R changes. That is the single most useful fact in this lecture: whenever you are asked why one residue behaves differently from another, the answer lives in the side chain.</p>
+      <p class="caption">The tray also carried COOCH<sub>3</sub>, CONH<sub>2</sub>, and CH<sub>3</sub> as decoys &mdash; a methyl ester where the free acid should be, an amide where the amine should be, and a plain methyl group as a generic wrong side-chain guess. None of them are what is actually on the alpha carbon.</p>
+    </div>
+
+    <h3>Chirality</h3>
+    <p>Because the alpha carbon carries four different substituents, amino acids are chiral. Chirality here is usually described with the <strong>D/L system</strong>, and almost every naturally occurring amino acid is the L form &mdash; which corresponds to <strong>S</strong> in the R/S system.</p>
+    <p>Two exceptions are worth memorizing now, because they show up on exams:</p>
+    <ul>
+      <li><strong>Glycine is achiral.</strong> Its side chain is a hydrogen, so the alpha carbon has two identical substituents and no stereocenter.</li>
+      <li><strong>Cysteine is R.</strong> Sulfur outranks the other substituents under the priority rules, so L-cysteine ends up designated R rather than S. Its physical arrangement is the same as the other L-amino acids; only the label changes.</li>
+    </ul>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c1">
+        <p>Which set of groups is attached to the alpha carbon of every proteinogenic amino acid?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c1b">
+        <p>Which proteinogenic amino acid has no stereocenter?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c1c">
+        <p>The L configuration corresponds to which designation in the R/S system?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s2">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 2</div>
+    <h2>Grouping the twenty</h2>
+    <p>There is more than one way to sort amino acids, and different questions call for different groupings. Start with the broadest split.</p>
+
+    <h3>Proteinogenic versus non-proteinogenic</h3>
+    <p>An amino acid is <strong>proteinogenic</strong> if it is incorporated into proteins during translation, the step where mRNA is read to build a chain. Twenty amino acids meet that definition. Plenty of other amino acids exist in the body as intermediates in biosynthetic pathways, but they are never built into proteins, so they are non-proteinogenic.</p>
+    <p>Note what this definition does <em>not</em> say. It says nothing about whether the body can make the amino acid &mdash; that is the separate essential versus non-essential distinction, and mixing the two up is a common error.</p>
+
+    <h3>Sorting by side chain</h3>
+    <p>Within the twenty, the useful groupings are all about the R group:</p>
+    <ul>
+      <li>polar versus non-polar</li>
+      <li>acidic, basic, or neutral</li>
+      <li>aliphatic versus aromatic</li>
+    </ul>
+
+    <h3>The hydrophobic set</h3>
+    <p>Nine amino acids are grouped as hydrophobic or non-polar, and they divide into three sub-groups:</p>
+    <table >
+      <thead><tr><th>Sub-group</th><th>Members</th><th>What they have in common</th></tr></thead>
+      <tbody>
+        <tr><td>Aliphatic</td><td>Gly, Ala, Val, Leu, Ile, Pro</td><td>Carbon-and-hydrogen side chains with no ring system or heteroatom</td></tr>
+        <tr><td>Aromatic</td><td>Phe, Trp</td><td>Ring systems that stack and pack into hydrophobic cores</td></tr>
+        <tr><td>Heteroatom</td><td>Met</td><td>A sulfur held inside a thioether, so still non-polar overall</td></tr>
+      </tbody>
+    </table>
+    <p>These residues cluster in the interior of a folded protein and along the membrane-facing surface of transmembrane helices, for the same reason oil separates from water.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c2">
+        <p>What makes an amino acid proteinogenic?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c2b">
+        <p>Which pair of hydrophobic amino acids carries aromatic side chains?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s3">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 3</div>
+    <h2>The polar amino acids</h2>
+    <p>The remaining eleven amino acids carry polar side chains, and they split three ways by what happens to that side chain in water.</p>
+
+    <table >
+      <thead><tr><th>Group</th><th>Members</th><th>Behaviour</th></tr></thead>
+      <tbody>
+        <tr><td>Polar, neutral</td><td>Ser, Thr, Asn, Gln, Tyr</td><td>Polar enough to hydrogen bond, but no proton gained or lost at physiological pH</td></tr>
+        <tr><td>Polar, acidic</td><td>Asp, Glu, Cys</td><td>Can donate a proton; Asp and Glu are fully ionized in the cell</td></tr>
+        <tr><td>Polar, basic</td><td>Lys, Arg, His</td><td>Can accept a proton; Lys and Arg are fully protonated in the cell</td></tr>
+      </tbody>
+    </table>
+
+    <div class="box clinical">
+      <h3><span class="tag">A NOTE ON CYSTEINE</span></h3>
+      <p>This course groups cysteine with the acidic amino acids, because its thiol has a measurable pKa of 8.33 and does give up a proton. Some textbooks place cysteine with the polar neutral group instead, since it is only about 10% ionized at physiological pH. Both descriptions are pointing at the same chemistry &mdash; a weakly acidic side chain sitting near the boundary. Follow this course's grouping, but understand why the disagreement exists.</p>
+    </div>
+
+    <h3>Sort the residues</h3>
+    <p>Assign each amino acid to its group. This is practice, not assessment &mdash; check as many times as you need.</p>
+    <div id="clsBody"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="clsCheck">Check</button>
+      <button class="btn ghost" id="clsReset">Try again</button>
+      <button class="btn ghost" id="clsNew">New set</button>
+    </div>
+    <span class="caption" id="clsScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY WHAT YOU KNOW</span></h3>
+      <div class="cp-item" data-check="c3">
+        <p>Which group contains the basic amino acids?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c3b">
+        <p>Threonine belongs to which group?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1quiz">
+  <div class="card">
+    <div class="eyebrow">Module 1</div>
+    <h2>Module 1 quiz</h2>
+    <p>Eight questions, drawn and shuffled fresh each attempt. Your best score is kept.</p>
+    <div class="quiz-body" data-quiz="m1"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================== MODULE 2 ============================== -->
+<section class="section" data-key="m2home">
+  <div class="card">
+    <div class="eyebrow">Module 2</div>
+    <h2>Ionization, Zwitterions &amp; pKa</h2>
+    <p>Amino acids contain both an acid and a base, so their charge is never a fixed property &mdash; it is a function of the surrounding pH. This module is about predicting that charge rather than memorizing it.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m2s1">
+        <span class="home-num">1</span>
+        <span class="home-body"><span class="home-title">The backbone and the zwitterion</span><span class="home-desc">Two ionizable groups, and why the net charge is zero anyway.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s2">
+        <span class="home-num">2</span>
+        <span class="home-body"><span class="home-title">Acidic side chains</span><span class="home-desc">Asp, Glu, and Cys, and what their pKa values predict.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s3">
+        <span class="home-num">3</span>
+        <span class="home-body"><span class="home-title">Basic side chains</span><span class="home-desc">Lys, Arg, and His, plus an interactive pH explorer.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body"><span class="home-title">Module 2 quiz</span><span class="home-desc">Eight questions drawn at random from the module bank.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s1">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 1</div>
+    <h2>The backbone and the zwitterion</h2>
+    <p>Every amino acid has two ionizable groups on the backbone alone, with reliable pKa ranges:</p>
+    <table >
+      <thead><tr><th>Group</th><th>pKa range</th><th>State at pH 7.4</th></tr></thead>
+      <tbody>
+        <tr><td>&#945;-carboxylic acid</td><td>1.5 &ndash; 2.5</td><td>Deprotonated, negative</td></tr>
+        <tr><td>&#945;-amino group</td><td>9.5 &ndash; 10.5</td><td>Protonated, positive</td></tr>
+      </tbody>
+    </table>
+    <p>Physiological pH sits <em>above</em> the carboxyl pKa and <em>below</em> the amino pKa, so both groups are ionized at once. The result is a <strong>zwitterion</strong>: a molecule with an overall charge of zero that nonetheless contains a full positive and a full negative charge.</p>
+    <p>The rule underneath all of this is simple and worth stating plainly. When pH is above a group's pKa, the group has given up its proton. When pH is below the pKa, the group is holding onto it. Everything in this module is that one comparison, applied to different numbers.</p>
+
+    <h3>Set the backbone</h3>
+    <p>A residue is shown at a randomly chosen pH. Decide what each backbone group is doing at that pH &mdash; the net charge updates as you go. This is practice, not assessment, so check as often as you like.</p>
+    <div class="chg-wrap" id="chgBackbone"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="cbCheck">Check</button>
+      <button class="btn ghost" id="cbReset">Try again</button>
+      <button class="btn ghost" id="cbNew">New pH</button>
+    </div>
+    <span class="caption" id="cbScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c4">
+        <p>What is the typical pKa range of the alpha-carboxylic acid?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c4b">
+        <p>Which description defines a zwitterion?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s2">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 2</div>
+    <h2>Acidic side chains</h2>
+    <p>Three side chains can donate a proton. Their pKa values differ enough that they behave very differently in the cell.</p>
+    <table >
+      <thead><tr><th>Amino acid</th><th>Side-chain pKa</th><th>At pH 7.4</th></tr></thead>
+      <tbody>
+        <tr><td>Aspartic acid</td><td>3.86</td><td>More than 99% ionized &mdash; negative</td></tr>
+        <tr><td>Glutamic acid</td><td>4.25</td><td>More than 99% ionized &mdash; negative</td></tr>
+        <tr><td>Cysteine</td><td>8.33</td><td>About 10% ionized</td></tr>
+      </tbody>
+    </table>
+    <p>Aspartate and glutamate sit three to four pH units below physiological pH, which is far enough that treating them as permanently negative is safe. Cysteine is the interesting one: only a tenth of it is deprotonated, but that thiolate minority is the chemically reactive form, which is why cysteine turns up in active sites out of proportion to how ionized it is.</p>
+    <p>Notice also that the names change with the charge. Aspartic acid becomes aspartate and glutamic acid becomes glutamate once deprotonated, which is why you see both forms in writing.</p>
+
+    <h3>Add the side chain</h3>
+    <p>Same task as the previous section, with one more group to track. Now the side chain has its own pKa, and it is the group that decides whether the residue is neutral or carries a real charge.</p>
+    <div class="chg-wrap" id="chgSide"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="csCheck">Check</button>
+      <button class="btn ghost" id="csReset">Try again</button>
+      <button class="btn ghost" id="csNew">New residue</button>
+    </div>
+    <span class="caption" id="csScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c5">
+        <p>At physiological pH, what is the state of the aspartic acid side chain?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c5b">
+        <p>Given a cysteine side-chain pKa of 8.33, what does that predict at physiological pH?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s3">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 3</div>
+    <h2>Basic side chains</h2>
+    <p>Three side chains can accept a proton, and again the pKa spread does the explaining.</p>
+    <table >
+      <thead><tr><th>Amino acid</th><th>Side-chain pKa</th><th>At pH 7.4</th></tr></thead>
+      <tbody>
+        <tr><td>Arginine</td><td>12.48</td><td>More than 99% protonated &mdash; positive</td></tr>
+        <tr><td>Lysine</td><td>10.79</td><td>More than 99% protonated &mdash; positive</td></tr>
+        <tr><td>Histidine</td><td>6.04</td><td>About 4% protonated</td></tr>
+      </tbody>
+    </table>
+    <p>Histidine is the outlier and the reason this table matters. Its pKa is the only one anywhere near physiological pH, so it is the only side chain whose protonation state shifts meaningfully with small pH changes. That responsiveness is exactly what an enzyme needs from a residue that has to pick up a proton in one step and release it in the next.</p>
+
+    <h3>pH explorer</h3>
+    <p>This is the titration picture from the lecture, made movable. Pick a residue, then drag the pH slider: the curves show what fraction of the molecules exist as each species at that pH, and the cards above them show which form is dominant. Watch what happens as you cross each pKa.</p>
+    <div class="ph-wrap">
+      <div class="ph-pick" id="phPick"></div>
+      <div class="ph-species" id="phSpecies"></div>
+      <svg class="ph-chart" id="phChart" viewBox="0 0 660 300" role="img"
+           aria-label="Relative amount of each ionization species plotted against pH"></svg>
+      <label class="ph-label" for="phSlider">pH <span id="phVal">7.40</span></label>
+      <input type="range" id="phSlider" min="0" max="14" step="0.05" value="7.4">
+      <div class="ph-read" id="phRead"></div>
+      <p class="ph-note" id="phNote"></p>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="phCheck">Check</button>
+        <button class="btn ghost" id="phReset">Try again</button>
+      </div>
+      <span class="caption" id="phScore" style="margin:0;display:block;margin-top:10px"></span>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY WHAT YOU KNOW</span></h3>
+      <div class="cp-item" data-check="c6">
+        <p>Which side chain has the highest pKa among the proteinogenic amino acids?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c6b">
+        <p>Given a histidine side-chain pKa of 6.04, what does that predict at physiological pH?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c6c">
+        <p>Which residue is best suited to buffering near physiological pH?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2quiz">
+  <div class="card">
+    <div class="eyebrow">Module 2</div>
+    <h2>Module 2 quiz</h2>
+    <p>Eight questions, drawn and shuffled fresh each attempt.</p>
+    <div class="quiz-body" data-quiz="m2"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================== MODULE 3 ============================== -->
+<section class="section" data-key="m3home">
+  <div class="card">
+    <div class="eyebrow">Module 3</div>
+    <h2>From Amino Acids to Peptides</h2>
+    <p>One bond turns a collection of amino acids into a chain. This module covers the vocabulary of that chain, the unusual chemistry of the bond that makes it, and how a sequence is read.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m3s1">
+        <span class="home-num">1</span>
+        <span class="home-body"><span class="home-title">Key terms</span><span class="home-desc">Peptide, oligopeptide, polypeptide, residue, peptide bond.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s2">
+        <span class="home-num">2</span>
+        <span class="home-body"><span class="home-title">Why the peptide bond is rigid</span><span class="home-desc">Resonance, partial double bond character, and cis versus trans.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s3">
+        <span class="home-num">3</span>
+        <span class="home-body"><span class="home-title">Termini and direction</span><span class="home-desc">N- and C-termini, sequence directionality, and an annotation exercise.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body"><span class="home-title">Module 3 quiz</span><span class="home-desc">Eight questions drawn at random from the module bank.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s1">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 1</div>
+    <h2>Key terms</h2>
+    <p>Amino acids are linked through <strong>peptide bonds</strong>, which are amides. The rest of this vocabulary is about chain length and about what to call the pieces.</p>
+    <table >
+      <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>Peptide</td><td>A short chain of amino acids linked together</td></tr>
+        <tr><td>Di-, tri-, tetrapeptide</td><td>Peptides of 2, 3, and 4 amino acids</td></tr>
+        <tr><td>Oligopeptide</td><td>A chain of 20 or fewer amino acids</td></tr>
+        <tr><td>Polypeptide</td><td>Any unbranched chain longer than 20 amino acids</td></tr>
+        <tr><td>Residue</td><td>An individual amino acid within a chain</td></tr>
+        <tr><td>Peptide bond</td><td>The amide linkage between two amino acids</td></tr>
+      </tbody>
+    </table>
+    <p>Two of these trip people up. The 20-residue threshold between oligo- and polypeptide is a convention, so it is worth knowing precisely. And "residue" is used because an amino acid inside a chain has lost atoms during bond formation &mdash; it is what remains, not the free molecule.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c7">
+        <p>Which definition describes an oligopeptide?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c7b">
+        <p>A peptide bond belongs to which functional group class?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s2">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 2</div>
+    <h2>Why the peptide bond is rigid</h2>
+    <p>The bond between the carbonyl carbon of one amino acid and the nitrogen of the next is drawn as a single bond, but it does not behave like one. It resists rotation.</p>
+    <p>The reason is <strong>resonance</strong>. The nitrogen lone pair delocalizes into the carbonyl, so the real bond is a hybrid of two structures and carries <strong>partial double bond character</strong>. Double bonds do not rotate freely, and neither does this one.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 480 150" role="img" aria-label="Two resonance structures of an amide bond">
+        <g font-size="14" fill="var(--ink)">
+          <text x="30"  y="60">O</text>
+          <line x1="34" y1="68" x2="34" y2="88" stroke="var(--ink-soft)" stroke-width="2"/>
+          <line x1="39" y1="68" x2="39" y2="88" stroke="var(--ink-soft)" stroke-width="2"/>
+          <text x="26"  y="105">C</text>
+          <line x1="46" y1="100" x2="80" y2="100" stroke="var(--ink-soft)" stroke-width="2"/>
+          <text x="84"  y="105">N&#8211;H</text>
+          <text x="150" y="105" font-size="20" fill="var(--ink-soft)">&#8596;</text>
+          <text x="205" y="60">O</text>
+          <text x="222" y="55" font-size="11" fill="var(--rose)">&#8722;</text>
+          <line x1="211" y1="68" x2="211" y2="88" stroke="var(--ink-soft)" stroke-width="2"/>
+          <text x="203" y="105">C</text>
+          <line x1="223" y1="97" x2="257" y2="97" stroke="var(--ink-soft)" stroke-width="2"/>
+          <line x1="223" y1="103" x2="257" y2="103" stroke="var(--ink-soft)" stroke-width="2"/>
+          <text x="261" y="105">N&#8211;H</text>
+          <text x="279" y="88" font-size="11" fill="var(--violet)">+</text>
+        </g>
+        <text x="365" y="88" text-anchor="middle" font-size="12" fill="var(--ink-mid)">the true bond is</text>
+        <text x="365" y="106" text-anchor="middle" font-size="12" fill="var(--ink-mid)">a hybrid of both</text>
+      </svg>
+      <p class="caption">Delocalization of the nitrogen lone pair gives the C&ndash;N bond partial double bond character.</p>
+    </div>
+
+    <p>This rigidity is not a curiosity &mdash; it is a requirement. A backbone that rotated freely at every linkage could not hold a defined three-dimensional shape. Compare an <strong>ester</strong>, where oxygen holds its lone pairs more tightly and donates far less into the carbonyl. Esters have little partial double bond character and are correspondingly flexible.</p>
+
+    <h3>Cis and trans</h3>
+    <p>Because the bond has double bond character, cis and trans arrangements are both possible. In proteins, <strong>trans wins by roughly 1000 to 1</strong>, because the cis form pushes the two flanking side chains into each other.</p>
+    <p>Proline is the exception. Its side chain loops back onto its own backbone nitrogen, so there is much less to clash with, and <strong>X-Pro bonds adopt cis geometry far more readily</strong> than any other pairing. That single quirk gives proline-containing regions structural motifs no other residue produces.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c8">
+        <p>What accounts for the restricted rotation around a peptide bond?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c8b">
+        <p>Compared with an amide, why is an ester linkage more flexible?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c8c">
+        <p>Preceding which residue is a cis peptide bond most readily accommodated?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s3">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 3</div>
+    <h2>Termini and direction</h2>
+    <p>Every peptide, at any length, has exactly two ends:</p>
+    <ul>
+      <li><strong>N-terminus</strong> &mdash; the end with a free amino group</li>
+      <li><strong>C-terminus</strong> &mdash; the end with a free carboxylic acid</li>
+    </ul>
+    <p>Proteins are translated from mRNA starting at the N-terminus and finishing at the C-terminus, and sequences are written the same way. Keeping the two conventions aligned means a written sequence always reads in the order the ribosome built it.</p>
+
+    <h3>Annotate the peptide</h3>
+    <p>Work through this sequence and answer each question. Practice, not assessment.</p>
+    <div id="terBody"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="terCheck">Check</button>
+      <button class="btn ghost" id="terReset">Try again</button>
+      <button class="btn ghost" id="terNew">New set</button>
+    </div>
+    <span class="caption" id="terScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY WHAT YOU KNOW</span></h3>
+      <div class="cp-item" data-check="c9">
+        <p>What defines the N-terminus of a peptide?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c9b">
+        <p>In the peptide Met&ndash;Val&ndash;Thr&ndash;Ala&ndash;Gln, which residue occupies the C-terminus?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3quiz">
+  <div class="card">
+    <div class="eyebrow">Module 3</div>
+    <h2>Module 3 quiz</h2>
+    <p>Eight questions, drawn and shuffled fresh each attempt.</p>
+    <div class="quiz-body" data-quiz="m3"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================== MODULE 4 ============================== -->
+<section class="section" data-key="m4home">
+  <div class="card">
+    <div class="eyebrow">Module 4</div>
+    <h2>Protein Structure &amp; Function</h2>
+    <p>Four levels of structure, each built from the one below it. The goal here is not to recite the four names but to say what changes at each step and what holds it together.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m4s1">
+        <span class="home-num">1</span>
+        <span class="home-body"><span class="home-title">The four levels</span><span class="home-desc">An overview and a structure explorer.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s2">
+        <span class="home-num">2</span>
+        <span class="home-body"><span class="home-title">The alpha helix</span><span class="home-desc">Hydrogen bonding, handedness, disruptors, and membranes.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s3">
+        <span class="home-num">3</span>
+        <span class="home-body"><span class="home-title">The beta sheet</span><span class="home-desc">Parallel and antiparallel strands, and the beta barrel.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s4">
+        <span class="home-num">4</span>
+        <span class="home-body"><span class="home-title">Tertiary structure</span><span class="home-desc">Domains, allosteric modulation, and stabilizing forces.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s5">
+        <span class="home-num">5</span>
+        <span class="home-body"><span class="home-title">Quaternary structure</span><span class="home-desc">Subunits, multimer vocabulary, and antibodies.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body"><span class="home-title">Module 4 quiz</span><span class="home-desc">Eight questions drawn at random from the module bank.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s1">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 1</div>
+    <h2>The four levels</h2>
+    <p>A protein is a macromolecule of at least one polypeptide chain, and it does an enormous range of jobs: catalysing reactions, transport, DNA replication, structural support, signalling, movement, and immune response. All of that variety comes from structure.</p>
+    <table >
+      <thead><tr><th>Level</th><th>What it describes</th></tr></thead>
+      <tbody>
+        <tr><td>Primary</td><td>The amino acid sequence</td></tr>
+        <tr><td>Secondary</td><td>Local motifs within the chain: alpha helices, beta sheets, tight turns</td></tr>
+        <tr><td>Tertiary</td><td>The overall three-dimensional shape of a single polypeptide chain</td></tr>
+        <tr><td>Quaternary</td><td>The arrangement of multiple chains, or subunits, in one protein</td></tr>
+      </tbody>
+    </table>
+    <p>One point is easy to miss: <strong>not every protein has quaternary structure.</strong> A protein built from a single chain stops at tertiary. Every protein, though, has the first three.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 520 130" role="img" aria-label="The four levels of protein structure in sequence">
+        <g>
+          <rect x="8"  y="30" width="108" height="70" rx="8" fill="var(--green-soft)" stroke="var(--green-line)"/>
+          <rect x="140" y="30" width="108" height="70" rx="8" fill="var(--green-soft)" stroke="var(--green-line)"/>
+          <rect x="272" y="30" width="108" height="70" rx="8" fill="var(--green-soft)" stroke="var(--green-line)"/>
+          <rect x="404" y="30" width="108" height="70" rx="8" fill="var(--green-soft)" stroke="var(--green-line)"/>
+          <text x="62"  y="58" text-anchor="middle" font-size="12" font-weight="700" fill="var(--green)">PRIMARY</text>
+          <text x="194" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="var(--green)">SECONDARY</text>
+          <text x="326" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="var(--green)">TERTIARY</text>
+          <text x="458" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="var(--green)">QUATERNARY</text>
+          <text x="62"  y="80" text-anchor="middle" font-size="11" fill="var(--ink-mid)">sequence</text>
+          <text x="194" y="80" text-anchor="middle" font-size="11" fill="var(--ink-mid)">helices, sheets</text>
+          <text x="326" y="80" text-anchor="middle" font-size="11" fill="var(--ink-mid)">one folded chain</text>
+          <text x="458" y="80" text-anchor="middle" font-size="11" fill="var(--ink-mid)">several subunits</text>
+          <text x="126" y="70" text-anchor="middle" font-size="16" fill="var(--ink-soft)">&#8594;</text>
+          <text x="258" y="70" text-anchor="middle" font-size="16" fill="var(--ink-soft)">&#8594;</text>
+          <text x="390" y="70" text-anchor="middle" font-size="16" fill="var(--ink-soft)">&#8594;</text>
+        </g>
+      </svg>
+      <p class="caption">Each level is built from the one before it. Only the last is optional.</p>
+    </div>
+
+    <h3>Walk the four levels</h3>
+    <p>Rather than reading the table again, work up through the levels one at a time. At each step, commit to what has changed and what holds it together before moving on. A wrong answer stays open so you can rethink it.</p>
+    <div id="lvlBody"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost" id="lvlReset">Start over</button>
+    </div>
+    <span class="caption" id="lvlScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c10">
+        <p>What does the primary structure of a protein describe?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c10b">
+        <p>Which level of structure is absent from a protein built from a single chain?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s2">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 2</div>
+    <h2>The alpha helix</h2>
+    <p>An alpha helix is a tightly coiled backbone held together by hydrogen bonds. The pattern is regular: each amide <strong>N&ndash;H</strong> donates to a carbonyl <strong>C=O</strong> located <strong>four residues</strong> further along the chain.</p>
+    <p>Helices can coil either direction, but right-handed is more favorable because it produces fewer steric clashes. In practice, essentially all protein helices are right-handed.</p>
+
+    <div class="figure">
+      <img src="img/figures/alpha-helix.jpg" alt="Ball-and-stick model of an alpha helix showing the right-handed ribbon, backbone hydrogen bonds spanning i to i+4, outward-facing R groups, a top-down view looking down the helix axis, and a key to the atom colors.">
+      <p class="caption">Side view: each dashed line is a hydrogen bond from one residue's C=O to the N&ndash;H four residues ahead (i &rarr; i+4). Top view, looking straight down the axis: the backbone forms the core and every R group points outward, toward the viewer.</p>
+    </div>
+
+    <h3>Where the side chains go</h3>
+    <p>The hydrogen-bonded backbone occupies the center of the helix, which pushes every side chain <strong>outward</strong>. This is a more important detail than it first appears: it means the exterior of a helix can be tailored residue by residue, so one face can be hydrophobic and another polar.</p>
+
+    <h3>Residues that break helices</h3>
+    <ul>
+      <li><strong>Proline</strong> is the strongest disruptor. Within a chain it has no N&ndash;H to donate, and its ring prevents the backbone angles a helix requires. Both problems at once.</li>
+      <li><strong>Serine, aspartate, and asparagine</strong> appear less often in helices. Their short side chains carry hydrogen bond donors and acceptors close to the backbone, where they compete with the helix's own bonding pattern.</li>
+    </ul>
+
+    <div class="box clinical">
+      <h3><span class="tag">PHARMACY CONNECTION</span></h3>
+      <p>Alpha helices are the most common membrane-spanning motif in proteins, because a helix with hydrophobic side chains presents a greasy outer surface that matches the lipid bilayer. G-protein coupled receptors use seven such helices &mdash; and GPCRs are the target of a large share of prescribed drugs. Helices also fit neatly into the major groove of DNA, which makes them a recurring DNA-binding motif.</p>
+    </div>
+
+    <h3>Helical wheel</h3>
+    <p>A helix turns 100&deg; per residue, so looking straight down the axis, consecutive residues land at 100&deg; intervals around a circle. That view answers a question the side view cannot: <strong>which residues end up on the same face?</strong></p>
+    <p>Load each candidate sequence below and read its wheel. Then click any residue to swap it and watch the hydrophobic face form or break in real time.</p>
+    <div class="wheel-wrap">
+      <div class="wheel-pick" id="whPick"></div>
+      <div class="wheel-grid">
+        <svg id="whChart" viewBox="0 0 330 330" role="img"
+             aria-label="Helical wheel showing 18 residues placed at 100 degree intervals, colored by hydrophobicity"></svg>
+        <div id="whRead"></div>
+      </div>
+      <p class="caption" style="margin-top:14px">Click any residue in the sequence to cycle it through Leu, Ile, Phe, Ala, Ser, Gln, Lys, Glu:</p>
+      <div class="wheel-seq" id="whSeq"></div>
+    </div>
+
+    <p style="margin-top:22px">Now classify each candidate. Load each one, read its wheel, and decide.</p>
+    <div id="whRows"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="whCheck">Check</button>
+      <button class="btn ghost" id="whReset">Try again</button>
+    </div>
+    <span class="caption" id="whScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c11">
+        <p>In an alpha helix, each backbone carbonyl hydrogen bonds to an N&ndash;H where?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11b">
+        <p>Where do side chains point in an alpha helix?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11c">
+        <p>Why does proline disrupt an alpha helix?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s3">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 3</div>
+    <h2>The beta sheet</h2>
+    <p>A beta sheet is built from linear strands lying alongside one another. Compared with the tight coil of a helix, the chain here is <strong>extended</strong>. The stabilizing force is the same though &mdash; hydrogen bonds between backbone amides, this time running between strands rather than within one coil.</p>
+
+    <h3>Parallel and antiparallel</h3>
+    <p>Adjacent strands can run either the same N-to-C direction (<strong>parallel</strong>) or opposite directions (<strong>antiparallel</strong>). The distinction matters because the hydrogen-bonding geometry differs between the two arrangements.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 460 160" role="img" aria-label="Parallel and antiparallel beta strand arrangements">
+        <g stroke-width="2">
+          <text x="105" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink-mid)">ANTIPARALLEL</text>
+          <line x1="30" y1="55" x2="180" y2="55" stroke="var(--green)"/>
+          <polygon points="180,55 170,50 170,60" fill="var(--green)"/>
+          <line x1="180" y1="100" x2="30" y2="100" stroke="var(--green)"/>
+          <polygon points="30,100 40,95 40,105" fill="var(--green)"/>
+          <g stroke="var(--ink-soft)" stroke-dasharray="3 3">
+            <line x1="60" y1="58" x2="60" y2="97"/><line x1="105" y1="58" x2="105" y2="97"/><line x1="150" y1="58" x2="150" y2="97"/>
+          </g>
+          <text x="355" y="24" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink-mid)">PARALLEL</text>
+          <line x1="280" y1="55" x2="430" y2="55" stroke="var(--blue)"/>
+          <polygon points="430,55 420,50 420,60" fill="var(--blue)"/>
+          <line x1="280" y1="100" x2="430" y2="100" stroke="var(--blue)"/>
+          <polygon points="430,100 420,95 420,105" fill="var(--blue)"/>
+          <g stroke="var(--ink-soft)" stroke-dasharray="3 3">
+            <line x1="310" y1="58" x2="310" y2="97"/><line x1="355" y1="58" x2="355" y2="97"/><line x1="400" y1="58" x2="400" y2="97"/>
+          </g>
+        </g>
+        <text x="105" y="132" text-anchor="middle" font-size="11" fill="var(--ink-mid)">strands run opposite directions</text>
+        <text x="355" y="132" text-anchor="middle" font-size="11" fill="var(--ink-mid)">strands run the same direction</text>
+      </svg>
+      <p class="caption">Arrows point from N-terminus to C-terminus. Dashed lines represent inter-strand hydrogen bonds.</p>
+    </div>
+
+    <h3>The beta barrel</h3>
+    <p>Beta sheets can adopt a wider range of larger structures than helices can. The best known is the <strong>beta barrel</strong>: a cylinder of antiparallel strands. A barrel can enclose a hydrophobic ligand in its center, as green fluorescent protein does with its chromophore, or it can span a membrane.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c12">
+        <p>What characterizes an antiparallel beta sheet?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c12b">
+        <p>What is a beta barrel?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s4">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 4</div>
+    <h2>Tertiary structure</h2>
+    <p>Tertiary structure is the three-dimensional shape of a <strong>single</strong> polypeptide chain. A typical protein contains many secondary structures, and looking at tertiary structure means asking how those assemble.</p>
+
+    <h3>Domains</h3>
+    <p>The unit of that assembly is the <strong>domain</strong>: a region of a protein able to carry out a particular function. A protein can have any number of domains, and they are not independent of one another. One domain often modulates another.</p>
+    <p>Many kinases show this directly. A regulatory domain switches on the catalytic activity of a separate domain, but only under particular conditions. That kind of action at a distance is <strong>allosteric modulation</strong>, and pyruvate kinase is a well-studied example.</p>
+
+    <h3>What holds it together</h3>
+    <p>Tertiary structure is stabilized by several kinds of interaction. Only one of them is covalent, which is worth keeping straight.</p>
+
+    <div class="figure">
+      <img src="img/figures/tertiary-forces.jpg" alt="Four side-chain interactions that stabilize tertiary structure: a hydrogen bond between two serine hydroxyls, van der Waals contacts between two leucine side chains, an ionic salt bridge between lysine and glutamate, and a covalent disulfide bond between two cysteines.">
+      <p class="caption">The same four interactions from the table below, drawn at the side-chain level. Hydrogen bonds, van der Waals contacts, and ionic bonds are all non-covalent and reversible; only the disulfide bond is covalent.</p>
+    </div>
+
+    <table >
+      <thead><tr><th>Interaction</th><th>Covalent?</th><th>Typical example</th></tr></thead>
+      <tbody>
+        <tr><td>Hydrophobic and hydrophilic interactions</td><td>No</td><td>Leucine and valine packing into a buried core</td></tr>
+        <tr><td>Hydrogen bonds</td><td>No</td><td>A serine hydroxyl to a backbone carbonyl</td></tr>
+        <tr><td>Ionic bonds (salt bridges)</td><td>No</td><td>Lysine to aspartate</td></tr>
+        <tr><td>Disulfide bonds</td><td>Yes</td><td>Two cysteine thiols oxidised together</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Match the interaction</h3>
+    <p>Assign each example to the interaction it illustrates. Practice, not assessment.</p>
+    <div id="frcBody"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="frcCheck">Check</button>
+      <button class="btn ghost" id="frcReset">Try again</button>
+      <button class="btn ghost" id="frcNew">New set</button>
+    </div>
+    <span class="caption" id="frcScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY WHAT YOU KNOW</span></h3>
+      <div class="cp-item" data-check="c13">
+        <p>Which description defines a protein domain?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c13b">
+        <p>Which stabilizing interaction is covalent?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s5">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 5</div>
+    <h2>Quaternary structure</h2>
+    <p>When a protein is built from more than one polypeptide chain, the arrangement of those chains is its quaternary structure. The individual chains are called <strong>subunits</strong>. Not every protein has one.</p>
+    <p>The interactions that hold subunits together are the same four that stabilize tertiary structure: hydrophobic and hydrophilic interactions, hydrogen bonds, salt bridges, and disulfide bonds. Nothing new is required &mdash; the same chemistry simply acts between chains instead of within one.</p>
+
+    <h3>The vocabulary</h3>
+    <table >
+      <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>Monomeric protein</td><td>One polypeptide chain &mdash; no quaternary structure</td></tr>
+        <tr><td>Multimeric protein</td><td>More than one chain; prefixed di-, tri-, tetra-, and so on</td></tr>
+        <tr><td>Homomultimer</td><td>All chains identical</td></tr>
+        <tr><td>Heteromultimer</td><td>Two or more different chains</td></tr>
+      </tbody>
+    </table>
+
+    <div class="box clinical">
+      <h3><span class="tag">PHARMACY CONNECTION</span></h3>
+      <p>An antibody is a large protein of four chains &mdash; two heavy and two light &mdash; which makes it a <strong>heterotetramer</strong>. Each chain contains a variable domain that changes to fit different antigens, plus one to three constant domains that do not. That separation is what makes monoclonal antibody therapeutics possible: the antigen-binding region can be redesigned for a new target while the rest of the molecule stays the same.</p>
+    </div>
+
+    <div class="figure">
+      <img src="img/figures/antibody-quaternary.jpg" alt="An IgG antibody diagram comparing tertiary and quaternary structure: the tertiary structure panel shows one variable domain folded into a beta-sheet-rich shape, and the quaternary structure panel shows the full Y-shaped antibody assembled from two heavy chains and two light chains, held together by disulfide bonds, with the two antigen-binding sites labeled.">
+      <p class="caption">Tertiary and quaternary structure side by side on the same molecule. On the left, one domain's own three-dimensional fold &mdash; this is tertiary structure, and it belongs to a single chain. On the right, all four chains assembled into the complete antibody, held together by disulfide bonds and non-covalent contacts &mdash; this is quaternary structure. The two antigen-binding sites sit where a variable heavy domain (V<sub>H</sub>) and a variable light domain (V<sub>L</sub>) pair up.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c14">
+        <p>What is a homomultimer?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c14b">
+        <p>An antibody has two heavy and two light chains. Which term describes it?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4quiz">
+  <div class="card">
+    <div class="eyebrow">Module 4</div>
+    <h2>Module 4 quiz</h2>
+    <p>Eight questions, drawn and shuffled fresh each attempt.</p>
+    <div class="quiz-body" data-quiz="m4"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================== MODULE 5 ============================== -->
+<section class="section" data-key="m5home">
+  <div class="card">
+    <div class="eyebrow">Module 5</div>
+    <h2>Post-Translational Modifications</h2>
+    <p>A protein leaving the ribosome is rarely finished. This module covers what happens next, and why so many drugs act on the enzymes that make those changes.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m5s1">
+        <span class="home-num">1</span>
+        <span class="home-body"><span class="home-title">From gene to mature protein</span><span class="home-desc">Transcription, translation, and where modification fits.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s2">
+        <span class="home-num">2</span>
+        <span class="home-body"><span class="home-title">Phosphorylation</span><span class="home-desc">Kinases, phosphatases, and the three target residues.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s3">
+        <span class="home-num">3</span>
+        <span class="home-body"><span class="home-title">Glycosylation and other modifications</span><span class="home-desc">O- and N-linkages, plus a matching exercise.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body"><span class="home-title">Module 5 quiz</span><span class="home-desc">Eight questions drawn at random from the module bank.</span></span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s1">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Section 1</div>
+    <h2>From gene to mature protein</h2>
+    <p>The path runs in one direction:</p>
+    <ol>
+      <li><strong>Transcription.</strong> DNA is used as a template to make precursor mRNA, a job handled by RNA polymerase II.</li>
+      <li><strong>Post-transcriptional modification.</strong> The precursor is processed into mature mRNA, ready to be read.</li>
+      <li><strong>Translation.</strong> The ribosome &mdash; itself a complex of proteins and RNA &mdash; reads the mature mRNA and builds a polypeptide.</li>
+      <li><strong>Post-translational modification.</strong> The immature protein is chemically altered to become a mature, functional one.</li>
+    </ol>
+    <p>Post-translational modifications are ubiquitous and serve many purposes. Two examples before the detailed sections:</p>
+    <ul>
+      <li><strong>Lipid anchoring.</strong> A lipophilic fatty acid attached to a protein inserts into the membrane, tethering an otherwise soluble protein in place.</li>
+      <li><strong>Propeptide cleavage.</strong> Some proteins are made as longer, inactive precursors and only become active once a specific segment is cut away. This lets a cell hold a ready supply and switch it on quickly.</li>
+    </ul>
+
+    <h3>Put the pathway in order</h3>
+    <p>The steps below are scrambled. Drag them into the order they happen in the cell &mdash; or use the arrow buttons if you would rather not drag. Getting the order right reveals what each step produces.</p>
+    <ol class="ord-list" id="ordList"></ol>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="ordCheck">Check order</button>
+      <button class="btn ghost" id="ordReset">Shuffle again</button>
+    </div>
+    <span class="caption" id="ordScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c15">
+        <p>Which sequence correctly orders the steps from gene to mature protein?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c15b">
+        <p>What does cleavage of a propeptide accomplish?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s2">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Section 2</div>
+    <h2>Phosphorylation</h2>
+    <p><strong>Phosphorylation is the most common post-translational modification.</strong> Two opposing enzyme families control it:</p>
+    <ul>
+      <li><strong>Kinases</strong> attach phosphate groups to proteins and small molecules.</li>
+      <li><strong>Phosphatases</strong> remove them.</li>
+    </ul>
+    <p>Because the two work against each other, phosphorylation is reversible. That is the whole point &mdash; it lets a cell switch a protein on and back off rather than committing permanently.</p>
+
+    <h3>The three targets</h3>
+    <p>Kinases attach phosphate through an oxygen, so a target residue needs a free hydroxyl. Only three residues routinely qualify:</p>
+    <table >
+      <thead><tr><th>Residue</th><th>Type of alcohol</th></tr></thead>
+      <tbody>
+        <tr><td>Serine</td><td>Aliphatic</td></tr>
+        <tr><td>Threonine</td><td>Aliphatic</td></tr>
+        <tr><td>Tyrosine</td><td>Aromatic</td></tr>
+      </tbody>
+    </table>
+    <p>If you can remember the requirement &mdash; a hydroxyl group &mdash; you can derive the list rather than memorize it.</p>
+
+    <div class="box clinical">
+      <h3><span class="tag">PHARMACY CONNECTION</span></h3>
+      <p>Kinase inhibitors are one of the largest classes of targeted therapy. Blocking a kinase prevents its targets from being phosphorylated, while phosphatases keep removing whatever phosphate is already there &mdash; so the pathway settles into the off state. Reasoning through that requires nothing more than knowing which enzyme does which job.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c16">
+        <p>Which residues are routinely phosphorylated by kinases?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c16b">
+        <p>Once a kinase has attached a phosphate group, what removes it?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s3">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Section 3</div>
+    <h2>Glycosylation and other modifications</h2>
+    <p><strong>Glycosylation</strong> &mdash; the addition of sugar molecules &mdash; is another extremely common modification, carried out by enzymes called <strong>glycosyltransferases</strong>. In proteins it happens at one of three residues, through two different linkage types:</p>
+    <table >
+      <thead><tr><th>Linkage</th><th>Residue</th><th>Attachment point</th></tr></thead>
+      <tbody>
+        <tr><td>O-linked</td><td>Serine, threonine</td><td>The hydroxyl oxygen of the side chain</td></tr>
+        <tr><td>N-linked</td><td>Asparagine</td><td>The amide nitrogen of the side chain</td></tr>
+      </tbody>
+    </table>
+    <p>The naming is descriptive rather than arbitrary: the letter names the atom the sugar is attached to. Notice too that serine and threonine appear here <em>and</em> in the phosphorylation list, for the same reason &mdash; they carry an available hydroxyl.</p>
+
+    <div class="box clinical">
+      <h3><span class="tag">PHARMACY CONNECTION</span></h3>
+      <p>Erythropoietin is a heavily glycosylated protein. Because glycosylation strongly affects how quickly a protein is cleared from circulation, therapeutic EPO products are engineered around their sugar content &mdash; a change in glycosylation, not in the amino acid sequence, is what separates one product's dosing interval from another's.</p>
+    </div>
+
+    <h3>Match the modification</h3>
+    <p>Assign each description to the modification it belongs to. Practice, not assessment.</p>
+    <div id="ptmBody"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="ptmCheck">Check</button>
+      <button class="btn ghost" id="ptmReset">Try again</button>
+      <button class="btn ghost" id="ptmNew">New set</button>
+    </div>
+    <span class="caption" id="ptmScore" style="margin:0;display:block;margin-top:10px"></span>
+
+    <div class="box apply">
+      <h3><span class="tag">APPLY WHAT YOU KNOW</span></h3>
+      <div class="cp-item" data-check="c17">
+        <p>In N-linked glycosylation, the sugar is attached to which residue?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c17b">
+        <p>What do glycosyltransferases do?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5quiz">
+  <div class="card">
+    <div class="eyebrow">Module 5</div>
+    <h2>Module 5 quiz</h2>
+    <p>Eight questions, drawn and shuffled fresh each attempt.</p>
+    <div class="quiz-body" data-quiz="m5"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================== FLASHCARDS ============================== -->
+<section class="section" data-key="flashcards">
+  <div class="card">
+    <div class="eyebrow">Retrieval Practice</div>
+    <h2>Flashcards</h2>
+    <p>Twenty-eight cards covering the definitions, pKa values, and rules from all five modules. Ungraded &mdash; use them as often as you like.</p>
+    <div class="fc-stage">
+          <div class="fc" id="fcCard" tabindex="0" role="button" aria-label="Flashcard. Press Enter to flip.">
+            <div class="fc-face fc-front"><div>
+              <div class="fc-term" id="fcFront"></div>
+              <div class="fc-hint">click, tap, or press Enter to flip</div>
+            </div></div>
+            <div class="fc-face fc-back"><div class="fc-def" id="fcBack"></div></div>
+          </div>
+        </div>
+        <div class="fc-bar">
+          <button class="btn ghost" id="fcPrev">Previous</button>
+          <span class="fc-count" id="fcCount"></span>
+          <button class="btn ghost" id="fcNext">Next</button>
+        </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ======================= CUMULATIVE MASTERY ========================== -->
+<section class="section" data-key="final">
+  <div class="card">
+    <div class="eyebrow">Cumulative Mastery Challenge</div>
+    <h2>Cumulative Mastery Challenge</h2>
+    <p>Twenty-five questions spanning every module, stratified across concept, application, and integration. After grading you will see a breakdown by content area, with a link back to the relevant section for anything that needs another look.</p>
+
+    <div class="quiz-body" data-quiz="final"></div>
+        <div class="controls" style="margin-top:22px">
+          <button class="btn q-submit">Submit quiz</button>
+          <button class="btn ghost q-retake">Start over</button>
+          <span class="caption q-warn" style="margin:0"></span>
+        </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+  </main>
+</div>
+
+<!-- Load order per shared/engine.js — do not reorder. -->
+<script src="banks/aminoacids.js"></script>
+<script src="banks/aminoacids.manifest.js"></script>
+<script src="shared/storage.js"></script>
+<script src="shared/helpers.js"></script>
+<script>
+/* ============================================================
+   THIS TOPIC'S CONTENT & INTERACTIVE FIGURES
+   Runs after storage.js/helpers.js (it reads `state` and calls
+   shuffle()/el() immediately) and before engine.js (which needs
+   MODULES, FLOW, SECTION_REQ and friends to already exist).
+   ============================================================ */
+
+/* ---------- Structure: modules, sections, routing ----------
+   Derived from MANIFEST (banks/aminoacids.manifest.js) per
+   companion-architecture.md §14.2, not hand-typed here — this
+   keeps the page and hub.html reading identical data. Edit the
+   manifest, not this block, to change the module/section layout. */
+var BADGES={lab:'&#9883;',m1:'1',m2:'2',m3:'3',m4:'4',m5:'5',flash:'&#10022;',final:'&#9733;'};
+
+var MODULES=MANIFEST.modules.map(function(m){
+  var mod={id:m.id,badge:BADGES[m.id]||'&#8226;',title:m.title,
+           sections:m.sections.map(function(s){return {key:s.key,label:s.label};})};
+  if(m.unlockAfter)mod.unlockAfter=m.unlockAfter;
+  return mod;
+});
+
+/* Landing pages and the flashcard deck: navigable, but never gated. */
+var UNGRADED=[];
+MANIFEST.modules.forEach(function(m){m.sections.forEach(function(s){
+  if(!s.checks&&!s.activity&&!s.quiz)UNGRADED.push(s.key);
+});});
+
+var FLOW=[]; MODULES.forEach(function(m){m.sections.forEach(function(s){FLOW.push(s);});});
+
+/* Which section to send a student back to when an area needs review */
+var AREA_SECTION=MANIFEST.areaSection;
+
+/* ---------- Which checkpoints/activities gate each section ---------- */
+var SECTION_REQ={}, QUIZ_KEY_FOR_SECTION={};
+MANIFEST.modules.forEach(function(m){m.sections.forEach(function(s){
+  if(s.checks||s.activity){
+    SECTION_REQ[s.key]={checks:s.checks||[]};
+    if(s.activity)SECTION_REQ[s.key].activity=s.activity;
+  }
+  if(s.quiz)QUIZ_KEY_FOR_SECTION[s.key]=s.quiz;
+});});
+var MODULE_QUIZ_SIZE=8;
+var FINAL_EXAM_MIX={concept:8,application:10,integration:7};
+
+/* ============================================================
+   AMINO ACID REFERENCE DATA
+   Structure images are looked for at img/aa/<code>.png. If a file
+   is missing the explorer falls back to the one-letter code, so
+   the page works whether or not the folder has been filled in.
+   ============================================================ */
+var AA_DATA=[
+ {n:'Alanine',t:'Ala',o:'A',cls:'nonpolar',sub:'Aliphatic',side:'A single methyl group',img:'ala'},
+ {n:'Arginine',t:'Arg',o:'R',cls:'basic',sub:'Basic',side:'A long chain ending in a guanidinium group',pka:'12.48',img:'arg'},
+ {n:'Asparagine',t:'Asn',o:'N',cls:'neutral',sub:'Polar neutral',side:'A short chain ending in an amide',img:'asn'},
+ {n:'Aspartic acid',t:'Asp',o:'D',cls:'acidic',sub:'Acidic',side:'A short chain ending in a carboxylic acid',pka:'3.86',img:'asp'},
+ {n:'Cysteine',t:'Cys',o:'C',cls:'acidic',sub:'Acidic',side:'A methylene bearing a thiol (SH)',pka:'8.33',img:'cys'},
+ {n:'Glutamine',t:'Gln',o:'Q',cls:'neutral',sub:'Polar neutral',side:'A two-carbon chain ending in an amide',img:'gln'},
+ {n:'Glutamic acid',t:'Glu',o:'E',cls:'acidic',sub:'Acidic',side:'A two-carbon chain ending in a carboxylic acid',pka:'4.25',img:'glu'},
+ {n:'Glycine',t:'Gly',o:'G',cls:'nonpolar',sub:'Aliphatic',side:'A single hydrogen — the only achiral amino acid',img:'gly'},
+ {n:'Histidine',t:'His',o:'H',cls:'basic',sub:'Basic',side:'An imidazole ring',pka:'6.04',img:'his'},
+ {n:'Isoleucine',t:'Ile',o:'I',cls:'nonpolar',sub:'Aliphatic',side:'A branched four-carbon chain',img:'ile'},
+ {n:'Leucine',t:'Leu',o:'L',cls:'nonpolar',sub:'Aliphatic',side:'A four-carbon chain, branched further out than isoleucine',img:'leu'},
+ {n:'Lysine',t:'Lys',o:'K',cls:'basic',sub:'Basic',side:'A long chain ending in a primary amine',pka:'10.79',img:'lys'},
+ {n:'Methionine',t:'Met',o:'M',cls:'nonpolar',sub:'Heteroatom',side:'A chain containing a thioether sulfur',img:'met'},
+ {n:'Phenylalanine',t:'Phe',o:'F',cls:'nonpolar',sub:'Aromatic',side:'A benzene ring',img:'phe'},
+ {n:'Proline',t:'Pro',o:'P',cls:'nonpolar',sub:'Aliphatic',side:'A ring that closes back onto the backbone nitrogen',img:'pro'},
+ {n:'Serine',t:'Ser',o:'S',cls:'neutral',sub:'Polar neutral',side:'A methylene bearing a hydroxyl',img:'ser'},
+ {n:'Threonine',t:'Thr',o:'T',cls:'neutral',sub:'Polar neutral',side:'A branched carbon bearing a hydroxyl',img:'thr'},
+ {n:'Tryptophan',t:'Trp',o:'W',cls:'nonpolar',sub:'Aromatic',side:'A bicyclic indole ring',img:'trp'},
+ {n:'Tyrosine',t:'Tyr',o:'Y',cls:'neutral',sub:'Polar neutral',side:'A benzene ring bearing a hydroxyl',img:'tyr'},
+ {n:'Valine',t:'Val',o:'V',cls:'nonpolar',sub:'Aliphatic',side:'A branched three-carbon chain',img:'val'}
+];
+var CLASS_LABEL={nonpolar:'Hydrophobic / non-polar',neutral:'Polar, neutral',
+                 acidic:'Polar, acidic',basic:'Polar, basic'};
+
+/* ---------- Reference Lab: explorer ---------- */
+(function(){
+  var grid=document.getElementById('aaGrid'),det=document.getElementById('aaDetail');
+  if(!grid||!det)return;
+  function show(i){
+    var a=AA_DATA[i];
+    Array.prototype.forEach.call(grid.children,function(b,j){b.classList.toggle('sel',j===i);});
+    det.innerHTML='<div class="aa-art">'+
+      '<img src="img/aa/'+a.img+'.png" alt="Structure of '+a.n+'" '+
+      'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">'+
+      '<span class="aa-fallback" style="display:none">'+a.o+'</span></div>'+
+      '<div><h3 style="margin:0">'+a.n+'</h3><div class="aa-facts">'+
+      '<span class="aa-fact">'+a.t+'</span><span class="aa-fact">'+a.o+'</span>'+
+      '<span class="aa-fact">'+CLASS_LABEL[a.cls]+'</span>'+
+      '<span class="aa-fact">'+a.sub+'</span>'+
+      (a.pka?'<span class="aa-fact">side-chain pKa '+a.pka+'</span>':'')+
+      '</div><p style="margin:0"><strong>Side chain:</strong> '+a.side+'</p></div>';
+  }
+  AA_DATA.forEach(function(a,i){
+    var b=el('button','aa-chip',a.t);
+    b.onclick=function(){show(i);};
+    grid.appendChild(b);
+  });
+  show(0);
+})();
+
+/* ---------- Reference Lab: practice mode (activity 'aapractice') ---------- */
+(function(){
+  var body=document.getElementById('aaPracBody'),score=document.getElementById('aaPracScore');
+  if(!body)return;
+  var current=[];
+  function build(){
+    current=shuffle(AA_DATA.slice()).slice(0,8);
+    body.innerHTML='';score.textContent='';
+    current.forEach(function(a,i){
+      var row=el('div','aa-prac-row',
+        '<div><strong>'+a.n+'</strong><br><span class="caption" style="margin:0">'+a.side+'</span></div>'+
+        '<input type="text" maxlength="1" placeholder="1-letter" aria-label="One-letter code for '+a.n+'">'+
+        '<select aria-label="Classification for '+a.n+'">'+
+        '<option value="">Choose a class</option>'+
+        '<option value="nonpolar">Hydrophobic / non-polar</option>'+
+        '<option value="neutral">Polar, neutral</option>'+
+        '<option value="acidic">Polar, acidic</option>'+
+        '<option value="basic">Polar, basic</option></select>');
+      body.appendChild(row);
+    });
+  }
+  document.getElementById('aaPracCheck').onclick=function(){
+    var right=0;
+    Array.prototype.forEach.call(body.children,function(row,i){
+      var letter=row.querySelector('input').value.trim().toUpperCase();
+      var cls=row.querySelector('select').value;
+      var ok=(letter===current[i].o)&&(cls===current[i].cls);
+      row.classList.remove('ok','no');row.classList.add(ok?'ok':'no');
+      if(ok)right++;
+    });
+    score.textContent=right+' of '+current.length+' correct. '+
+      (right===current.length?'That is the whole set — try a new one to keep the recall fresh.'
+                             :'Rows outlined in red have at least one field wrong. Use the explorer above, then check again.');
+    state.activities.aapractice={done:true,best:right};saveState();paintNav();
+  };
+  document.getElementById('aaPracNew').onclick=build;
+  build();
+})();
+
+/* ============================================================
+   BUILD-THE-FRAMEWORK  (activity 'buildaa', section 1.1)
+   Four correct labels (H2N, COOH, H, R) plus three decoys (COOCH3,
+   CONH2, CH3) start in a tray, shuffled together. The student drags
+   — or taps, as a non-drag fallback — labels onto the four bonds;
+   the decoys have no correct slot, so a bond holding one always
+   reads as wrong. "Check" only runs once all four slots are filled;
+   a fully correct layout locks the pills, reveals the "only R
+   varies" note plus the explanatory text below the figure (which
+   names the four groups, so it stays hidden until this point), and
+   saves the activity. An incomplete layout is left alone (fitting
+   the "activities are practice, not assessment" rule) so the
+   student can freely rearrange and check again with no penalty,
+   the same retry-until-correct spirit as the checkpoints.
+   ============================================================ */
+(function(){
+  var wrap=document.getElementById('baaWrap'), tray=document.getElementById('baaTray');
+  var checkBtn=document.getElementById('baaCheck'), resetBtn=document.getElementById('baaReset');
+  var feedback=document.getElementById('baaFeedback'), note=document.getElementById('baaNote');
+  var explain=document.getElementById('m1s1Explain');
+  if(!wrap) return;
+
+  var LABEL={NH2:'H<sub>2</sub>N',COOH:'COOH',H:'H',R:'R',
+             COOME:'COOCH<sub>3</sub>',CONH2:'CONH<sub>2</sub>',CH3:'CH<sub>3</sub>'};
+  var DESC={NH2:'amino group, NH2',COOH:'carboxylic acid, COOH',H:'hydrogen, H',R:'side chain, R',
+            COOME:'a methyl ester, COOCH3',CONH2:'an amide group, CONH2',
+            CH3:'a methyl group, CH3'};
+  var CORRECT={left:'NH2',right:'COOH',top:'H',bottom:'R'};
+  var ALL_CODES=['NH2','COOH','H','R','COOME','CONH2','CH3'];
+  var SLOTS=Array.prototype.slice.call(wrap.querySelectorAll('.baa-slot'));
+  var slotState={left:null,right:null,top:null,bottom:null};
+  var ghost=null, dragPill=null, dragFrom=null, startX=0, startY=0, moved=false, selectedPill=null, solved=false;
+
+  function slotFor(key){return document.getElementById('baaSlot-'+key);}
+
+  function makePill(code){
+    var p=el('div','dnd-pill',LABEL[code]);
+    p.dataset.val=code;
+    p.setAttribute('role','button');
+    p.setAttribute('tabindex','0');
+    p.setAttribute('aria-label',DESC[code]);
+    p.addEventListener('pointerdown',onPointerDown);
+    return p;
+  }
+  function returnToTray(pill){tray.appendChild(pill);pill.classList.remove('placed');}
+  function placeInSlot(pill,key){
+    var slot=slotFor(key);
+    slot.innerHTML='';slot.appendChild(pill);
+    slot.classList.add('filled');pill.classList.add('placed');
+    slotState[key]=pill;
+  }
+  function clearSlot(key){
+    var slot=slotFor(key);
+    slot.innerHTML='';slot.classList.remove('filled','correct','incorrect');
+    slotState[key]=null;
+  }
+  function allFilled(){return Object.keys(slotState).every(function(k){return !!slotState[k];});}
+  function updateCheckState(){checkBtn.disabled=!allFilled()||solved;}
+  function clearSelection(){if(selectedPill)selectedPill.classList.remove('picked');selectedPill=null;}
+  function moveGhost(x,y){if(ghost){ghost.style.left=x+'px';ghost.style.top=y+'px';}}
+
+  function dropPill(pill,from,toKey){
+    if(!toKey){
+      if(from!=='tray'){clearSlot(from);returnToTray(pill);}
+    } else if(toKey!==from){
+      var displaced=slotState[toKey];
+      if(from==='tray'){
+        if(displaced)returnToTray(displaced);
+        clearSlot(toKey);placeInSlot(pill,toKey);
+      } else {
+        clearSlot(from);
+        if(displaced){clearSlot(toKey);placeInSlot(displaced,from);}
+        placeInSlot(pill,toKey);
+      }
+    }
+    feedback.textContent='';
+    SLOTS.forEach(function(s){s.classList.remove('correct','incorrect');});
+    updateCheckState();
+  }
+
+  function onPointerDown(e){
+    if(solved)return;
+    var pill=e.currentTarget;
+    startX=e.clientX;startY=e.clientY;moved=false;
+    dragPill=pill;
+    dragFrom=pill.parentElement===tray?'tray':pill.parentElement.dataset.slot;
+    document.addEventListener('pointermove',onPointerMove);
+    document.addEventListener('pointerup',onPointerUp);
+  }
+  function onPointerMove(e){
+    if(!dragPill)return;
+    var dx=e.clientX-startX,dy=e.clientY-startY;
+    if(!moved&&Math.sqrt(dx*dx+dy*dy)>6){
+      moved=true;clearSelection();
+      dragPill.classList.add('dragging');
+      ghost=el('div','dnd-ghost',dragPill.innerHTML);
+      document.body.appendChild(ghost);
+    }
+    if(moved){
+      moveGhost(e.clientX,e.clientY);
+      SLOTS.forEach(function(s){s.classList.remove('over');});
+      var t=document.elementFromPoint(e.clientX,e.clientY);
+      var slotEl=t&&t.closest?t.closest('.baa-slot'):null;
+      if(slotEl)slotEl.classList.add('over');
+    }
+  }
+  function onPointerUp(e){
+    if(!dragPill)return;
+    document.removeEventListener('pointermove',onPointerMove);
+    document.removeEventListener('pointerup',onPointerUp);
+    SLOTS.forEach(function(s){s.classList.remove('over');});
+    if(moved){
+      if(ghost){ghost.remove();ghost=null;}
+      dragPill.classList.remove('dragging');
+      var t=document.elementFromPoint(e.clientX,e.clientY);
+      var slotEl=t&&t.closest?t.closest('.baa-slot'):null;
+      dropPill(dragPill,dragFrom,slotEl?slotEl.dataset.slot:null);
+    } else {
+      /* a tap, not a drag: tap-to-place fallback */
+      if(selectedPill===dragPill){clearSelection();}
+      else{clearSelection();selectedPill=dragPill;dragPill.classList.add('picked');}
+    }
+    dragPill=null;dragFrom=null;moved=false;
+  }
+  SLOTS.forEach(function(s){
+    s.addEventListener('click',function(){
+      if(!selectedPill)return;
+      var from=selectedPill.parentElement===tray?'tray':selectedPill.parentElement.dataset.slot;
+      dropPill(selectedPill,from,s.dataset.slot);clearSelection();
+    });
+  });
+  tray.addEventListener('click',function(e){
+    if(e.target!==tray||!selectedPill)return;
+    var from=selectedPill.parentElement===tray?'tray':selectedPill.parentElement.dataset.slot;
+    dropPill(selectedPill,from,null);clearSelection();
+  });
+
+  function lockAll(){
+    tray.querySelectorAll('.dnd-pill').forEach(function(p){p.classList.add('locked');});
+    Object.keys(slotState).forEach(function(k){var p=slotState[k];if(p)p.classList.add('locked');});
+  }
+  function revealSolved(save){
+    solved=true;
+    Object.keys(CORRECT).forEach(function(key){slotFor(key).classList.add('correct');});
+    lockAll();
+    if(slotState.bottom)slotState.bottom.classList.add('accent');
+    note.style.display='block';
+    if(explain)explain.style.display='block';
+    feedback.innerHTML='<strong>That\u2019s the framework.</strong> Amino group, carboxylic acid, hydrogen, and side chain \u2014 the same four positions on every proteinogenic amino acid. Only R changes, which is why nearly every question about one residue behaving differently from another comes back to the side chain.';
+    checkBtn.style.display='none';resetBtn.style.display='inline-flex';
+    if(save){state.activities.buildaa={done:true};saveState();paintNav();}
+  }
+  checkBtn.addEventListener('click',function(){
+    if(!allFilled())return;
+    var got=0;
+    Object.keys(CORRECT).forEach(function(key){
+      var pill=slotState[key],ok=pill&&pill.dataset.val===CORRECT[key];
+      slotFor(key).classList.toggle('correct',ok);
+      slotFor(key).classList.toggle('incorrect',!ok);
+      if(ok)got++;
+    });
+    if(got===4){revealSolved(true);}
+    else{feedback.textContent=got+' of 4 correct. Drag the highlighted ones to a new spot and check again.';}
+    updateCheckState();
+  });
+  resetBtn.addEventListener('click',function(){
+    clearSelection();
+    Object.keys(slotState).forEach(function(k){
+      var p=slotState[k];if(p){p.classList.remove('locked','accent');returnToTray(p);}
+      clearSlot(k);
+    });
+    var pills=Array.prototype.slice.call(tray.children);
+    shuffle(pills).forEach(function(p){tray.appendChild(p);});
+    solved=false;note.style.display='none';feedback.textContent='';
+    if(explain)explain.style.display='none';
+    checkBtn.style.display='inline-flex';resetBtn.style.display='none';
+    updateCheckState();
+    state.activities.buildaa=null;saveState();paintNav();
+  });
+
+  /* initial build */
+  shuffle(ALL_CODES).forEach(function(c){tray.appendChild(makePill(c));});
+  updateCheckState();
+
+  /* restore a previously solved layout on reload */
+  if(state.activities.buildaa&&state.activities.buildaa.done){
+    Object.keys(CORRECT).forEach(function(key){
+      var code=CORRECT[key],pill=null;
+      Array.prototype.forEach.call(tray.children,function(p){if(p.dataset.val===code)pill=p;});
+      if(pill){tray.removeChild(pill);placeInSlot(pill,key);}
+    });
+    revealSolved(false);
+  }
+})();
+
+/* ============================================================
+   CHARGE STATE PRACTICE  (activities 'chargebb' 2.1, 'chargesc' 2.2)
+   One builder, used twice. A round is a residue plus a randomly
+   chosen pH; the student picks the protonation state of each
+   ionizable group, and the readout assembles the molecule and
+   sums the net charge live as they go. Check grades each group
+   against the actual rule (pH above pKa means the proton is gone)
+   rather than against a stored answer, so the generator can invent
+   new residue/pH combinations freely.
+
+   Rounds are generated so every group sits at least MIN_GAP pH
+   units away from its own pKa. Right at the pKa a group is half
+   protonated and there is no single right answer, so those cases
+   are excluded rather than marked wrong.
+   ============================================================ */
+var MIN_GAP=0.8;
+
+/* charge contributed by each group in each state */
+function groupForms(kind){
+  if(kind==='acid')  return {prot:{txt:'COOH',   chg:0},  deprot:{txt:'COO<sup>&minus;</sup>', chg:-1}};
+  if(kind==='amine') return {prot:{txt:'NH<sub>3</sub><sup>+</sup>', chg:1}, deprot:{txt:'NH<sub>2</sub>', chg:0}};
+  if(kind==='thiol') return {prot:{txt:'SH',     chg:0},  deprot:{txt:'S<sup>&minus;</sup>',   chg:-1}};
+  return null;
+}
+
+function buildChargeActivity(cfg){
+  var mount=document.getElementById(cfg.mountId), score=document.getElementById(cfg.scoreId);
+  if(!mount)return;
+  var round=null, picks=[], graded=false;
+
+  function trueState(g,ph){return ph>g.pka?'deprot':'prot';}
+
+  function netCharge(){
+    var n=0,complete=true;
+    round.groups.forEach(function(g,i){
+      if(!picks[i]){complete=false;return;}
+      n+=groupForms(g.kind)[picks[i]].chg;
+    });
+    return {n:n,complete:complete};
+  }
+
+  function paintReadout(){
+    var strip=mount.querySelector('.chg-readout');
+    strip.innerHTML='';
+    round.groups.forEach(function(g,i){
+      if(i)strip.appendChild(el('span','chg-plus','+'));
+      var f=picks[i]?groupForms(g.kind)[picks[i]].txt:'?';
+      strip.appendChild(el('span','chg-piece'+(picks[i]?'':' pending'),f));
+    });
+    var net=netCharge();
+    var box=el('span','chg-net','Net charge');
+    var b=document.createElement('b');
+    if(!net.complete){b.textContent='\u2014';}
+    else{
+      b.textContent=net.n>0?'+'+net.n:String(net.n);
+      b.className=net.n<0?'neg':(net.n>0?'pos':'zero');
+    }
+    box.appendChild(b);strip.appendChild(box);
+  }
+
+  function paint(){
+    mount.innerHTML='';
+    var head=el('div','chg-head');
+    head.appendChild(el('div','chg-res',round.label));
+    head.appendChild(el('div','chg-ph','at pH <b>'+round.ph.toFixed(1)+'</b>'));
+    mount.appendChild(head);
+
+    round.groups.forEach(function(g,i){
+      var row=el('div','sort-row');
+      row.appendChild(el('div','sort-text',g.name+' <span class="caption" style="margin:0">(pKa '+g.pka.toFixed(2)+')</span>'));
+      var opts=el('div','sort-opts');
+      ['prot','deprot'].forEach(function(stateKey){
+        var f=groupForms(g.kind)[stateKey];
+        var txt=f.txt+' <span style="opacity:.65">('+(f.chg>0?'+1':(f.chg<0?'\u22121':'0'))+')</span>';
+        var b=el('button','opt',txt);
+        b.dataset.state=stateKey;
+        if(picks[i]===stateKey)b.classList.add('sel');
+        if(graded){
+          b.disabled=true;
+          if(stateKey===trueState(g,round.ph))b.classList.add('reveal');
+          if(picks[i]===stateKey&&stateKey!==trueState(g,round.ph))b.classList.add('bad');
+        } else {
+          b.onclick=function(){
+            picks[i]=stateKey;
+            opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+            b.classList.add('sel');
+            paintReadout();
+          };
+        }
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);mount.appendChild(row);
+    });
+
+    mount.appendChild(el('div','chg-readout',''));
+    mount.appendChild(el('div','chg-rule','Rule: if the pH is <em>above</em> a group\u2019s pKa the proton has left; if it is <em>below</em>, the group is still holding on.'));
+    paintReadout();
+  }
+
+  function newRound(){
+    round=cfg.generate();
+    picks=new Array(round.groups.length).fill(null);
+    graded=false;score.textContent='';
+    paint();
+  }
+
+  document.getElementById(cfg.checkId).onclick=function(){
+    if(picks.some(function(p){return !p;})){
+      score.textContent='Choose a state for every group first.';return;
+    }
+    var got=0;
+    round.groups.forEach(function(g,i){if(picks[i]===trueState(g,round.ph))got++;});
+    graded=true;paint();
+    var trueNet=round.groups.reduce(function(s,g){
+      return s+groupForms(g.kind)[trueState(g,round.ph)].chg;},0);
+    var netTxt=trueNet>0?'+'+trueNet:String(trueNet);
+    score.innerHTML=got+' of '+round.groups.length+' correct \u2014 the true net charge at pH '+
+      round.ph.toFixed(1)+' is <strong>'+netTxt+'</strong>. '+
+      (got===round.groups.length?cfg.done:cfg.retry)+
+      ' Press <strong>'+cfg.newLabel+'</strong> for a fresh round.';
+    state.activities[cfg.name]={done:true,best:got,of:round.groups.length};saveState();paintNav();
+  };
+  document.getElementById(cfg.resetId).onclick=function(){
+    picks=new Array(round.groups.length).fill(null);
+    graded=false;score.textContent='';paint();
+    state.activities[cfg.name]=null;saveState();paintNav();
+  };
+  document.getElementById(cfg.newId).onclick=newRound;
+  newRound();
+}
+
+/* Draw a pH that is clear of every pKa in the round, so each group
+   has one unambiguous answer. Falls back after a bounded number of
+   tries rather than looping forever. */
+function phClearOf(pkas){
+  var LADDER=[1.0,1.5,2.0,3.0,4.0,5.0,6.0,7.4,8.0,9.0,10.0,11.0,12.0];
+  var ok=LADDER.filter(function(ph){
+    return pkas.every(function(p){return Math.abs(ph-p)>=MIN_GAP;});
+  });
+  return ok.length?pickN(ok,1)[0]:7.4;
+}
+
+/* --- 2.1 backbone only: two groups --- */
+buildChargeActivity({name:'chargebb',mountId:'chgBackbone',scoreId:'cbScore',
+  checkId:'cbCheck',resetId:'cbReset',newId:'cbNew',newLabel:'New pH',
+  generate:function(){
+    /* a residue with no ionizable side chain, so only the backbone matters */
+    var PLAIN=AA_DATA.filter(function(a){return !a.pka;});
+    var aa=pickN(PLAIN,1)[0];
+    /* backbone pKa values vary slightly by residue; draw from the taught ranges */
+    var acidPka=Math.round((1.8+Math.random()*0.7)*100)/100;
+    var aminePka=Math.round((9.0+Math.random()*1.4)*100)/100;
+    return {label:aa.n,ph:phClearOf([acidPka,aminePka]),groups:[
+      {name:'&#945;-carboxylic acid',kind:'acid', pka:acidPka},
+      {name:'&#945;-amino group',    kind:'amine',pka:aminePka}
+    ]};
+  },
+  done:'That is the zwitterion reasoning applied correctly.',
+  retry:'Compare the pH with each pKa separately \u2014 one comparison per group, nothing more.'});
+
+/* --- 2.2 backbone plus an ionizable side chain: three groups --- */
+buildChargeActivity({name:'chargesc',mountId:'chgSide',scoreId:'csScore',
+  checkId:'csCheck',resetId:'csReset',newId:'csNew',newLabel:'New residue',
+  generate:function(){
+    var ACIDIC=[
+      {n:'Aspartic acid',pka:3.86,kind:'acid', side:'side-chain carboxylic acid'},
+      {n:'Glutamic acid',pka:4.25,kind:'acid', side:'side-chain carboxylic acid'},
+      {n:'Cysteine',     pka:8.33,kind:'thiol',side:'side-chain thiol'}
+    ];
+    var aa=pickN(ACIDIC,1)[0];
+    var acidPka=Math.round((1.8+Math.random()*0.7)*100)/100;
+    var aminePka=Math.round((9.0+Math.random()*1.4)*100)/100;
+    return {label:aa.n,ph:phClearOf([acidPka,aminePka,aa.pka]),groups:[
+      {name:'&#945;-carboxylic acid',kind:'acid', pka:acidPka},
+      {name:'&#945;-amino group',    kind:'amine',pka:aminePka},
+      {name:aa.side,                 kind:aa.kind,pka:aa.pka}
+    ]};
+  },
+  done:'All three groups reasoned out correctly.',
+  retry:'The side chain follows exactly the same rule as the backbone \u2014 it just has a different pKa.'});
+
+/* ============================================================
+   PATHWAY ORDERING  (activity 'pathorder', section 5.1)
+   Drag-to-reorder the four steps from gene to mature protein.
+   Dragging uses pointer events, matching the 1.1 builder, and each
+   row also carries up/down buttons so the task can be completed
+   entirely by clicking — dragging a list is awkward with a
+   keyboard or a screen reader, and this activity gates the
+   section, so it must not depend on a drag succeeding.
+   The scramble is rejected and redrawn if it happens to come out
+   already in the right order.
+   ============================================================ */
+(function(){
+  var list=document.getElementById('ordList');
+  var checkBtn=document.getElementById('ordCheck'), resetBtn=document.getElementById('ordReset');
+  var score=document.getElementById('ordScore');
+  if(!list)return;
+
+  var STEPS=[
+    {t:'Transcription',                   s:'RNA polymerase II reads DNA and builds precursor mRNA',
+     y:'produces <strong>precursor mRNA</strong>'},
+    {t:'Post-transcriptional modification',s:'The precursor is processed into a readable transcript',
+     y:'produces <strong>mature mRNA</strong>'},
+    {t:'Translation',                     s:'The ribosome reads the transcript and builds a chain',
+     y:'produces an <strong>immature protein</strong>'},
+    {t:'Post-translational modification', s:'The chain is chemically altered after it is built',
+     y:'produces the <strong>mature, functional protein</strong>'}
+  ];
+
+  var order=[], graded=false, dragIdx=null, ghost=null, startY=0, moved=false;
+
+  function paint(){
+    list.innerHTML='';
+    order.forEach(function(si,pos){
+      var step=STEPS[si];
+      var li=el('li','ord-item'+(graded?' locked':''));
+      li.dataset.pos=pos;
+      var grip=el('span','ord-grip','\u2630');
+      grip.setAttribute('aria-hidden','true');
+      if(!graded)grip.addEventListener('pointerdown',onDown);
+      li.appendChild(grip);
+      li.appendChild(el('span','ord-num',String(pos+1)));
+      var body=el('div','ord-body');
+      body.appendChild(el('div','ord-title',step.t));
+      body.appendChild(el('div','ord-sub',graded&&order[pos]===pos?step.y:step.s));
+      li.appendChild(body);
+      if(!graded){
+        var h=el('div','ord-handle');
+        var up=el('button','','\u2191');up.title='Move up';up.setAttribute('aria-label','Move '+step.t+' up');
+        up.disabled=pos===0;up.onclick=function(){swap(pos,pos-1);};
+        var dn=el('button','','\u2193');dn.title='Move down';dn.setAttribute('aria-label','Move '+step.t+' down');
+        dn.disabled=pos===order.length-1;dn.onclick=function(){swap(pos,pos+1);};
+        h.appendChild(up);h.appendChild(dn);li.appendChild(h);
+      } else {
+        li.classList.add(order[pos]===pos?'correct':'incorrect');
+      }
+      list.appendChild(li);
+    });
+  }
+  function swap(a,b){
+    var t=order[a];order[a]=order[b];order[b]=t;
+    score.textContent='';paint();
+  }
+  function moveTo(from,to){
+    if(to<0||to>=order.length||from===to)return;
+    var item=order.splice(from,1)[0];
+    order.splice(to,0,item);
+    score.textContent='';paint();
+  }
+
+  function onDown(e){
+    if(graded)return;
+    var li=e.currentTarget.closest('.ord-item');
+    dragIdx=Number(li.dataset.pos);startY=e.clientY;moved=false;
+    document.addEventListener('pointermove',onMove);
+    document.addEventListener('pointerup',onUp);
+  }
+  function onMove(e){
+    if(dragIdx===null)return;
+    if(!moved&&Math.abs(e.clientY-startY)>6){
+      moved=true;
+      list.children[dragIdx].classList.add('dragging');
+      ghost=el('div','dnd-ghost',STEPS[order[dragIdx]].t);
+      document.body.appendChild(ghost);
+    }
+    if(moved){
+      ghost.style.left=e.clientX+'px';ghost.style.top=e.clientY+'px';
+      Array.prototype.forEach.call(list.children,function(c){c.classList.remove('over');});
+      var t=document.elementFromPoint(e.clientX,e.clientY);
+      var over=t&&t.closest?t.closest('.ord-item'):null;
+      if(over&&Number(over.dataset.pos)!==dragIdx)over.classList.add('over');
+    }
+  }
+  function onUp(e){
+    if(dragIdx===null)return;
+    document.removeEventListener('pointermove',onMove);
+    document.removeEventListener('pointerup',onUp);
+    if(moved){
+      if(ghost){ghost.remove();ghost=null;}
+      var t=document.elementFromPoint(e.clientX,e.clientY);
+      var over=t&&t.closest?t.closest('.ord-item'):null;
+      if(over)moveTo(dragIdx,Number(over.dataset.pos));
+      else paint();
+    }
+    dragIdx=null;moved=false;
+  }
+
+  function scramble(){
+    /* redraw rather than present an already-solved list */
+    var tries=0;
+    do{order=shuffle([0,1,2,3]);tries++;}
+    while(tries<20&&order.every(function(v,i){return v===i;}));
+    graded=false;score.textContent='';paint();
+  }
+
+  checkBtn.onclick=function(){
+    var got=0;
+    order.forEach(function(v,i){if(v===i)got++;});
+    graded=true;paint();
+    score.innerHTML=got+' of 4 in the right place. '+
+      (got===4
+        ? 'Each step now shows what it hands to the next one \u2014 that chain of products is the whole pathway.'
+        : 'Work from what each step needs as input: nothing can be translated before there is a mature transcript to read.')+
+      ' Press <strong>Shuffle again</strong> for a fresh scramble.';
+    state.activities.pathorder={done:true,best:got,of:4};saveState();paintNav();
+  };
+  resetBtn.onclick=function(){
+    scramble();
+    state.activities.pathorder=null;saveState();paintNav();
+  };
+
+  scramble();
+})();
+
+/* ---------- Shared builder for the four match activities ----------
+   Each activity supplies a generate() that returns a fresh array of
+   {q, a, opts} items, so "New set" produces a genuinely different
+   round every time rather than replaying one hard-coded list. Items
+   carry their own option list, which lets a generator build choices
+   out of whatever it just invented (residues in a random peptide,
+   for instance).
+   ------------------------------------------------------------------ */
+function buildMatchActivity(cfg){
+  var rows=document.getElementById(cfg.bodyId),score=document.getElementById(cfg.scoreId);
+  if(!rows)return;
+  var items=[],picks=[];
+
+  function paint(){
+    rows.innerHTML='';
+    items.forEach(function(item,r){
+      var row=el('div','sort-row');
+      row.appendChild(el('div','sort-text',item.q));
+      var opts=el('div','sort-opts');
+      shuffle((item.opts||cfg.options).slice()).forEach(function(o){
+        var b=el('button','opt',o);b.dataset.val=o;
+        if(picks[r]===o)b.classList.add('sel');
+        b.onclick=function(){picks[r]=o;
+          opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+          b.classList.add('sel');};
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);rows.appendChild(row);
+    });
+  }
+  function newSet(){
+    items=cfg.generate();
+    picks=new Array(items.length).fill(null);
+    score.textContent='';
+    paint();
+  }
+
+  document.getElementById(cfg.checkId).onclick=function(){
+    var got=0;
+    rows.querySelectorAll('.sort-row').forEach(function(row,r){
+      var correct=items[r].a;
+      if(picks[r]===correct)got++;
+      row.querySelectorAll('.opt').forEach(function(b){
+        b.disabled=true;
+        if(b.dataset.val===correct)b.classList.add('reveal');
+        if(b.classList.contains('sel')&&picks[r]!==correct)b.classList.add('bad');
+      });
+    });
+    score.innerHTML=got+' of '+items.length+' correct. '+
+      (got===items.length?cfg.done:cfg.retry)+' Press <strong>New set</strong> for a fresh round.';
+    state.activities[cfg.name]={done:true,best:got,of:items.length};saveState();paintNav();
+  };
+  document.getElementById(cfg.resetId).onclick=function(){
+    picks=new Array(items.length).fill(null);
+    score.textContent='';
+    paint();
+    state.activities[cfg.name]=null;saveState();paintNav();
+  };
+  document.getElementById(cfg.newId).onclick=newSet;
+  newSet();
+}
+
+/* pick n distinct items from a list */
+function pickN(list,n){return shuffle(list.slice()).slice(0,n);}
+
+/* --- 1.3 classify residues — drawn from all 20, so every round differs --- */
+var CLS_LABEL={nonpolar:'Non-polar',neutral:'Polar neutral',acidic:'Acidic',basic:'Basic'};
+buildMatchActivity({name:'classify',bodyId:'clsBody',scoreId:'clsScore',
+  checkId:'clsCheck',resetId:'clsReset',newId:'clsNew',
+  options:['Non-polar','Polar neutral','Acidic','Basic'],
+  generate:function(){
+    return pickN(AA_DATA,8).map(function(a){
+      return {q:a.n+' <span class="caption" style="margin:0">('+a.side+')</span>', a:CLS_LABEL[a.cls]};
+    });
+  },
+  done:'All eight placed correctly.',
+  retry:'Work from the side chain rather than the name: a hydroxyl or amide is polar-neutral, a carboxylic acid or thiol is acidic, an amine or ring nitrogen is basic.'});
+
+/* --- 3.3 annotate a randomly generated peptide --- */
+buildMatchActivity({name:'termini',bodyId:'terBody',scoreId:'terScore',
+  checkId:'terCheck',resetId:'terReset',newId:'terNew',
+  generate:function(){
+    var NUM=['Three','Four','Five','Six','Seven'];
+    /* build a peptide guaranteed to contain a proline and a basic residue,
+       so the last two questions always have a well-defined answer */
+    var basic=pickN(AA_DATA.filter(function(a){return a.cls==='basic';}),1);
+    var pro=AA_DATA.filter(function(a){return a.t==='Pro';});
+    var filler=pickN(AA_DATA.filter(function(a){
+      return a.cls!=='basic' && a.t!=='Pro';}),3);
+    var pep=shuffle(basic.concat(pro,filler));
+    var names=pep.map(function(a){return a.t;});
+    var seq='<strong>'+names.join('&ndash;')+'</strong>';
+    return [
+      {q:'In '+seq+', which residue is at the N-terminus?', a:names[0], opts:names.slice()},
+      {q:'Which residue is at the C-terminus?', a:names[names.length-1], opts:names.slice()},
+      {q:'How many peptide bonds does this peptide contain?', a:NUM[pep.length-3], opts:NUM.slice()},
+      {q:'Before which residue is a cis peptide bond most readily accommodated?', a:'Pro', opts:names.slice()},
+      {q:'Which residue carries a positively charged side chain at physiological pH?', a:basic[0].t, opts:names.slice()}
+    ];
+  },
+  done:'Every annotation is correct.',
+  retry:'Sequences are written N to C, and n residues are joined by n minus 1 bonds.'});
+
+/* --- 4.4 which interaction forms between this pair of residues? --- */
+buildMatchActivity({name:'forces',bodyId:'frcBody',scoreId:'frcScore',
+  checkId:'frcCheck',resetId:'frcReset',newId:'frcNew',
+  options:['Hydrophobic','Hydrogen bond','Ionic (salt bridge)','Disulfide'],
+  generate:function(){
+    var HYDROPHOBIC=['Leucine','Isoleucine','Valine','Phenylalanine','Alanine','Methionine'];
+    var HBOND=['Serine','Threonine','Tyrosine','Asparagine','Glutamine'];
+    var POS=['Lysine','Arginine','Histidine'], NEG=['Aspartate','Glutamate'];
+    function pair(a,b){return a+' and '+b;}
+    var makers=[
+      function(){return {q:pair('Cysteine','Cysteine'),a:'Disulfide'};},
+      function(){var p=pickN(POS,1)[0],n=pickN(NEG,1)[0];
+                 return {q:pair(p,n),a:'Ionic (salt bridge)'};},
+      function(){var t=pickN(HYDROPHOBIC,2);
+                 return {q:pair(t[0],t[1]),a:'Hydrophobic'};},
+      function(){var t=pickN(HBOND,2);
+                 return {q:pair(t[0],t[1]),a:'Hydrogen bond'};}
+    ];
+    /* always include the disulfide case, then fill with random others */
+    var out=[makers[0]()];
+    for(var i=0;i<4;i++)out.push(makers[1+Math.floor(Math.random()*3)]());
+    return shuffle(out);
+  },
+  done:'All five identified.',
+  retry:'Ask what each side chain actually offers: a thiol, a charge, a hydroxyl or amide, or nothing but carbon and hydrogen.'});
+
+/* --- 5.3 identify the modification --- */
+buildMatchActivity({name:'ptm',bodyId:'ptmBody',scoreId:'ptmScore',
+  checkId:'ptmCheck',resetId:'ptmReset',newId:'ptmNew',
+  options:['Phosphorylation','O-linked glycosylation','N-linked glycosylation','Propeptide cleavage','Lipid anchoring'],
+  generate:function(){
+    var BANK=[
+      {q:'A sugar attached to the amide nitrogen of asparagine',a:'N-linked glycosylation'},
+      {q:'A sugar attached through the hydroxyl oxygen of threonine',a:'O-linked glycosylation'},
+      {q:'A sugar attached through the hydroxyl oxygen of serine',a:'O-linked glycosylation'},
+      {q:'A phosphate added to tyrosine by a kinase',a:'Phosphorylation'},
+      {q:'A phosphate added to serine by a kinase',a:'Phosphorylation'},
+      {q:'The modification reversed by a phosphatase',a:'Phosphorylation'},
+      {q:'The modification that requires a free hydroxyl group on the side chain',a:'Phosphorylation'},
+      {q:'A fatty acid added to tether a soluble protein to a membrane',a:'Lipid anchoring'},
+      {q:'The modification that makes a protein less water-soluble',a:'Lipid anchoring'},
+      {q:'A segment removed to activate an inactive precursor',a:'Propeptide cleavage'},
+      {q:'The irreversible modification that switches on a stored protein',a:'Propeptide cleavage'},
+      {q:'The modification carried out by glycosyltransferases onto asparagine',a:'N-linked glycosylation'},
+      {q:'The heavy modification that governs how long erythropoietin stays in circulation',a:'N-linked glycosylation'}
+    ];
+    return pickN(BANK,6);
+  },
+  done:'All six identified.',
+  retry:'The letter in "O-linked" and "N-linked" names the atom the sugar attaches to; phosphate always needs a hydroxyl.'});
+
+/* ============================================================
+   HELICAL WHEEL  (activity 'wheel', section 4.2)
+   An alpha helix advances 100 degrees per residue, so viewed down
+   the axis the residues land at 100-degree intervals. Plotting them
+   that way shows which residues share a face — the thing a side
+   view cannot show, and the reason "side chains point outward"
+   matters for membrane proteins.
+
+   Two numbers are computed live, both standard:
+     <H>  mean hydrophobicity (Kyte-Doolittle, rescaled to 0..1)
+     muH  hydrophobic moment — the vector sum of each residue's
+          hydrophobicity at its own angle, divided by residue count.
+          A high moment means the hydrophobic residues cluster on
+          one face; a low moment means they are spread evenly.
+   ============================================================ */
+(function(){
+  var pickEl=document.getElementById('whPick'), chart=document.getElementById('whChart');
+  var read=document.getElementById('whRead'), seqEl=document.getElementById('whSeq');
+  var rowsEl=document.getElementById('whRows'), score=document.getElementById('whScore');
+  if(!chart) return;
+
+  var KD={I:4.5,V:4.2,L:3.8,F:2.8,C:2.5,M:1.9,A:1.8,G:-0.4,T:-0.7,S:-0.8,W:-0.9,
+          Y:-1.3,P:-1.6,H:-3.2,E:-3.5,Q:-3.5,D:-3.5,N:-3.5,K:-3.9,R:-4.5};
+  var THREE={I:'Ile',V:'Val',L:'Leu',F:'Phe',C:'Cys',M:'Met',A:'Ala',G:'Gly',T:'Thr',
+             S:'Ser',W:'Trp',Y:'Tyr',P:'Pro',H:'His',E:'Glu',Q:'Gln',D:'Asp',N:'Asn',K:'Lys',R:'Arg'};
+  var PALETTE=['L','I','F','A','S','Q','K','E'];  /* hydrophobic -> polar -> charged */
+  function h(c){return (KD[c]+4.5)/9;}
+
+  var PRESETS=[
+    {id:'tm',   label:'Candidate A', seq:'ILVFLIAVLFILVALIFV', a:'Transmembrane'},
+    {id:'amph', label:'Candidate B', seq:'ILKQVKDLIEKIEKILKE', a:'Amphipathic'},
+    {id:'sol',  label:'Candidate C', seq:'KESQDKNESKQDSEKNQS', a:'Soluble'}
+  ];
+  var OPTIONS=['Transmembrane','Amphipathic','Soluble'];
+  var seq=PRESETS[0].seq.split(''), loaded=0, picks=[null,null,null];
+
+  function stats(arr){
+    var n=arr.length,sx=0,sy=0,sum=0;
+    for(var i=0;i<n;i++){
+      var ang=(100*i)*Math.PI/180, v=h(arr[i]);
+      sum+=v; sx+=v*Math.cos(ang); sy+=v*Math.sin(ang);
+    }
+    return {H:sum/n, mu:Math.sqrt(sx*sx+sy*sy)/n, ax:sx, ay:sy};
+  }
+  function verdict(st){
+    if(st.mu>0.15)return {v:'Amphipathic',
+      d:'The hydrophobic residues cluster on one face. A helix like this sits at an interface — one face in the membrane or a protein core, the other in water.'};
+    if(st.H>0.65)return {v:'Transmembrane',
+      d:'Hydrophobic all the way round, with no single face standing out. A helix like this buries itself entirely in the lipid bilayer, which is how a GPCR crosses the membrane seven times.'};
+    return {v:'Soluble',
+      d:'Mostly polar and charged, with no hydrophobic face. A helix like this sits on the outside of a protein, in contact with water.'};
+  }
+  function colFor(c){
+    var v=h(c);
+    return v>0.6?'var(--green)':(v>0.42?'var(--blue)':'var(--rose)');
+  }
+  function svg(tag,attrs,txt){
+    var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(var k in attrs)e.setAttribute(k,attrs[k]);
+    if(txt!==undefined)e.textContent=txt;
+    return e;
+  }
+
+  function draw(){
+    var st=stats(seq), CX=165, CY=165, R=112;
+    chart.innerHTML='';
+    function pos(i){
+      var ang=(-90+100*i)*Math.PI/180;
+      return {x:CX+R*Math.cos(ang), y:CY+R*Math.sin(ang)};
+    }
+    /* shaded wedge showing the hydrophobic face, when there is one */
+    if(st.mu>0.15){
+      var dir=Math.atan2(st.ay,st.ax)-Math.PI/2;
+      var half=68*Math.PI/180;   /* a real hydrophobic face spans roughly 130 degrees */
+      var x1=CX+150*Math.cos(dir-half), y1=CY+150*Math.sin(dir-half);
+      var x2=CX+150*Math.cos(dir+half), y2=CY+150*Math.sin(dir+half);
+      chart.appendChild(svg('path',{d:'M '+CX+' '+CY+' L '+x1.toFixed(1)+' '+y1.toFixed(1)+
+        ' A 150 150 0 0 1 '+x2.toFixed(1)+' '+y2.toFixed(1)+' Z',
+        fill:'var(--green-soft)',opacity:'.75'}));
+    }
+    /* the helical path, residue 1 through 18 */
+    var d='';
+    for(var i=0;i<seq.length;i++){var q=pos(i);d+=(i?' L ':'M ')+q.x.toFixed(1)+' '+q.y.toFixed(1);}
+    chart.appendChild(svg('path',{d:d,fill:'none',stroke:'var(--line)','stroke-width':1.5}));
+    /* residues */
+    for(var i=0;i<seq.length;i++){
+      var q=pos(i);
+      chart.appendChild(svg('circle',{cx:q.x,cy:q.y,r:16,fill:colFor(seq[i]),
+        stroke:'#fff','stroke-width':2}));
+      chart.appendChild(svg('text',{x:q.x,y:q.y+4,'text-anchor':'middle','font-size':12,
+        fill:'#fff','font-weight':700},seq[i]));
+      chart.appendChild(svg('text',{x:q.x,y:q.y-22,'text-anchor':'middle','font-size':9,
+        fill:'var(--ink-soft)'},String(i+1)));
+    }
+    var vd=verdict(st);
+    read.innerHTML=
+      '<div class="wh-verdict" style="color:var(--green)">'+vd.v+'</div>'+
+      '<p class="caption" style="margin:0 0 10px">'+vd.d+'</p>'+
+      '<div class="wh-stat"><span>Mean hydrophobicity &lt;H&gt;</span><b>'+st.H.toFixed(2)+'</b></div>'+
+      '<div class="wh-stat"><span>Hydrophobic moment &mu;H</span><b>'+st.mu.toFixed(2)+'</b></div>'+
+      '<div class="wh-stat" style="border-bottom:0"><span>Shaded wedge</span><b>'+
+        (st.mu>0.15?'the hydrophobic face':'none — evenly spread')+'</b></div>';
+
+    seqEl.innerHTML='';
+    seq.forEach(function(c,i){
+      var b=el('button','wheel-res',THREE[c]);
+      b.style.borderColor=colFor(c);
+      b.title='Residue '+(i+1)+' — click to change';
+      b.onclick=function(){
+        seq[i]=PALETTE[(PALETTE.indexOf(seq[i])+1)%PALETTE.length];
+        draw();
+      };
+      seqEl.appendChild(b);
+    });
+  }
+
+  function paintPicker(){
+    Array.prototype.forEach.call(pickEl.children,function(b,i){
+      b.classList.toggle('sel',i===loaded);
+    });
+  }
+  PRESETS.forEach(function(pr,i){
+    var b=el('button','opt'+(i===0?' sel':''),pr.label);
+    b.onclick=function(){loaded=i;seq=pr.seq.split('');paintPicker();draw();};
+    pickEl.appendChild(b);
+  });
+
+  /* the graded part: classify all three candidates */
+  PRESETS.forEach(function(pr,r){
+    var row=el('div','sort-row');
+    row.appendChild(el('div','sort-text',pr.label+' would most likely be&hellip;'));
+    var opts=el('div','sort-opts');
+    OPTIONS.forEach(function(o){
+      var b=el('button','opt',o);b.dataset.val=o;
+      b.onclick=function(){picks[r]=o;
+        opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+        b.classList.add('sel');};
+      opts.appendChild(b);
+    });
+    row.appendChild(opts);rowsEl.appendChild(row);
+  });
+
+  document.getElementById('whCheck').onclick=function(){
+    var got=0;
+    rowsEl.querySelectorAll('.sort-row').forEach(function(row,r){
+      var correct=PRESETS[r].a;
+      if(picks[r]===correct)got++;
+      row.querySelectorAll('.opt').forEach(function(b){
+        b.disabled=true;
+        if(b.dataset.val===correct)b.classList.add('reveal');
+        if(b.classList.contains('sel')&&picks[r]!==correct)b.classList.add('bad');
+      });
+    });
+    score.innerHTML=got+' of 3 correct. '+(got===3
+      ? 'Now try breaking one: load Candidate B and change a couple of the green residues to Lys or Glu. Watch the wedge disappear as the face breaks up.'
+      : 'Read the wheel rather than the sequence — the question is whether the green residues gather on one side or spread evenly around the circle.');
+    state.activities.wheel={done:true,best:got,of:3};saveState();paintNav();
+  };
+  document.getElementById('whReset').onclick=function(){
+    picks=[null,null,null];score.textContent='';
+    rowsEl.querySelectorAll('.opt').forEach(function(b){
+      b.disabled=false;b.classList.remove('sel','bad','reveal');});
+    state.activities.wheel=null;saveState();paintNav();
+  };
+
+  draw();
+})();
+
+/* ============================================================
+   FOUR-LEVEL STRUCTURE STEPPER  (activity 'levels', section 4.1)
+   Each level asks the same two questions — what changed, and what
+   holds it together — because that pairing is what separates the
+   levels from one another. Both must be right before the next
+   level opens; a wrong answer stays open rather than locking.
+   ============================================================ */
+(function(){
+  var body=document.getElementById('lvlBody'), score=document.getElementById('lvlScore');
+  if(!body) return;
+
+  function fig(inner){return '<svg viewBox="0 0 420 110" role="img">'+inner+'</svg>';}
+  var beads='';
+  for(var i=0;i<7;i++){
+    beads+='<circle cx="'+(60+i*50)+'" cy="55" r="15" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>';
+    if(i<6)beads+='<line x1="'+(75+i*50)+'" y1="55" x2="'+(95+i*50)+'" y2="55" stroke="var(--ink-soft)" stroke-width="2"/>';
+  }
+
+  var LEVELS=[
+    {name:'Primary', art:fig(beads),
+     cap:'A chain of residues joined end to end.',
+     q1:{q:'What does this level describe?',
+         a:'The order of amino acids in the chain',
+         opts:['The order of amino acids in the chain','Local coils and sheets',
+               'The folded shape of one chain','How separate chains fit together']},
+     q2:{q:'What holds it together?',
+         a:'Covalent peptide bonds',
+         opts:['Covalent peptide bonds','Backbone hydrogen bonds',
+               'Side-chain interactions','Contacts between separate chains']}},
+
+    {name:'Secondary',
+     art:fig('<path d="M30 55 q 18 -34 36 0 q 18 34 36 0 q 18 -34 36 0 q 18 34 36 0 q 18 -34 36 0" fill="none" stroke="var(--green)" stroke-width="7" stroke-linecap="round"/>'+
+             '<path d="M250 34 L370 34 L370 26 L392 42 L370 58 L370 50 L250 50 Z" fill="var(--blue)" opacity=".85"/>'+
+             '<path d="M250 78 L370 78 L370 70 L392 86 L370 102 L370 94 L250 94 Z" fill="var(--blue)" opacity=".55"/>'+
+             '<text x="66" y="100" text-anchor="middle" font-size="11" fill="var(--ink-soft)">helix</text>'+
+             '<text x="320" y="18" text-anchor="middle" font-size="11" fill="var(--ink-soft)">sheet</text>'),
+     cap:'The same chain, now coiling and pleating locally.',
+     q1:{q:'What has changed from the previous level?',
+         a:'The chain folds locally into helices and sheets',
+         opts:['The chain folds locally into helices and sheets','The residue order has been rearranged',
+               'A second chain has joined','The chain has been cut into fragments']},
+     q2:{q:'What holds it together?',
+         a:'Hydrogen bonds between backbone amide groups',
+         opts:['Hydrogen bonds between backbone amide groups','Covalent peptide bonds',
+               'Disulfide bonds between cysteines','Salt bridges between charged side chains']}},
+
+    {name:'Tertiary',
+     art:fig('<path d="M40 60 q 40 -50 90 -10 q 50 40 100 -5 q 55 -48 110 15 q 30 35 40 5" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" opacity=".55"/>'+
+             '<circle cx="150" cy="52" r="13" fill="var(--rose)" opacity=".8"/>'+
+             '<circle cx="250" cy="46" r="13" fill="var(--violet)" opacity=".8"/>'+
+             '<line x1="163" y1="52" x2="237" y2="46" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="4 4"/>'+
+             '<text x="200" y="88" text-anchor="middle" font-size="11" fill="var(--ink-soft)">side chains meet across the fold</text>'),
+     cap:'One whole chain packed into its three-dimensional shape.',
+     q1:{q:'What has changed from the previous level?',
+         a:'The whole chain folds, packing its helices and sheets into domains',
+         opts:['The whole chain folds, packing its helices and sheets into domains',
+               'Only a single helix has formed','Several chains have assembled',
+               'The amino acid sequence has changed']},
+     q2:{q:'What holds it together?',
+         a:'Side-chain interactions: hydrophobic, hydrogen, ionic, and disulfide',
+         opts:['Side-chain interactions: hydrophobic, hydrogen, ionic, and disulfide',
+               'Backbone hydrogen bonds alone','Peptide bonds alone',
+               'Nothing — tertiary structure is not stabilized']}},
+
+    {name:'Quaternary',
+     art:fig('<path d="M40 62 q 35 -44 80 -8 q 45 36 85 -6" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" opacity=".55"/>'+
+             '<path d="M215 62 q 35 -44 80 -8 q 45 36 85 -6" fill="none" stroke="var(--blue)" stroke-width="8" stroke-linecap="round" opacity=".55"/>'+
+             '<line x1="196" y1="48" x2="215" y2="48" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="4 4"/>'+
+             '<text x="110" y="98" text-anchor="middle" font-size="11" fill="var(--ink-soft)">subunit 1</text>'+
+             '<text x="295" y="98" text-anchor="middle" font-size="11" fill="var(--ink-soft)">subunit 2</text>'),
+     cap:'Two separate folded chains, now assembled into one protein.',
+     q1:{q:'What has changed from the previous level?',
+         a:'Separate polypeptide chains have assembled into one protein',
+         opts:['Separate polypeptide chains have assembled into one protein',
+               'One chain has folded more tightly','New helices have formed',
+               'The chain has been chemically modified']},
+     q2:{q:'What holds it together?',
+         a:'The same side-chain interactions, now acting between chains',
+         opts:['The same side-chain interactions, now acting between chains',
+               'Peptide bonds joining the chains end to end',
+               'Backbone hydrogen bonds within one helix',
+               'Nothing — subunits are not held together']}}
+  ];
+
+  var step=0, solved=[];
+
+  function render(){
+    body.innerHTML='';
+    var dots=el('div','lvl-dots');
+    LEVELS.forEach(function(L,i){
+      var cls='lvl-dot'+(i===step?' on':'')+(solved[i]?' done':'');
+      var d=el('span',cls,(solved[i]?'&#10003; ':'')+L.name);
+      dots.appendChild(d);
+    });
+    body.appendChild(dots);
+
+    var L=LEVELS[step];
+    var stage=el('div','lvl-stage');
+    stage.innerHTML=L.art+'<p class="caption" style="text-align:center;margin:0 auto">'+L.cap+'</p>';
+
+    var got={q1:false,q2:false};
+    ['q1','q2'].forEach(function(key){
+      var spec=L[key];
+      var wrap=el('div','lvl-q');
+      wrap.appendChild(el('p',null,spec.q));
+      var box=el('div','choices');
+      var fb=el('div','feedback');
+      shuffle(spec.opts.slice()).forEach(function(o){
+        var b=el('button','choice',o);
+        b.onclick=function(){
+          if(o===spec.a){
+            box.querySelectorAll('.choice').forEach(function(x){
+              x.disabled=true;x.classList.remove('wrong');
+              if(x.textContent===spec.a)x.classList.add('right');
+            });
+            fb.className='feedback show';
+            fb.innerHTML='<strong>That\u2019s it.</strong>';
+            got[key]=true;
+            if(got.q1&&got.q2)advance();
+          }else{
+            box.querySelectorAll('.choice').forEach(function(x){x.classList.remove('wrong');});
+            b.classList.add('wrong');
+            fb.className='feedback show miss';
+            fb.innerHTML='<strong>Not quite — try again.</strong>';
+          }
+        };
+        box.appendChild(b);
+      });
+      wrap.appendChild(box);wrap.appendChild(fb);
+      stage.appendChild(wrap);
+    });
+    body.appendChild(stage);
+  }
+
+  function advance(){
+    solved[step]=true;
+    if(step<LEVELS.length-1){
+      var next=el('div',null,'');
+      score.innerHTML='<strong>'+LEVELS[step].name+' complete.</strong> Moving up to '+LEVELS[step+1].name+'\u2026';
+      setTimeout(function(){step++;render();score.textContent='';},700);
+    }else{
+      var lastDot=body.querySelectorAll('.lvl-dot')[step];
+      if(lastDot){lastDot.classList.add('done');lastDot.innerHTML='&#10003; '+LEVELS[step].name;}
+      score.innerHTML='<strong>All four levels complete.</strong> Notice that only the last two are stabilized by side chains &mdash; the first two are backbone chemistry.';
+      state.activities.levels={done:true};saveState();paintNav();
+    }
+  }
+
+  document.getElementById('lvlReset').onclick=function(){
+    step=0;solved=[];score.textContent='';
+    state.activities.levels=null;saveState();paintNav();render();
+  };
+  if(state.activities.levels){solved=[true,true,true,true];step=LEVELS.length-1;}
+  render();
+})();
+
+/* ---------- The pH explorer (activity 'ph') ----------
+   Draws the species-distribution (titration) curves from the lecture.
+   For a molecule with n ionizable groups there are n+1 species, from
+   fully protonated to fully deprotonated. The fraction of each at a
+   given pH follows the standard polyprotic distribution:
+
+     weight(i) = 10^( sum over the i lowest pKa's of (pH - pKa) )
+     fraction(i) = weight(i) / sum of all weights
+
+   Exponents are shifted by their maximum before exponentiating, which
+   keeps 10^x from overflowing at the ends of the pH range.
+   ------------------------------------------------------------------ */
+(function(){
+  var pick=document.getElementById('phPick'),slid=document.getElementById('phSlider');
+  var val=document.getElementById('phVal'),read=document.getElementById('phRead');
+  var note=document.getElementById('phNote'),score=document.getElementById('phScore');
+  var cards=document.getElementById('phSpecies'),chart=document.getElementById('phChart');
+  if(!pick||!slid||!chart)return;
+
+  /* `sign` is the charge a group carries while it is still PROTONATED. */
+  var RES=[
+   {n:'Glycine',groups:[{lbl:'\u03b1-COOH',pka:2.3,sign:0},{lbl:'\u03b1-NH\u2083\u207a',pka:9.6,sign:1}]},
+   {n:'Aspartic acid',groups:[{lbl:'\u03b1-COOH',pka:2.0,sign:0},{lbl:'side-chain COOH',pka:3.86,sign:0},{lbl:'\u03b1-NH\u2083\u207a',pka:9.9,sign:1}]},
+   {n:'Cysteine',groups:[{lbl:'\u03b1-COOH',pka:1.9,sign:0},{lbl:'side-chain SH',pka:8.33,sign:0},{lbl:'\u03b1-NH\u2083\u207a',pka:10.7,sign:1}]},
+   {n:'Histidine',groups:[{lbl:'\u03b1-COOH',pka:1.8,sign:0},{lbl:'side-chain imidazole',pka:6.04,sign:1},{lbl:'\u03b1-NH\u2083\u207a',pka:9.3,sign:1}]},
+   {n:'Lysine',groups:[{lbl:'\u03b1-COOH',pka:2.2,sign:0},{lbl:'\u03b1-NH\u2083\u207a',pka:9.0,sign:1},{lbl:'side-chain NH\u2083\u207a',pka:10.79,sign:1}]},
+   {n:'Arginine',groups:[{lbl:'\u03b1-COOH',pka:2.2,sign:0},{lbl:'\u03b1-NH\u2083\u207a',pka:9.0,sign:1},{lbl:'side-chain guanidinium',pka:12.48,sign:1}]}
+  ];
+  /* Species colors, in order from fully protonated to fully deprotonated.
+     Chosen to echo the lecture figure: magenta, blue, green, then extras. */
+  var SPCOL=['var(--rose)','var(--blue)','var(--green)','var(--violet)','var(--amber)'];
+  var sel=0;
+
+  function chargeText(q){return q>0?'+'+q:(q<0?'\u2212'+Math.abs(q):'0');}
+
+  /* Build the species list for a residue: pKa order, charge, and a label. */
+  function speciesOf(r){
+    var g=r.groups.slice().sort(function(a,b){return a.pka-b.pka;});
+    var q0=g.reduce(function(t,x){return t+x.sign;},0);   /* fully protonated charge */
+    var out=[];
+    for(var i=0;i<=g.length;i++){
+      var desc;
+      if(i===0)desc='every group protonated';
+      else if(i===g.length)desc='every group deprotonated';
+      else if(g.length===2)desc='zwitterion \u2014 COO\u207b and NH\u2083\u207a together';
+      else desc=g.slice(0,i).map(function(x){return x.lbl;}).join(' + ')+' deprotonated';
+      out.push({q:q0-i,desc:desc,pkas:g.slice(0,i).map(function(x){return x.pka;}),
+                col:SPCOL[i%SPCOL.length]});
+    }
+    return {groups:g,species:out};
+  }
+
+  /* Fractional abundance of every species at one pH. */
+  function fractions(g,pH){
+    var exps=[0],run=0,i;
+    for(i=0;i<g.length;i++){run+=(pH-g[i].pka);exps.push(run);}
+    var mx=Math.max.apply(null,exps),w=exps.map(function(e){return Math.pow(10,e-mx);});
+    var sum=w.reduce(function(a,b){return a+b;},0);
+    return w.map(function(x){return x/sum;});
+  }
+
+  /* ---- chart geometry ---- */
+  var X0=52,X1=642,Y0=40,Y1=248,PHMAX=14;
+  function px(ph){return X0+(ph/PHMAX)*(X1-X0);}
+  function py(f){return Y1-f*(Y1-Y0);}
+  function svg(tag,attrs,txt){
+    var e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(var k in attrs)e.setAttribute(k,attrs[k]);
+    if(txt!==undefined)e.textContent=txt;
+    return e;
+  }
+
+  function drawChart(model,pH){
+    chart.innerHTML='';
+    var i,t;
+    /* horizontal gridlines + y labels */
+    for(i=0;i<=4;i++){
+      var yv=i/4,y=py(yv);
+      chart.appendChild(svg('line',{x1:X0,y1:y,x2:X1,y2:y,stroke:'var(--line)','stroke-width':1}));
+      chart.appendChild(svg('text',{x:X0-9,y:y+4,'text-anchor':'end','font-size':11,
+        fill:'var(--ink-soft)'},Math.round(yv*100)+'%'));
+    }
+    /* x axis ticks */
+    for(t=0;t<=PHMAX;t+=2){
+      chart.appendChild(svg('text',{x:px(t),y:Y1+18,'text-anchor':'middle','font-size':11,
+        fill:'var(--ink-soft)'},String(t)));
+    }
+    chart.appendChild(svg('text',{x:(X0+X1)/2,y:Y1+40,'text-anchor':'middle','font-size':12,
+      fill:'var(--ink-mid)'},'pH'));
+    chart.appendChild(svg('text',{x:14,y:(Y0+Y1)/2,'text-anchor':'middle','font-size':12,
+      fill:'var(--ink-mid)',transform:'rotate(-90 14 '+((Y0+Y1)/2)+')'},'Relative amount'));
+
+    /* dashed pKa markers */
+    model.groups.forEach(function(g){
+      chart.appendChild(svg('line',{x1:px(g.pka),y1:Y0,x2:px(g.pka),y2:Y1,
+        stroke:'var(--ink-soft)','stroke-width':1,'stroke-dasharray':'4 4','opacity':.75}));
+      chart.appendChild(svg('text',{x:px(g.pka),y:Y0-7,'text-anchor':'middle','font-size':10,
+        fill:'var(--ink-soft)'},'pKa '+g.pka));
+    });
+
+    /* one curve per species */
+    var STEP=0.1;
+    model.species.forEach(function(sp,si){
+      var pts=[];
+      for(t=0;t<=PHMAX+1e-9;t+=STEP){
+        pts.push(px(t).toFixed(1)+','+py(fractions(model.groups,t)[si]).toFixed(1));
+      }
+      chart.appendChild(svg('polyline',{points:pts.join(' '),fill:'none',stroke:sp.col,
+        'stroke-width':2.5,'stroke-linejoin':'round','stroke-linecap':'round'}));
+    });
+
+    /* the moving pH marker, plus a dot on each curve */
+    chart.appendChild(svg('line',{x1:px(pH),y1:Y0,x2:px(pH),y2:Y1,stroke:'var(--ink)','stroke-width':1.5}));
+    chart.appendChild(svg('rect',{x:px(pH)-24,y:Y0-34,width:48,height:16,rx:8,fill:'var(--ink)'}));
+    chart.appendChild(svg('text',{x:px(pH),y:Y0-22,'text-anchor':'middle','font-size':10,
+      fill:'#fff','font-weight':700},'pH '+pH.toFixed(1)));
+    var fr=fractions(model.groups,pH);
+    model.species.forEach(function(sp,si){
+      chart.appendChild(svg('circle',{cx:px(pH),cy:py(fr[si]),r:4,fill:sp.col,
+        stroke:'#fff','stroke-width':1.5}));
+    });
+  }
+
+  function draw(){
+    var pH=parseFloat(slid.value);
+    val.textContent=pH.toFixed(2);
+    var model=speciesOf(RES[sel]);
+    var fr=fractions(model.groups,pH);
+    var dom=fr.indexOf(Math.max.apply(null,fr));
+
+    drawChart(model,pH);
+
+    /* species cards */
+    cards.innerHTML='';
+    model.species.forEach(function(sp,i){
+      var c=document.createElement('div');
+      c.className='ph-card'+(i===dom?' dom':'');
+      c.style.borderColor=(i===dom?sp.col:'var(--line)');
+      c.innerHTML='<div class="ph-chg" style="color:'+sp.col+'">'+chargeText(sp.q)+'</div>'+
+                  '<div class="ph-desc">'+sp.desc+'</div>'+
+                  '<div class="ph-pctnum">'+(fr[i]*100).toFixed(fr[i]>=0.1?0:1)+'%</div>';
+      cards.appendChild(c);
+    });
+
+    /* abundance bars */
+    read.innerHTML='';
+    var net=0;
+    model.species.forEach(function(sp,i){
+      net+=fr[i]*sp.q;
+      var pct=fr[i]*100;
+      var row=document.createElement('div');
+      row.className='ph-row';
+      row.innerHTML='<span class="ph-name">charge '+chargeText(sp.q)+'</span>'+
+        '<span class="ph-track"><span class="ph-fill" style="width:'+pct.toFixed(1)+'%;background:'+sp.col+'"></span></span>'+
+        '<span class="ph-pct">'+(pct>=0.1?pct.toFixed(0)+'%':'&lt;1%')+'</span>';
+      read.appendChild(row);
+    });
+    var nd=document.createElement('div');
+    nd.className='ph-net';
+    nd.innerHTML='Average net charge at pH '+pH.toFixed(1)+': '+
+      (net>=0?'+':'\u2212')+Math.abs(net).toFixed(2);
+    read.appendChild(nd);
+
+    /* running commentary */
+    var near=model.groups.filter(function(g){return Math.abs(pH-g.pka)<0.35;});
+    if(near.length){
+      note.innerHTML='You are sitting essentially on the pKa of the <strong>'+near[0].lbl+
+        '</strong> ('+near[0].pka+'). At a pKa the two species either side of it are present in equal amounts \u2014 '+
+        'that is what a crossover point on this chart means.';
+    }else if(Math.abs(pH-7.4)<0.2){
+      note.innerHTML='This is physiological pH. The dominant species here is the one the residue actually adopts in the body, '+
+        'and its charge is what you should be able to state from memory.';
+    }else{
+      note.innerHTML='A group is protonated when the pH sits <strong>below</strong> its pKa and deprotonated when it sits '+
+        '<strong>above</strong>. Each dashed line is a pKa; crossing one hands the molecule from one species to the next. '+
+        'Slide to 7.4 for the physiological picture.';
+    }
+  }
+
+  RES.forEach(function(r,i){
+    var b=el('button','opt'+(i===0?' sel':''),r.n);
+    b.onclick=function(){sel=i;
+      Array.prototype.forEach.call(pick.children,function(x,j){x.classList.toggle('sel',i===j);});
+      draw();};
+    pick.appendChild(b);
+  });
+  slid.oninput=draw;
+
+  document.getElementById('phCheck').onclick=function(){
+    score.textContent='Saved. Before moving on, check you can answer these without the chart: which residue here is the only one whose dominant species changes between pH 6 and pH 8, and what is happening at each crossover point?';
+    state.activities.ph={residue:RES[sel].n,pH:parseFloat(slid.value)};saveState();paintNav();
+  };
+  document.getElementById('phReset').onclick=function(){
+    score.textContent='';slid.value=7.4;sel=0;
+    Array.prototype.forEach.call(pick.children,function(x,j){x.classList.toggle('sel',j===0);});
+    state.activities.ph=null;saveState();paintNav();draw();
+  };
+
+  if(state.activities.ph&&state.activities.ph.pH)slid.value=state.activities.ph.pH;
+  draw();
+})();
+</script>
+<script src="shared/engine.js"></script>
+</body>
+</html>

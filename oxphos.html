@@ -1,0 +1,2138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oxidative Phosphorylation · Interactive Companion · PHA3134</title>
+<link rel="stylesheet" href="shared/styles.css">
+<style>
+/* ============================================================
+   THIS COMPANION'S ACCENT — electric cobalt.
+   The token names stay --green* on purpose: they mean "this
+   companion's primary color", and every shared component reads
+   them. Renaming them would mean editing shared/styles.css,
+   which would re-theme every other companion at once.
+   ============================================================ */
+:root{
+  --green:#1E5FD0; --green-bright:#3B82F6;
+  --green-soft:#E8EFFD; --green-line:#BCD2F8;
+}
+/* The shared stylesheet hardcodes a dark green ink (#1C7554) in about
+   fourteen rules. These override the ones that would otherwise look
+   wrong against a blue accent. */
+.mod-head.current,.mod-badge.done,.mod-head.current .mod-badge,
+.sub button.current,.pill,.ring-num,.opt.sel,
+.home-num.done,.home-status.done,.btn.ghost.on,
+.apply .tag,.s-strong,.dnd-pill{color:#14479E}
+.ring-cap{color:#3C63A8}
+.apply .tag{background:#CEDFFA}
+.predict .tag{background:#F6E0B8}
+/* engine.js writes #2FA97A inline for the "Strong" bar; !important is
+   required to override an inline style. */
+.bd-fill{background:var(--green)!important}
+.score-hero{background:linear-gradient(135deg,#3B82F6,#1E4FA8)}
+.fc-front{background:linear-gradient(140deg,#EDF3FE,#E4F1FB);border-color:var(--green-line)}
+.btn:hover{background:#1A52B5}
+
+/* ---- Small additions this topic needs and the shared sheet lacks ---- */
+.stack{display:grid;gap:12px;margin:18px 0}
+.mini{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;
+  padding:7px 14px;font-size:.84rem;color:var(--ink-mid);font-weight:600}
+.chip.on{background:var(--green-soft);border-color:var(--green);color:#14479E}
+.tally{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px}
+.tally div{background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:10px 16px;min-width:120px}
+.tally .k{font-size:.72rem;color:var(--ink-soft)}
+.tally .v{font-weight:700;font-size:1.2rem;color:var(--ink)}
+.tally .v.hi{color:var(--green)}
+.seq-tray{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:#FAFCFD;
+  border:1px solid var(--line);border-radius:var(--r-md);min-height:52px}
+.seq-line{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;
+  background:#fff;border:1.5px dashed var(--green-line);border-radius:var(--r-md);
+  min-height:52px;margin-bottom:10px}
+.seq-slot{padding:8px 14px;border-radius:999px;background:var(--green-soft);
+  border:1.5px solid var(--green-line);font-size:.85rem;font-weight:600;color:#14479E}
+.seq-slot.bad{background:var(--rose-soft);border-color:var(--rose);color:var(--rose)}
+.seq-slot.good{background:var(--green-soft);border-color:var(--green)}
+.seq-arrow{color:var(--ink-soft);font-size:.9rem}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}
+.dash-cell{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px}
+.dash-cell .k{font-size:.74rem;color:var(--ink-soft);margin-bottom:6px}
+.dash-cell .v{font-weight:700;font-size:1.05rem}
+.up{color:var(--rose)}.down{color:var(--blue)}.same{color:var(--ink-soft)}
+.dnd-pill.picked{outline:3px solid var(--green);outline-offset:2px;background:var(--green-soft)}
+.note{font-size:.88rem;color:var(--ink-mid);background:#F7FAFB;border-radius:var(--r-sm);
+  padding:12px 14px;margin-top:12px}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <a class="back-to-hub" href="hub.html"><span class="arrow">&#8592;</span> Back to hub</a>
+    <div class="brand">
+      <div class="brand-mark">O</div>
+      <div>
+        <div class="brand-title">Oxidative Phosphorylation</div>
+        <div class="brand-sub">PHA3134 · Study Companion</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#C9DBFA" stroke-width="5"/>
+        <circle id="ringFill" cx="22" cy="22" r="18" fill="none" stroke="#1E5FD0" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+                transform="rotate(-90 22 22)"/>
+      </svg>
+      <div>
+        <div class="ring-num" id="ringPct">0%</div>
+        <div class="ring-cap">of the companion<br>complete</div>
+      </div>
+    </div>
+    <button class="reset" id="resetBtn">Clear my saved progress</button>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="topTitle">Welcome</h1>
+        <div class="meta" id="topMeta">Work through each module in order. Your progress saves in this browser.</div>
+      </div>
+      <div class="pill" id="topPill">Not started</div>
+    </div>
+
+<!-- ================= MODULE 1 ================= -->
+
+<section class="section" data-key="m1home">
+  <div class="card">
+    <div class="eyebrow">Module 1</div>
+    <h2>Follow the electrons</h2>
+    <p><strong>Central question: where do the electrons go, and what happens because they move?</strong></p>
+    <p>Oxidative phosphorylation runs in two phases. This module is phase one: electrons leave NADH and FADH&#8322;, travel through four protein complexes, and end up in water &mdash; and the energy released along the way is spent pushing protons out of the matrix.</p>
+    <p>You will not be handed the finished diagram. You will build it, then work out the proton arithmetic yourself.</p>
+    <div class="keypoints">
+      <h4>By the end of this module you should be able to</h4>
+      <ul>
+        <li>Explain why electrons move from NADH toward oxygen using reduction potential</li>
+        <li>Place complexes I&ndash;IV, coenzyme Q, and cytochrome c in the correct order</li>
+        <li>Distinguish the NADH entry route from the FADH&#8322; entry route</li>
+        <li>Derive 10 H&#8314; per NADH and 6 H&#8314; per FADH&#8322; from the per-complex stoichiometry</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m1s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Why electrons move</span>
+          <span class="home-desc">Reduction potential, and why oxygen sits at the end.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Building the chain</span>
+          <span class="home-desc">Assemble both electron routes from the parts.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Counting the protons</span>
+          <span class="home-desc">Pump the protons yourself and read off the totals.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 1 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s1">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 1</div>
+    <h2>Why electrons move</h2>
+    <p>Nothing pushes electrons through the chain. They fall. Each carrier holds electrons a little more tightly than the one before it, and that difference &mdash; <strong>reduction potential</strong> &mdash; is what makes every transfer spontaneous.</p>
+    <p>The overall reaction is the same one that makes fire hot:</p>
+    <div class="figure">
+      <svg viewBox="0 0 640 70" role="img" aria-label="Overall reaction: NADH plus one half O2 plus H+ gives H2O plus NAD+, with a standard free energy change of about minus 220 kilojoules per mole.">
+        <text x="20" y="30" font-size="17" fill="#1D2B33" font-family="system-ui,sans-serif">NADH + &#189; O&#8322; + H&#8314; &#8594; H&#8322;O + NAD&#8314;</text>
+        <text x="20" y="56" font-size="14" fill="#4A5C68" font-family="system-ui,sans-serif">&#916;G&#176;&#8242; = &#8722;220 kJ/mol &mdash; strongly favorable, and far too much to release in one step</text>
+      </svg>
+      <p class="caption">The chain exists to release this energy gradually, in steps small enough to do useful work.</p>
+    </div>
+    <p>The reason the mitochondrion does not simply run this reaction directly is that the energy would leave as heat. Instead, the drop is divided across a series of carriers, and three of those steps are coupled to pumping protons out of the matrix.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">EXPLORE &middot; ORDER THE LADDER</span></h3>
+      <p>Below are five points along the electron path, shuffled. Place them in order of <strong>increasing reduction potential</strong> &mdash; that is, in the order electrons actually visit them. Click a card to add it to the ladder.</p>
+      <div id="ladderHost"></div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c1a">
+        <p>Electrons move through the chain toward carriers that differ in one key property. Which property increases along the path from NADH to oxygen?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c1b">
+        <p>Oxygen sits at the end of the chain. Which feature explains that position?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c1c">
+        <p>The reaction of NADH with oxygen releases a large amount of free energy. How does the mitochondrion capture it?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s2">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 2</div>
+    <h2>Building the chain</h2>
+    <p>There are two doors into the electron transport chain, and which door the electrons use determines almost everything that follows. Rather than reading the finished pathway, build it.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">MANIPULATE &middot; BUILD THE ELECTRON HIGHWAY</span></h3>
+      <p>Drag each component into the slot where it belongs, or tap a component and then tap a slot. Both routes converge before they reach oxygen.</p>
+      <div id="highwayHost"></div>
+    </div>
+
+    <div class="figure">
+      <h3>What you just built</h3>
+      <svg viewBox="0 0 660 210" role="img" aria-label="Diagram of the inner mitochondrial membrane showing complexes one through four, coenzyme Q and cytochrome c, with NADH entering at complex one and FADH2 at complex two, and protons pumped upward into the intermembrane space.">
+        <text x="8" y="16" font-size="12" fill="#7E8F9B" font-family="system-ui,sans-serif">INTERMEMBRANE SPACE</text>
+        <rect x="0" y="24" width="660" height="8" fill="#E8EFFD"/>
+        <rect x="0" y="60" width="660" height="72" fill="#F4F7FA" stroke="#E4EAEE"/>
+        <text x="8" y="200" font-size="12" fill="#7E8F9B" font-family="system-ui,sans-serif">MATRIX</text>
+
+        <g font-family="system-ui,sans-serif" font-size="12" text-anchor="middle">
+          <rect x="40" y="52" width="86" height="88" rx="10" fill="#BCD2F8" stroke="#1E5FD0"/>
+          <text x="83" y="90" fill="#14479E" font-weight="700">I</text>
+          <text x="83" y="108" fill="#14479E" font-size="10">4 H&#8314;</text>
+
+          <rect x="176" y="76" width="86" height="56" rx="10" fill="#E9EFF2" stroke="#7E8F9B"/>
+          <text x="219" y="100" fill="#4A5C68" font-weight="700">II</text>
+          <text x="219" y="118" fill="#4A5C68" font-size="10">0 H&#8314;</text>
+
+          <rect x="330" y="52" width="86" height="88" rx="10" fill="#BCD2F8" stroke="#1E5FD0"/>
+          <text x="373" y="90" fill="#14479E" font-weight="700">III</text>
+          <text x="373" y="108" fill="#14479E" font-size="10">4 H&#8314;</text>
+
+          <rect x="500" y="52" width="86" height="88" rx="10" fill="#BCD2F8" stroke="#1E5FD0"/>
+          <text x="543" y="90" fill="#14479E" font-weight="700">IV</text>
+          <text x="543" y="108" fill="#14479E" font-size="10">2 H&#8314;</text>
+
+          <circle cx="295" cy="96" r="20" fill="#FFF4E0" stroke="#B57614"/>
+          <text x="295" y="100" fill="#B57614" font-size="11" font-weight="700">Q</text>
+          <circle cx="458" cy="40" r="20" fill="#FDECEF" stroke="#D4536B"/>
+          <text x="458" y="44" fill="#D4536B" font-size="10" font-weight="700">cyt c</text>
+        </g>
+
+        <g stroke="#1E5FD0" stroke-width="2" fill="none" marker-end="url(#ah)">
+          <path d="M126 96 L272 96"/>
+          <path d="M262 104 L276 100"/>
+          <path d="M318 96 L328 96"/>
+          <path d="M416 78 L438 52"/>
+          <path d="M478 46 L520 56"/>
+        </g>
+        <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0 0 L7 3.5 L0 7 z" fill="#1E5FD0"/></marker></defs>
+
+        <g font-family="system-ui,sans-serif" font-size="11" fill="#4A5C68">
+          <text x="4" y="66">NADH</text>
+          <text x="176" y="166">FADH&#8322;</text>
+          <text x="600" y="66">O&#8322;</text>
+        </g>
+        <g stroke="#4A5C68" stroke-width="1.5" fill="none" marker-end="url(#ah)">
+          <path d="M14 72 L36 90"/>
+          <path d="M204 154 L214 138"/>
+          <path d="M598 74 L590 88"/>
+        </g>
+        <g stroke="#B57614" stroke-width="1.6" fill="none">
+          <path d="M83 50 L83 34"/><path d="M373 50 L373 34"/><path d="M543 50 L543 34"/>
+          <path d="M79 38 L83 32 L87 38"/><path d="M369 38 L373 32 L377 38"/><path d="M539 38 L543 32 L547 38"/>
+        </g>
+      </svg>
+      <p class="caption">Both routes merge at coenzyme Q. From that point on, every electron takes the same path.</p>
+    </div>
+
+    <div class="keypoints">
+      <h4>The four complexes and two mobile carriers</h4>
+      <ul>
+        <li><strong>Complex I (NADH-Q oxidoreductase)</strong> &mdash; oxidizes NADH, reduces coenzyme Q, pumps protons</li>
+        <li><strong>Complex II (succinate dehydrogenase)</strong> &mdash; the same enzyme as step 6 of the citric acid cycle; passes FADH&#8322; electrons to Q and pumps nothing</li>
+        <li><strong>Coenzyme Q (ubiquinone)</strong> &mdash; lipophilic, diffuses inside the membrane, collects from both entry points</li>
+        <li><strong>Complex III (Q-cytochrome c oxidoreductase)</strong> &mdash; QH&#8322; to cytochrome c, pumps protons</li>
+        <li><strong>Cytochrome c</strong> &mdash; small, water-soluble, carries one electron at a time on its heme iron</li>
+        <li><strong>Complex IV (cytochrome c oxidase)</strong> &mdash; reduces O&#8322; to water, pumps protons</li>
+      </ul>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c2a">
+        <p>Coenzyme Q moves electrons between two points in the chain. Which pair does it connect?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c2b">
+        <p>Cytochrome c carries electrons through the intermembrane space. Which feature makes that possible?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c2c">
+        <p>Succinate dehydrogenase belongs to two pathways at once. Which pathway shares this enzyme with the electron transport chain?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s3">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 3</div>
+    <h2>Counting the protons</h2>
+    <p>Here is the part that is usually presented as a table to memorize. Instead, run the chain yourself and read the totals off the counter.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">MANIPULATE &middot; PUMP THE PROTONS</span></h3>
+      <p>Pick an electron source, then click each complex the electrons pass through. Watch where the protons go.</p>
+      <div id="protonHost"></div>
+    </div>
+
+    <div class="note"><strong>A detail worth noticing.</strong> Complex IV draws 8 H&#8314; out of the matrix for every O&#8322; it reduces: four are built into two molecules of water, and four are pumped across. Because one O&#8322; accepts four electrons, that works out to 2 H&#8314; pumped per <em>pair</em> of electrons &mdash; which is the number in the table.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c3a">
+        <p>Complex II transfers electrons to coenzyme Q without moving protons. What does that mean for FADH&#8322;?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c3b">
+        <p>Two electrons from NADH pass through complexes I, III, and IV. How many protons reach the intermembrane space?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1quiz">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Mastery check</div>
+    <h2>Module 1 quiz</h2>
+    <p>Eight questions drawn at random from this module's bank. After grading, any concept area you did not fully clear opens a <strong>targeted practice round</strong> built only from questions in those areas.</p>
+    <div class="quiz-body" data-quiz="m1"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ================= MODULE 2 ================= -->
+
+<section class="section" data-key="m2home">
+  <div class="card">
+    <div class="eyebrow">Module 2</div>
+    <h2>Build the battery</h2>
+    <p><strong>Central question: where is the energy from NADH actually stored?</strong></p>
+    <p>The electron transport chain makes no ATP. What it makes is a charged membrane &mdash; a difference in both proton concentration and electrical charge that the mitochondrion can spend later. If you take one idea from this whole companion, take this one.</p>
+    <div class="keypoints">
+      <h4>By the end of this module you should be able to</h4>
+      <ul>
+        <li>Describe the pH and charge of the matrix and intermembrane space during active transport</li>
+        <li>Explain why an impermeable inner membrane is a requirement, not a detail</li>
+        <li>Name the two components of the proton motive force</li>
+        <li>Predict what happens to electron transport, the gradient, and ATP output when any one of them is disturbed</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m2s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Charging the mitochondrion</span>
+          <span class="home-desc">Run the pumps and watch pH and charge separate.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Coupling, and what breaks it</span>
+          <span class="home-desc">Four perturbations. Predict all three outcomes first.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 2 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s1">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 1</div>
+    <h2>Charging the mitochondrion</h2>
+    <p>Start from a mitochondrion at rest, with equal proton concentrations on both sides of the inner membrane. Then transfer electrons and watch what separates.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">MANIPULATE &middot; CHARGE THE MITOCHONDRION</span></h3>
+      <p>Move the slider to transfer electron pairs through the chain. Every reading updates live.</p>
+      <div id="chargeHost"></div>
+    </div>
+
+    <p>Two things are being separated at once, and both store energy:</p>
+    <div class="keypoints">
+      <h4>The proton motive force has two parts</h4>
+      <ul>
+        <li><strong>A chemical gradient (&#916;pH)</strong> &mdash; matrix around pH 7.8, intermembrane space around pH 7.0</li>
+        <li><strong>An electrical gradient (&#916;&#968;)</strong> &mdash; the intermembrane space is positive relative to the matrix</li>
+      </ul>
+    </div>
+    <div class="box clinical">
+      <h3><span class="tag">GO DEEPER &middot; OPTIONAL</span></h3>
+      <p>pH is a logarithmic scale, so a difference of 0.8 units is a difference of about six-fold in actual [H&#8314;]. That is worth seeing once, but the number to carry forward is the direction of the gradient, not its magnitude.</p>
+    </div>
+    <p>None of this works without an impermeable barrier. The inner mitochondrial membrane blocks free diffusion of H&#8314;, and of ATP and ADP, which is why dedicated transport proteins exist for the latter two. A gradient across a leaky membrane is not a gradient for long &mdash; a fact Module 5 exploits.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c4a">
+        <p>Proton pumping changes conditions on both sides of the inner membrane. Which description fits the intermembrane space?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c4b">
+        <p>The energy carried by NADH ends up somewhere before any ATP is made. Where is it held?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s2">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 2</div>
+    <h2>Coupling, and what breaks it</h2>
+    <p>Electron transport and ATP synthesis are <strong>two distinct processes joined by one shared resource</strong>. Neither touches the other directly. Both depend on the gradient, so interfering with either eventually stops the other.</p>
+    <p>That is a claim worth testing rather than accepting. Below are four disturbances. Commit to a prediction for all three readouts before you check.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">PREDICT &#8594; INTERACT &#8594; EXPLAIN</span></h3>
+      <p>For each disturbance, choose what happens to the rate of electron transport, the size of the proton gradient, and ATP synthesis.</p>
+      <div id="couplingHost"></div>
+    </div>
+
+    <div class="figure">
+      <h3>The coupling loop</h3>
+      <svg viewBox="0 0 620 150" role="img" aria-label="A loop diagram: electron transport pumps protons out, which builds the gradient, which drives protons back through ATP synthase, which makes ATP and lowers the gradient, which allows electron transport to continue.">
+        <g font-family="system-ui,sans-serif" font-size="12" text-anchor="middle">
+          <rect x="20" y="46" width="130" height="56" rx="12" fill="#E8EFFD" stroke="#1E5FD0"/>
+          <text x="85" y="70" fill="#14479E" font-weight="700">Electron</text>
+          <text x="85" y="86" fill="#14479E" font-weight="700">transport</text>
+
+          <rect x="240" y="46" width="130" height="56" rx="12" fill="#FFF4E0" stroke="#B57614"/>
+          <text x="305" y="70" fill="#B57614" font-weight="700">H&#8314; gradient</text>
+          <text x="305" y="86" fill="#B57614" font-size="10">stored energy</text>
+
+          <rect x="460" y="46" width="130" height="56" rx="12" fill="#EFEBFC" stroke="#6B4FD8"/>
+          <text x="525" y="70" fill="#6B4FD8" font-weight="700">ATP synthase</text>
+          <text x="525" y="86" fill="#6B4FD8" font-size="10">spends it</text>
+        </g>
+        <g stroke="#4A5C68" stroke-width="1.8" fill="none" marker-end="url(#ah2)">
+          <path d="M150 66 L234 66"/>
+          <path d="M370 66 L454 66"/>
+          <path d="M525 108 C525 138, 85 138, 85 108"/>
+        </g>
+        <defs><marker id="ah2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+          <path d="M0 0 L7 3.5 L0 7 z" fill="#4A5C68"/></marker></defs>
+        <text x="305" y="145" font-size="11" fill="#7E8F9B" text-anchor="middle" font-family="system-ui,sans-serif">relieving the gradient is what lets the pumps keep working</text>
+      </svg>
+      <p class="caption">Break the loop anywhere and it stops everywhere &mdash; but the intermediate states differ, and that is how each lesion is identified.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c5a">
+        <p>A compound makes the inner membrane freely permeable to protons. What happens to the rate of electron transport?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c5b">
+        <p>Oligomycin blocks the proton channel of ATP synthase. What happens to the proton gradient?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c5c">
+        <p>Oxygen is removed from an actively respiring mitochondrion. Which outcome follows?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2quiz">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Mastery check</div>
+    <h2>Module 2 quiz</h2>
+    <p>Eight questions on the proton motive force and coupling. Anything you miss opens a <strong>targeted practice round</strong> on those concept areas.</p>
+    <div class="quiz-body" data-quiz="m2"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ================= MODULE 3 ================= -->
+
+<section class="section" data-key="m3home">
+  <div class="card">
+    <div class="eyebrow">Module 3</div>
+    <h2>Spend the gradient</h2>
+    <p><strong>Central question: how does proton movement become ATP?</strong></p>
+    <p>ATP synthase is a rotary motor. Protons flowing through the membrane turn a shaft, and the turning shaft squeezes three catalytic sites through a repeating cycle of shapes. Understanding it as a machine is far easier than memorizing three letters.</p>
+    <div class="keypoints">
+      <h4>By the end of this module you should be able to</h4>
+      <ul>
+        <li>Assign a function to F&#8320;, F&#8321;, the &#947; subunit, and the &#946; subunits</li>
+        <li>Order the O, L, and T states and say what happens in each</li>
+        <li>Explain why one 360&#176; rotation yields three ATP</li>
+        <li>Connect roughly 4 H&#8314; per ATP to the yields you will use in Module 4</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m3s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Anatomy of the machine</span>
+          <span class="home-desc">Which part does what, and why it is built this way.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">The binding-change cycle</span>
+          <span class="home-desc">Turn the rotor yourself, 120 degrees at a time.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 3 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s1">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 1</div>
+    <h2>Anatomy of the machine</h2>
+    <p>F&#8320;F&#8321; ATP synthase has a part in the membrane and a part in the matrix, connected by a shaft. Protons never reach the catalytic sites &mdash; their energy arrives there as mechanical rotation.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 520 250" role="img" aria-label="ATP synthase: the F0 rotor sits in the inner membrane conducting protons, a gamma shaft rises into the F1 head in the matrix, and the F1 head contains three beta subunits that make ATP.">
+        <text x="8" y="18" font-size="12" fill="#7E8F9B" font-family="system-ui,sans-serif">INTERMEMBRANE SPACE (high H&#8314;)</text>
+        <rect x="0" y="28" width="520" height="52" fill="#F4F7FA" stroke="#E4EAEE"/>
+        <text x="8" y="240" font-size="12" fill="#7E8F9B" font-family="system-ui,sans-serif">MATRIX (low H&#8314;)</text>
+
+        <ellipse cx="260" cy="54" rx="56" ry="26" fill="#BCD2F8" stroke="#1E5FD0"/>
+        <text x="260" y="59" font-size="14" font-weight="700" fill="#14479E" text-anchor="middle" font-family="system-ui,sans-serif">F&#8320;</text>
+
+        <rect x="252" y="78" width="16" height="52" rx="6" fill="#B57614"/>
+        <text x="290" y="110" font-size="13" font-weight="700" fill="#B57614" font-family="system-ui,sans-serif">&#947;</text>
+
+        <circle cx="260" cy="170" r="52" fill="#EFEBFC" stroke="#6B4FD8"/>
+        <text x="260" y="150" font-size="14" font-weight="700" fill="#6B4FD8" text-anchor="middle" font-family="system-ui,sans-serif">F&#8321;</text>
+        <g font-size="11" font-weight="700" fill="#6B4FD8" text-anchor="middle" font-family="system-ui,sans-serif">
+          <circle cx="228" cy="186" r="17" fill="#fff" stroke="#6B4FD8"/><text x="228" y="190">&#946;</text>
+          <circle cx="292" cy="186" r="17" fill="#fff" stroke="#6B4FD8"/><text x="292" y="190">&#946;</text>
+          <circle cx="260" cy="212" r="17" fill="#fff" stroke="#6B4FD8"/><text x="260" y="216">&#946;</text>
+        </g>
+        <g stroke="#1E5FD0" stroke-width="2" fill="none">
+          <path d="M212 20 L212 44"/><path d="M208 30 L212 22 L216 30"/>
+        </g>
+        <text x="200" y="8" font-size="11" fill="#1E5FD0" font-family="system-ui,sans-serif">H&#8314; enters here</text>
+        <text x="330" y="232" font-size="11" fill="#6B4FD8" font-family="system-ui,sans-serif">ADP + P&#7522; &#8594; ATP</text>
+      </svg>
+      <p class="caption">Proton flow turns F&#8320;. F&#8320; turns &#947;. &#947; deforms the &#946; subunits. The &#946; subunits make ATP.</p>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">MATCH &middot; WHO DOES WHAT</span></h3>
+      <p>Assign the correct function to each component.</p>
+      <div id="partsHost"></div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c6a">
+        <p>ATP synthase has two main parts. Which task belongs to F&#8320;?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c6b">
+        <p>The &#947; subunit runs through the center of the enzyme. What does it do?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s2">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 2</div>
+    <h2>The binding-change cycle</h2>
+    <p>The three &#946; subunits are never in the same state at the same time. The &#947; shaft is asymmetric, so at any instant one site is open, one is loose, and one is tight. Turning the shaft advances all three at once.</p>
+    <div class="keypoints">
+      <h4>The three states</h4>
+      <ul>
+        <li><strong>O (open)</strong> &mdash; low affinity: ATP leaves, ADP and P&#7522; enter</li>
+        <li><strong>L (loose)</strong> &mdash; ADP and P&#7522; are held but do not react</li>
+        <li><strong>T (tight)</strong> &mdash; the bond forms and ATP is made</li>
+      </ul>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">MANIPULATE &middot; SPIN ATP SYNTHASE</span></h3>
+      <p>Push protons through F&#8320; and watch the rotor advance. Complete one full turn.</p>
+      <div id="rotorHost"></div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c7a">
+        <p>A &#946; subunit currently holds newly formed ATP tightly. Which state comes next for that subunit?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c7b">
+        <p>Each full rotation of the &#947; subunit produces three ATP. How many form after a single 120&#176; step?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c7c">
+        <p>Roughly four protons move through F&#8320; per ATP, and ten protons are pumped per NADH. Which ATP yield fits that arithmetic?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3quiz">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Mastery check</div>
+    <h2>Module 3 quiz</h2>
+    <p>Eight questions on ATP synthase. Anything you miss opens a <strong>targeted practice round</strong> on those concept areas.</p>
+    <div class="quiz-body" data-quiz="m3"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ================= MODULE 4 ================= -->
+
+<section class="section" data-key="m4home">
+  <div class="card">
+    <div class="eyebrow">Module 4</div>
+    <h2>Count the ATP</h2>
+    <p><strong>Central question: why can the same molecule of glucose yield 30 ATP or 32?</strong></p>
+    <p>This is the arithmetic-heavy module, and the shuttles are the reason the arithmetic has two answers. Rather than reading a finished accounting table, you will build one.</p>
+    <div class="keypoints">
+      <h4>By the end of this module you should be able to</h4>
+      <ul>
+        <li>State the ATP yield of mitochondrial NADH and of FADH&#8322;, and say where those numbers come from</li>
+        <li>Explain why cytosolic NADH needs a shuttle at all</li>
+        <li>Trace both shuttles and identify where each delivers its electrons</li>
+        <li>Calculate the total yield per glucose for a given tissue</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m4s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Building the ATP ledger</span>
+          <span class="home-desc">Fill in the accounting yourself and watch the total move.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Tracing the shuttles</span>
+          <span class="home-desc">Follow the electrons and find the bypassed pump.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 4 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s1">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 1</div>
+    <h2>Building the ATP ledger</h2>
+    <p>By the time glucose has been through glycolysis, pyruvate oxidation, and the citric acid cycle, the cell holds <strong>4 ATP, 10 NADH, and 2 FADH&#8322;</strong>. Two of those NADH were made in the cytosol; the other eight were made inside the matrix.</p>
+    <p>Everything from here is division. Protons pumped, divided by protons spent.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">CALCULATE &middot; ATP YIELD LEDGER</span></h3>
+      <p>Choose the yield for each carrier, then choose a tissue. The total updates as you go.</p>
+      <div id="yieldHost"></div>
+    </div>
+
+    <div class="note"><strong>Where 2.5 and 1.5 come from.</strong> 10 H&#8314; per NADH &divide; ~4 H&#8314; per ATP &#8776; 2.5. 6 H&#8314; per FADH&#8322; &divide; ~4 &#8776; 1.5. These are ratios, not constants &mdash; which is why older textbooks list 3 and 2 instead.</p>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c8a">
+        <p>One molecule of mitochondrial NADH supports how much ATP synthesis?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c8b">
+        <p>A muscle cell uses the glycerol-3-phosphate shuttle. How much ATP does each cytosolic NADH support?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s2">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 2</div>
+    <h2>Tracing the shuttles</h2>
+    <p>Cytosolic NADH cannot cross the inner membrane. Neither can its electrons, on their own. So the cell moves the <em>electrons</em> using molecules that do have carriers &mdash; and the route it picks decides the yield.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 660 200" role="img" aria-label="Two shuttle routes compared. The glycerol-3-phosphate shuttle passes electrons from cytosolic NADH to FADH2 and then to coenzyme Q, bypassing complex I. The malate-aspartate shuttle regenerates NADH inside the matrix, which enters at complex I.">
+        <g font-family="system-ui,sans-serif" font-size="11">
+          <rect x="14" y="16" width="300" height="168" rx="12" fill="#FFF4E0" stroke="#B57614"/>
+          <text x="30" y="38" font-size="12" font-weight="700" fill="#B57614">Glycerol-3-phosphate shuttle</text>
+          <text x="30" y="56" fill="#4A5C68">skeletal muscle &middot; brain</text>
+          <text x="30" y="86" fill="#1D2B33">cytosolic NADH &#8594; DHAP &#8594; G3P</text>
+          <text x="30" y="106" fill="#1D2B33">&#8594; FADH&#8322; &#8594; CoQ</text>
+          <text x="30" y="136" font-weight="700" fill="#B57614">Complex I is bypassed</text>
+          <text x="30" y="156" fill="#4A5C68">6 H&#8314; pumped &#8594; 1.5 ATP</text>
+
+          <rect x="346" y="16" width="300" height="168" rx="12" fill="#E8EFFD" stroke="#1E5FD0"/>
+          <text x="362" y="38" font-size="12" font-weight="700" fill="#14479E">Malate-aspartate shuttle</text>
+          <text x="362" y="56" fill="#4A5C68">liver &middot; heart &middot; kidney</text>
+          <text x="362" y="86" fill="#1D2B33">cytosolic NADH &#8594; malate &#8594; matrix</text>
+          <text x="362" y="106" fill="#1D2B33">&#8594; matrix NADH &#8594; complex I</text>
+          <text x="362" y="136" font-weight="700" fill="#14479E">Complex I is used</text>
+          <text x="362" y="156" fill="#4A5C68">10 H&#8314; pumped &#8594; 2.5 ATP</text>
+        </g>
+      </svg>
+      <p class="caption">The two shuttles differ in one respect that matters: whether the electrons still get to pass through complex I.</p>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">EXPLORE &middot; SHUTTLE TRACER</span></h3>
+      <p>Pick a shuttle, then put its steps in order. When the route is correct, the entry point into the chain is revealed.</p>
+      <div id="shuttleHost"></div>
+    </div>
+
+    <div class="box clinical">
+      <h3><span class="tag">WHY THE TISSUE DIFFERENCE</span></h3>
+      <p>The glycerol-3-phosphate shuttle is one-way and fast, which suits tissues with sudden, large energy demands. The malate-aspartate shuttle is reversible and more efficient, which suits tissues doing steady biosynthetic work. Muscle trades ATP for speed; liver keeps the ATP.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c9a">
+        <p>Electrons carried by the glycerol-3-phosphate shuttle enter the chain at coenzyme Q. Which pump is bypassed?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c9b">
+        <p>The malate-aspartate shuttle regenerates NADH inside the matrix. Where do those electrons enter the chain?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c9c">
+        <p>Complete oxidation of one glucose in a liver cell yields how much ATP?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4quiz">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Mastery check</div>
+    <h2>Module 4 quiz</h2>
+    <p>Eight questions on yields and shuttles. Anything you miss opens a <strong>targeted practice round</strong> on those concept areas.</p>
+    <div class="quiz-body" data-quiz="m4"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ================= MODULE 5 ================= -->
+
+<section class="section" data-key="m5home">
+  <div class="card">
+    <div class="eyebrow">Module 5</div>
+    <h2>Break the system</h2>
+    <p><strong>Central question: if you know where a compound acts, can you predict what the cell will do?</strong></p>
+    <p>This is the pharmacology module. Every compound here &mdash; a pesticide, a poison, a discontinued diet drug, a first-line diabetes agent &mdash; works by interrupting the loop you built in Module 2 at a specific point.</p>
+    <div class="keypoints">
+      <h4>By the end of this module you should be able to</h4>
+      <ul>
+        <li>Place rotenone, malonate, antimycin A, cyanide, and oligomycin at their targets</li>
+        <li>Distinguish an inhibitor from an uncoupler by their effect on oxygen consumption</li>
+        <li>Explain how DNP and UCP-1 produce heat instead of ATP</li>
+        <li>Describe why metformin's effect on complex I lowers blood glucose</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m5s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Mapping the inhibitors</span>
+          <span class="home-desc">Place each compound at its target and see the consequence.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Uncouplers and drug targets</span>
+          <span class="home-desc">Run the metabolic dashboard and diagnose each compound.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 5 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s1">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Section 1</div>
+    <h2>Mapping the inhibitors</h2>
+    <p>Each of these compounds stops the chain at one point. Where it stops determines which carriers pile up in their reduced form, which substrates still work, and what the cell does next.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">MANIPULATE &middot; INHIBITOR MAP</span></h3>
+      <p>Drag each compound onto its target, or tap a compound then tap a target. Correct placements reveal the biochemical consequence.</p>
+      <div id="inhibHost"></div>
+    </div>
+
+    <div class="box clinical">
+      <h3><span class="tag">CLINICAL CONNECTION</span></h3>
+      <p>Cyanide poisoning presents with normal blood oxygen and tissues that cannot use it. Because complex IV is blocked, cells fall back on glycolysis, and the lactate produced drives a metabolic acidosis. The paradox &mdash; adequate oxygen delivery, failing oxygen use &mdash; is the diagnostic clue.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c10a">
+        <p>Cyanide binds the iron of cytochrome c oxidase. Which step is blocked?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c10b">
+        <p>Rotenone blocks complex I. Which electron source can still deliver electrons to coenzyme Q?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s2">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Section 2</div>
+    <h2>Uncouplers and drug targets</h2>
+    <p>An inhibitor and an uncoupler both end with less ATP, which is why they are easy to confuse. They are told apart by <strong>oxygen consumption</strong>, which moves in opposite directions.</p>
+    <div class="keypoints">
+      <h4>Three ways to uncouple</h4>
+      <ul>
+        <li><strong>2,4-dinitrophenol (DNP)</strong> &mdash; a small acid that ferries protons across the membrane. Sold as a weight-loss drug in the 1930s; withdrawn after fatal hyperthermia.</li>
+        <li><strong>UCP-1 (thermogenin)</strong> &mdash; a regulated proton channel in brown adipose tissue. Physiological, not toxic: it is how infants and hibernating mammals make heat without shivering.</li>
+        <li><strong>Metformin</strong> &mdash; not an uncoupler, but a partial complex I inhibitor. Lower hepatic ATP raises AMP, which activates AMPK, which suppresses gluconeogenesis.</li>
+      </ul>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">DIAGNOSE &middot; METABOLIC DETECTIVE</span></h3>
+      <p>Administer a compound, predict all five dashboard readings, then check. Work through at least three compounds.</p>
+      <div id="detectiveHost"></div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c11a">
+        <p>2,4-dinitrophenol carries protons across the inner membrane. What happens to heat production?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11b">
+        <p>UCP-1 in brown adipose tissue provides a proton route back to the matrix. What is its physiological purpose?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11c">
+        <p>Metformin inhibits complex I. Which downstream signal rises as cellular ATP falls?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5quiz">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Mastery check</div>
+    <h2>Module 5 quiz</h2>
+    <p>Eight questions on inhibitors, uncouplers, and drug targets. Anything you miss opens a <strong>targeted practice round</strong> on those concept areas.</p>
+    <div class="quiz-body" data-quiz="m5"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ================= MASTERY LAB ================= -->
+
+<section class="section" data-key="labhome">
+  <div class="card">
+    <div class="eyebrow">Mastery Lab</div>
+    <h2>Diagnose the mitochondrion</h2>
+    <p>Nothing new is taught here. This lab exists to make the five modules behave as one mental model rather than five separate topics.</p>
+    <p>You are handed a set of readings from a mitochondrial preparation &mdash; electron transport rate, oxygen consumption, proton gradient, ATP output, heat &mdash; and asked what happened. That is the reasoning direction exams use, and it is the opposite of the direction lectures teach in.</p>
+    <div class="keypoints">
+      <h4>The three patterns that separate every case</h4>
+      <ul>
+        <li><strong>Uncoupler:</strong> gradient down, oxygen consumption <em>up</em>, ATP down, heat up</li>
+        <li><strong>Chain inhibitor:</strong> gradient down, oxygen consumption <em>down</em>, ATP down</li>
+        <li><strong>ATP synthase inhibitor:</strong> gradient <em>up</em>, oxygen consumption down, ATP down</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="lab1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Case files</span>
+          <span class="home-desc">Six mitochondrial observations. Name the lesion.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="labquiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Integration check</span>
+          <span class="home-desc">Eight questions that cross module boundaries.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="lab1">
+  <div class="card">
+    <div class="eyebrow">Mastery Lab &middot; Section 1</div>
+    <h2>Case files</h2>
+    <p>Each case gives you a set of readings and nothing else. Work from the pattern, not from the name of a drug.</p>
+
+    <div class="box apply">
+      <h3><span class="tag">DIAGNOSE &middot; SIX CASES</span></h3>
+      <p>Match each observation to the disturbance that explains it.</p>
+      <div id="casesHost"></div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c12a">
+        <p>Mitochondrial ATP production falls sharply. The proton gradient collapses, but electron transport continues rapidly. Which type of disruption best explains these findings?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c12b">
+        <p>Oxygen consumption falls sharply while the proton gradient stays unusually high. Which type of disruption fits?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c12c">
+        <p>NADH-driven respiration stops while succinate-driven respiration continues. Which site is affected?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="labquiz">
+  <div class="card">
+    <div class="eyebrow">Mastery Lab &middot; Integration check</div>
+    <h2>Integration check</h2>
+    <p>Eight questions that each require more than one module. Anything you miss opens a <strong>targeted practice round</strong> on those concept areas.</p>
+    <div class="quiz-body" data-quiz="lab"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ================= FLASHCARDS ================= -->
+
+<section class="section" data-key="flashcards">
+  <div class="card">
+    <div class="eyebrow">Retrieval Practice</div>
+    <h2>Flashcards</h2>
+    <p>Twenty-six cards covering the facts worth having at recall speed. Try to answer before you flip &mdash; the effort of retrieving is what builds the memory, not the reading.</p>
+    <div class="fc-stage">
+      <div class="fc" id="fcCard" tabindex="0" role="button" aria-label="Flashcard. Press Enter to flip.">
+        <div class="fc-face fc-front"><div>
+          <div class="fc-term" id="fcFront"></div>
+          <div class="fc-hint">click, tap, or press Enter to flip</div>
+        </div></div>
+        <div class="fc-face fc-back"><div class="fc-def" id="fcBack"></div></div>
+      </div>
+    </div>
+    <div class="fc-bar">
+      <button class="btn ghost" id="fcPrev">Previous</button>
+      <span class="fc-count" id="fcCount"></span>
+      <button class="btn ghost" id="fcNext">Next</button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ================= FINAL EXAM ================= -->
+
+<section class="section" data-key="final">
+  <div class="card">
+    <div class="eyebrow">Mastery Challenge</div>
+    <h2>Mastery exam</h2>
+    <p>Twenty-five questions drawn at random from the full 72-question bank, stratified across recall, application, and mechanistic reasoning. Every attempt is a different set in a different order.</p>
+    <p>After grading you will see a breakdown by concept area, links back to the sections behind any weak area, and an <strong>adaptive round</strong> built from the areas you missed. That round does not overwrite your best score, so it is safe to use as practice.</p>
+    <div class="quiz-body" data-quiz="final"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit exam</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     LOAD ORDER IS LOAD-BEARING. Do not rearrange these six tags.
+       1. banks/oxphos.js  — pure content (TOPIC_ID, CHECKPOINTS, CARDS, POOL)
+       2. banks/oxphos.manifest.js — defines MANIFEST, the one place the
+          module/section structure is written. MODULES/FLOW/SECTION_REQ/etc.
+          below are DERIVED from it, not hand-typed, so nothing can drift
+          out of sync with what the hub reads.
+       3. shared/storage.js — defines `state`; needs TOPIC_ID
+       4. shared/helpers.js — el(), shuffle(), order(), LETTERS
+       5. this page's content script — MODULES, FLOW, the activities
+       6. shared/engine.js  — must be last; builds the nav and wires everything
+     ============================================================ -->
+<script src="banks/oxphos.js"></script>
+<script src="banks/oxphos.manifest.js"></script>
+<script src="shared/storage.js"></script>
+<script src="shared/helpers.js"></script>
+
+<script>
+/* ============================================================
+   OXPHOS COMPANION — this topic's own content script.
+   Nothing reusable lives here; anything that would be useful to
+   another companion belongs in shared/ instead.
+   ============================================================ */
+
+/* ---------- 1. STRUCTURE — derived from MANIFEST, not hand-typed.
+   banks/oxphos.manifest.js is the one place this structure is
+   written; the hub reads the same file. Nothing here duplicates it
+   a second time, so there is nothing left to drift out of sync. If
+   MANIFEST is missing or malformed this block throws immediately
+   and the page fails to load — see the note at the top of the
+   manifest file for why that is the correct behavior. ---------- */
+
+/* Presentation-only sidebar icon per module id. Deliberately not
+   part of the manifest — the hub has no use for it. */
+var BADGES = {m1:'1', m2:'2', m3:'3', m4:'4', m5:'5', lab:'&#9878;', flash:'&#10022;', final:'&#9733;'};
+
+var MODULES = MANIFEST.modules.map(function(m){
+  var mod = {id:m.id, badge:BADGES[m.id]||'&#8226;', title:m.title,
+             sections:m.sections.map(function(s){return {key:s.key,label:s.label};})};
+  if(m.unlockAfter) mod.unlockAfter = m.unlockAfter;
+  return mod;
+});
+
+/* FLOW is the flat study path. engine.js uses it for every positional
+   thing it does. Always derive it from MODULES so the two cannot drift. */
+var FLOW = []; MODULES.forEach(function(m){ m.sections.forEach(function(s){ FLOW.push(s); }); });
+
+/* Declared for readability. Ungraded sections are actually identified by
+   absence from SECTION_REQ and QUIZ_KEY_FOR_SECTION. */
+var UNGRADED = [];
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(!s.checks && !s.activity && !s.quiz) UNGRADED.push(s.key);
+});});
+
+var SECTION_REQ = {}, QUIZ_KEY_FOR_SECTION = {};
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(s.checks || s.activity){
+    SECTION_REQ[s.key] = {checks:s.checks||[]};
+    if(s.activity) SECTION_REQ[s.key].activity = s.activity;
+  }
+  if(s.quiz) QUIZ_KEY_FOR_SECTION[s.key] = s.quiz;
+});});
+
+/* Where "revisit this" sends a student after a quiz. Keys must match the
+   `area` strings used in POOL exactly, spelling and capitalization both. */
+var AREA_SECTION = MANIFEST.areaSection;
+
+var MODULE_QUIZ_SIZE = 8;
+/* 25 questions at roughly 20% recall / 45% application / 35% reasoning. */
+var FINAL_EXAM_MIX = {concept:5, application:11, integration:9};
+
+
+/* ============================================================
+   2. SHARED ACTIVITY PLUMBING (local to this page)
+   Every activity follows the same save/clear contract from the
+   architecture doc: write to state.activities.<name> on Check,
+   write null on Try again, and call saveState() + paintNav() both
+   times. sectionComplete() only tests for non-null — it does not
+   grade the activity.
+   ============================================================ */
+function saveAct(name, data){
+  state.activities[name] = data;
+  saveState();
+  if(typeof paintNav === 'function') paintNav();
+}
+function clearAct(name){
+  state.activities[name] = null;
+  saveState();
+  if(typeof paintNav === 'function') paintNav();
+}
+function actDone(name){
+  return state.activities[name] !== null && state.activities[name] !== undefined;
+}
+function bar(){ return el('div','controls'); }
+function cap(text){ return el('span','caption', text || ''); }
+
+
+/* ------------------------------------------------------------
+   MATCH ACTIVITY — a stack of rows, each with a strip of options.
+   Used by: coupling, parts, detective rows, cases.
+   cfg = { name, items:[{text, ans, why, group}], options:[...] }
+   ------------------------------------------------------------ */
+function makeMatch(host, cfg){
+  host.innerHTML = '';
+  var picks = new Array(cfg.items.length).fill(null);
+  var rows  = [];
+  var lastGroup = null;
+
+  cfg.items.forEach(function(item, i){
+    if(item.group && item.group !== lastGroup){
+      var h = el('h4', null, item.group);
+      h.style.margin = '18px 0 2px';
+      h.style.fontSize = '.92rem';
+      host.appendChild(h);
+      lastGroup = item.group;
+    }
+    var row  = el('div','sort-row');
+    row.appendChild(el('div','sort-text', item.text));
+    var opts = el('div','sort-opts');
+    shuffle(cfg.options).forEach(function(o){
+      var b = el('button','opt', o);
+      b.dataset.val = o;
+      b.onclick = function(){
+        picks[i] = o;
+        opts.querySelectorAll('.opt').forEach(function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+      };
+      opts.appendChild(b);
+    });
+    row.appendChild(opts);
+    host.appendChild(row);
+    rows.push({row:row, opts:opts, item:item});
+  });
+
+  var why  = el('div','stack');
+  var ctrl = bar();
+  var score = cap('');
+  var check = el('button','btn','Check my answers');
+  var again = el('button','btn ghost','Try again');
+  ctrl.appendChild(check); ctrl.appendChild(again); ctrl.appendChild(score);
+  host.appendChild(ctrl); host.appendChild(why);
+
+  check.onclick = function(){
+    var missing = picks.filter(function(p){ return p === null; }).length;
+    if(missing > 0){
+      score.textContent = missing + (missing > 1 ? ' rows still need' : ' row still needs') + ' an answer.';
+      return;
+    }
+    var right = 0;
+    why.innerHTML = '';
+    rows.forEach(function(r, i){
+      var ok = (picks[i] === r.item.ans);
+      if(ok) right++;
+      r.opts.querySelectorAll('.opt').forEach(function(b){
+        b.disabled = true;
+        if(b.dataset.val === r.item.ans) b.classList.add('reveal');
+        if(b.classList.contains('sel') && !ok) b.classList.add('bad');
+      });
+      if(r.item.why){
+        why.appendChild(el('div','note',
+          '<strong>' + r.item.text + '</strong><br>' + r.item.why));
+      }
+    });
+    score.textContent = right + ' of ' + rows.length + ' correct.';
+    saveAct(cfg.name, {picks:picks, right:right});
+  };
+  again.onclick = function(){ clearAct(cfg.name); makeMatch(host, cfg); };
+
+  /* Restore a previously checked attempt so the section still reads done
+     after a reload, and the student can see what they chose. */
+  var saved = state.activities[cfg.name];
+  if(saved && saved.picks){
+    saved.picks.forEach(function(p, i){
+      if(p === null) return;
+      picks[i] = p;
+      var b = rows[i].opts.querySelector('.opt[data-val="' + p + '"]');
+      if(b) b.classList.add('sel');
+    });
+    check.onclick();
+  }
+}
+
+
+/* ------------------------------------------------------------
+   SEQUENCER — click items to build an ordered path.
+   Used by: ladder, shuttle tracer.
+   cfg = { name, steps:[...correct order...], reveal, onDone }
+   ------------------------------------------------------------ */
+function makeSequencer(host, cfg){
+  host.innerHTML = '';
+  var chosen = [];
+
+  var line = el('div','seq-line');
+  var tray = el('div','seq-tray');
+  var ctrl = bar();
+  var score = cap('');
+  var out  = el('div','stack');
+  var undo  = el('button','btn ghost','Undo last');
+  var check = el('button','btn','Check the order');
+  var again = el('button','btn ghost','Start over');
+  ctrl.appendChild(check); ctrl.appendChild(undo); ctrl.appendChild(again); ctrl.appendChild(score);
+  host.appendChild(line); host.appendChild(tray); host.appendChild(ctrl); host.appendChild(out);
+
+  function paint(){
+    line.innerHTML = '';
+    if(chosen.length === 0){
+      line.appendChild(el('span','caption','Click items below to build the path, in order.'));
+    }
+    chosen.forEach(function(s, i){
+      if(i > 0) line.appendChild(el('span','seq-arrow','&#8594;'));
+      line.appendChild(el('span','seq-slot', s));
+    });
+    tray.innerHTML = '';
+    var pool = shuffle(cfg.steps.filter(function(s){ return chosen.indexOf(s) === -1; }));
+    if(pool.length === 0){
+      tray.appendChild(el('span','caption','All items placed. Check the order.'));
+    }
+    pool.forEach(function(s){
+      var b = el('button','dnd-pill', s);
+      b.onclick = function(){ chosen.push(s); paint(); };
+      tray.appendChild(b);
+    });
+  }
+
+  check.onclick = function(){
+    if(chosen.length < cfg.steps.length){
+      score.textContent = 'Place every item before checking.';
+      return;
+    }
+    var right = 0;
+    line.querySelectorAll('.seq-slot').forEach(function(sl, i){
+      var ok = (chosen[i] === cfg.steps[i]);
+      sl.classList.add(ok ? 'good' : 'bad');
+      if(ok) right++;
+    });
+    score.textContent = right + ' of ' + cfg.steps.length + ' in the right position.';
+    out.innerHTML = '';
+    if(right === cfg.steps.length && cfg.reveal){
+      out.appendChild(el('div','note', cfg.reveal));
+    } else if(right < cfg.steps.length){
+      out.appendChild(el('div','note','Positions marked in red are out of order. Start over and use the energy story: each step has to hand its electrons to something that holds them more tightly.'));
+    }
+    tray.innerHTML = '';
+    saveAct(cfg.name, {order:chosen.slice(), right:right});
+    if(cfg.onDone) cfg.onDone(right === cfg.steps.length);
+  };
+  undo.onclick  = function(){ chosen.pop(); paint(); score.textContent=''; };
+  again.onclick = function(){ chosen = []; out.innerHTML=''; score.textContent=''; clearAct(cfg.name); paint(); };
+
+  var saved = state.activities[cfg.name];
+  if(saved && saved.order && saved.order.length === cfg.steps.length){
+    chosen = saved.order.slice();
+    paint();
+    check.onclick();
+  } else {
+    paint();
+  }
+}
+
+
+/* ------------------------------------------------------------
+   DRAG AND DROP — labelled slots plus a tray of pills.
+   Works with mouse, touch, and tap-then-tap. Used by: highway,
+   inhibitor map.
+   cfg = { name, rows:[{desc, ans, why}], pills:[...] }
+   ------------------------------------------------------------ */
+function makeDnD(host, cfg){
+  host.innerHTML = '';
+  var board = el('div','dnd-board');
+  var tray  = el('div','dnd-tray');
+  var ctrl  = bar();
+  var score = cap('');
+  var check = el('button','btn','Check my map');
+  var again = el('button','btn ghost','Clear the board');
+  ctrl.appendChild(check); ctrl.appendChild(again); ctrl.appendChild(score);
+
+  var slots = [], selected = null;
+
+  cfg.rows.forEach(function(r, i){
+    var row  = el('div','dnd-row');
+    row.appendChild(el('div','dnd-desc', r.desc));
+    var slot = el('div','dnd-slot');
+    slot.dataset.idx = i;
+    slot.onclick = function(){ if(selected) drop(selected, slot); };
+    row.appendChild(slot);
+    board.appendChild(row);
+    slots.push({row:row, slot:slot, item:r});
+  });
+  host.appendChild(board); host.appendChild(tray); host.appendChild(ctrl);
+  var why = el('div','stack'); host.appendChild(why);
+
+  function makePill(label){
+    var p = el('button','dnd-pill', label);
+    p.dataset.label = label;
+    p.onpointerdown = function(e){ startDrag(e, p); };
+    p.onclick = function(){
+      if(p.dataset.moved === '1'){ p.dataset.moved = '0'; return; }
+      if(selected === p){ p.classList.remove('picked'); selected = null; return; }
+      if(selected) selected.classList.remove('picked');
+      selected = p; p.classList.add('picked');
+    };
+    return p;
+  }
+  function drop(pill, slot){
+    var existing = slot.querySelector('.dnd-pill');
+    if(existing) tray.appendChild(existing);
+    slot.appendChild(pill);
+    pill.classList.remove('picked');
+    selected = null;
+    refreshTray();
+  }
+  function startDrag(e, pill){
+    if(pill.disabled) return;
+    var sx = e.clientX, sy = e.clientY, moving = false, ghost = null;
+    pill.setPointerCapture(e.pointerId);
+    pill.onpointermove = function(ev){
+      if(!moving && Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 8){
+        moving = true;
+        pill.dataset.moved = '1';
+        pill.classList.add('dragging');
+        ghost = el('div','dnd-ghost', pill.dataset.label);
+        document.body.appendChild(ghost);
+      }
+      if(moving){
+        ghost.style.left = ev.clientX + 'px';
+        ghost.style.top  = ev.clientY + 'px';
+        slots.forEach(function(s){ s.slot.classList.remove('over'); });
+        var over = document.elementFromPoint(ev.clientX, ev.clientY);
+        var sl = over && over.closest ? over.closest('.dnd-slot') : null;
+        if(sl) sl.classList.add('over');
+      }
+    };
+    pill.onpointerup = function(ev){
+      pill.onpointermove = null; pill.onpointerup = null;
+      if(!moving) return;
+      pill.classList.remove('dragging');
+      if(ghost) ghost.remove();
+      slots.forEach(function(s){ s.slot.classList.remove('over'); });
+      var over = document.elementFromPoint(ev.clientX, ev.clientY);
+      var sl = over && over.closest ? over.closest('.dnd-slot') : null;
+      if(sl){ drop(pill, sl); } else { tray.appendChild(pill); refreshTray(); }
+      setTimeout(function(){ pill.dataset.moved = '0'; }, 0);
+    };
+  }
+
+  function refreshTray(){
+    var hint = tray.querySelector('.tray-hint');
+    if(tray.querySelectorAll('.dnd-pill').length === 0){
+      if(!hint) tray.appendChild(el('span','caption tray-hint','All components placed. Check the map below.'));
+    } else if(hint){ hint.remove(); }
+  }
+  shuffle(cfg.pills).forEach(function(p){ tray.appendChild(makePill(p)); });
+
+  check.onclick = function(){
+    var placed = slots.filter(function(s){ return s.slot.querySelector('.dnd-pill'); });
+    if(placed.length < slots.length){
+      score.textContent = (slots.length - placed.length) + ' slot(s) still empty.';
+      return;
+    }
+    var right = 0; why.innerHTML = '';
+    slots.forEach(function(s){
+      var pill = s.slot.querySelector('.dnd-pill');
+      var ok = pill && pill.dataset.label === s.item.ans;
+      s.row.classList.remove('correct','incorrect');
+      s.row.classList.add(ok ? 'correct' : 'incorrect');
+      if(ok){
+        right++;
+        if(s.item.why) why.appendChild(el('div','note',
+          '<strong>' + s.item.ans + '</strong> &mdash; ' + s.item.why));
+      }
+    });
+    score.textContent = right + ' of ' + slots.length + ' placed correctly.';
+    var layout = slots.map(function(s){
+      var p = s.slot.querySelector('.dnd-pill');
+      return p ? p.dataset.label : null;
+    });
+    saveAct(cfg.name, {layout:layout, right:right});
+  };
+  again.onclick = function(){ clearAct(cfg.name); makeDnD(host, cfg); };
+
+  var saved = state.activities[cfg.name];
+  if(saved && saved.layout){
+    saved.layout.forEach(function(lab, i){
+      if(!lab) return;
+      var pill = tray.querySelector('.dnd-pill[data-label="' + lab + '"]');
+      if(pill) slots[i].slot.appendChild(pill);
+    });
+    check.onclick();
+  }
+  refreshTray();
+}
+
+
+/* ============================================================
+   3. THE ACTIVITIES THEMSELVES
+   ============================================================ */
+
+/* ---- M1S1 · reduction-potential ladder ---- */
+makeSequencer(document.getElementById('ladderHost'), {
+  name:'ladder',
+  steps:['NADH','FADH\u2082 at complex II','Coenzyme Q','Cytochrome c','O\u2082'],
+  reveal:'<strong>That is the electron path, and it is also the order of increasing reduction potential.</strong> ' +
+         'NADH sits lowest at about \u22120.32 V, FADH\u2082 at complex II around +0.03 V, coenzyme Q near +0.045 V, ' +
+         'cytochrome c around +0.235 V, and oxygen highest at about +0.82 V. Notice that FADH\u2082 already sits above ' +
+         'complex I \u2014 which is exactly why its electrons cannot enter there and why they miss complex I\u2019s proton pump.'
+});
+
+/* ---- M1S2 · build the electron highway ---- */
+makeDnD(document.getElementById('highwayHost'), {
+  name:'highway',
+  pills:['Complex I','Complex II','Coenzyme Q','Complex III','Cytochrome c','Complex IV','O\u2082'],
+  rows:[
+    {desc:'Where NADH delivers its electrons', ans:'Complex I',
+     why:'NADH-Q oxidoreductase. It oxidizes NADH, reduces coenzyme Q, and pumps 4 H\u207A per electron pair.'},
+    {desc:'Where FADH\u2082 delivers its electrons', ans:'Complex II',
+     why:'Succinate dehydrogenase, which is also step 6 of the citric acid cycle. It pumps no protons.'},
+    {desc:'The mobile carrier inside the membrane that collects from both entry points', ans:'Coenzyme Q',
+     why:'Lipophilic, so it diffuses within the bilayer. Both routes converge here as QH\u2082.'},
+    {desc:'The complex that oxidizes QH\u2082', ans:'Complex III',
+     why:'Q-cytochrome c oxidoreductase. Each QH\u2082 reduces two cytochrome c and 4 H\u207A are pumped.'},
+    {desc:'The mobile carrier on the outer face of the inner membrane', ans:'Cytochrome c',
+     why:'Water-soluble, carries one electron at a time on its heme iron, Fe\u00B3\u207A \u21C4 Fe\u00B2\u207A.'},
+    {desc:'The complex that reduces the terminal acceptor', ans:'Complex IV',
+     why:'Cytochrome c oxidase. It draws 8 H\u207A from the matrix per O\u2082: four become water, four are pumped.'},
+    {desc:'The terminal electron acceptor', ans:'O\u2082',
+     why:'The highest reduction potential in the system, so the electrons stop here, as water.'}
+  ]
+});
+
+/* ---- M1S3 · pump the protons ---- */
+(function(){
+  var host = document.getElementById('protonHost');
+  var ROUTES = {
+    'NADH':   [{c:'I', h:4},{c:'III', h:4},{c:'IV', h:2}],
+    'FADH\u2082':[{c:'II', h:0},{c:'III', h:4},{c:'IV', h:2}]
+  };
+  var source = 'NADH', step = 0, pumped = 0;
+  var totals = (state.activities.protons && state.activities.protons.totals) || {};
+
+  var chips = el('div','mini');
+  var stage = el('div','figure');
+  var tally = el('div','tally');
+  var msg   = el('div','note');
+  var ctrl  = bar();
+  var reset = el('button','btn ghost','Reset this run');
+  ctrl.appendChild(reset);
+  host.appendChild(chips); host.appendChild(stage);
+  host.appendChild(tally); host.appendChild(msg); host.appendChild(ctrl);
+
+  function paint(){
+    chips.innerHTML = '';
+    Object.keys(ROUTES).forEach(function(s){
+      var c = el('button','chip' + (s === source ? ' on' : ''), 'Source: ' + s);
+      c.onclick = function(){ source = s; step = 0; pumped = 0; paint(); };
+      chips.appendChild(c);
+    });
+
+    var route = ROUTES[source];
+    stage.innerHTML = '';
+    var strip = el('div','mini');
+    ['I','II','III','IV'].forEach(function(name){
+      var inRoute = route.filter(function(r){ return r.c === name; })[0];
+      var done = inRoute && route.indexOf(inRoute) < step;
+      var b = el('button','chip' + (done ? ' on' : ''), 'Complex ' + name);
+      b.onclick = function(){
+        if(step >= route.length){ msg.innerHTML = '<strong>Route finished.</strong> Switch the source or reset the run.'; return; }
+        if(route[step].c !== name){
+          msg.innerHTML = '<strong>Electrons cannot go there from here.</strong> ' +
+            (source === 'NADH'
+              ? 'NADH electrons enter at complex I, then follow Q \u2192 III \u2192 cyt c \u2192 IV.'
+              : 'FADH\u2082 electrons enter at complex II, then follow Q \u2192 III \u2192 cyt c \u2192 IV.');
+          return;
+        }
+        pumped += route[step].h;
+        step++;
+        msg.innerHTML = route[step-1].h === 0
+          ? '<strong>Complex ' + name + ' pumped nothing.</strong> Succinate dehydrogenase passes electrons to coenzyme Q without moving protons across the membrane.'
+          : '<strong>Complex ' + name + ' pumped ' + route[step-1].h + ' H\u207A</strong> into the intermembrane space.';
+        if(step === route.length){
+          totals[source] = pumped;
+          msg.innerHTML += ' <br>Route complete: <strong>' + pumped + ' H\u207A per ' + source + '</strong>.';
+          if(totals['NADH'] !== undefined && totals['FADH\u2082'] !== undefined){
+            msg.innerHTML += '<br>Both routes recorded. The 4 H\u207A difference is complex I, and it is the whole reason FADH\u2082 is worth less ATP.';
+          } else {
+            msg.innerHTML += '<br>Now run the other electron source and compare.';
+          }
+          saveAct('protons', {totals:totals});
+        }
+        paint();
+      };
+      strip.appendChild(b);
+    });
+    stage.appendChild(strip);
+    stage.appendChild(el('p','caption','Click the complexes in the order the electrons visit them.'));
+
+    tally.innerHTML = '';
+    tally.appendChild(el('div', null, '<div class="k">H\u207A in the IMS this run</div><div class="v hi">' + pumped + '</div>'));
+    tally.appendChild(el('div', null, '<div class="k">Step</div><div class="v">' + step + ' of ' + route.length + '</div>'));
+    tally.appendChild(el('div', null, '<div class="k">Recorded: NADH</div><div class="v">' + (totals['NADH'] !== undefined ? totals['NADH'] + ' H\u207A' : '\u2014') + '</div>'));
+    tally.appendChild(el('div', null, '<div class="k">Recorded: FADH\u2082</div><div class="v">' + (totals['FADH\u2082'] !== undefined ? totals['FADH\u2082'] + ' H\u207A' : '\u2014') + '</div>'));
+  }
+  reset.onclick = function(){ step = 0; pumped = 0; msg.textContent = ''; paint(); };
+  msg.innerHTML = 'Pick a source, then click each complex in turn.';
+  paint();
+})();
+
+/* ---- M2S1 · charge the mitochondrion ---- */
+(function(){
+  var host = document.getElementById('chargeHost');
+  var slider = document.createElement('input');
+  slider.type = 'range'; slider.min = 0; slider.max = 10; slider.value = 0;
+  slider.setAttribute('aria-label','Electron pairs transferred through the chain');
+
+  var svgWrap = el('div','figure');
+  var read = el('div','readout');
+  var ctrl = bar();
+  var logBtn = el('button','btn','Log these readings');
+  var score = cap('');
+  ctrl.appendChild(logBtn); ctrl.appendChild(score);
+
+  host.appendChild(el('p','caption','Electron pairs transferred through the chain'));
+  host.appendChild(slider);
+  host.appendChild(svgWrap);
+  host.appendChild(read);
+  host.appendChild(ctrl);
+
+  function paint(){
+    var n = +slider.value;
+    var mPH  = (7.40 + 0.04 * n).toFixed(2);
+    var iPH  = (7.40 - 0.04 * n).toFixed(2);
+    var mv   = Math.round(n * 18);
+    var ims  = n * 10;
+
+    /* One dot = 10 protons on BOTH sides, so the two compartments stay
+       directly comparable as the slider moves. */
+    var dots = '', mDots = '';
+    for(var i = 0; i < n; i++){
+      dots += '<circle cx="' + (40 + i * 58) + '" cy="60" r="9" fill="#1E5FD0"/>';
+    }
+    for(var j = 0; j < (10 - n); j++){
+      mDots += '<circle cx="' + (40 + j * 58) + '" cy="142" r="9" fill="#7E8F9B"/>';
+    }
+    svgWrap.innerHTML =
+      '<svg viewBox="0 0 640 180" role="img" aria-label="Protons distributed across the inner mitochondrial membrane">' +
+      '<text x="6" y="20" font-size="11" fill="#7E8F9B" font-family="system-ui,sans-serif">INTERMEMBRANE SPACE</text>' +
+      dots +
+      '<rect x="0" y="86" width="640" height="26" fill="#F4F7FA" stroke="#E4EAEE"/>' +
+      '<text x="200" y="103" font-size="11" fill="#7E8F9B" font-family="system-ui,sans-serif">inner membrane &mdash; impermeable to H\u207A</text>' +
+      mDots +
+      '<text x="6" y="172" font-size="11" fill="#7E8F9B" font-family="system-ui,sans-serif">MATRIX</text>' +
+      '</svg>' +
+      '<p class="caption">Each dot represents 10 protons. Every electron pair from NADH moves one dot upward.</p>';
+
+    read.innerHTML =
+      '<div><div class="k">H\u207A moved to the IMS</div><div class="v">' + ims + '</div></div>' +
+      '<div><div class="k">Matrix pH</div><div class="v">' + mPH + '</div></div>' +
+      '<div><div class="k">IMS pH</div><div class="v">' + iPH + '</div></div>' +
+      '<div><div class="k">Membrane potential</div><div class="v">\u2212' + mv + ' mV</div></div>' +
+      '<div><div class="k">Matrix charge</div><div class="v">' + (n === 0 ? 'neutral' : 'more negative') + '</div></div>';
+  }
+  slider.oninput = paint;
+  logBtn.onclick = function(){
+    if(+slider.value === 0){
+      score.textContent = 'Move the slider first, then log the readings.';
+      return;
+    }
+    score.textContent = 'Readings logged at ' + slider.value + ' electron pairs.';
+    saveAct('charge', {pairs:+slider.value});
+  };
+  if(state.activities.charge && state.activities.charge.pairs){
+    slider.value = state.activities.charge.pairs;
+    score.textContent = 'Readings logged at ' + slider.value + ' electron pairs.';
+  }
+  paint();
+})();
+
+/* ---- M2S2 · predict the perturbation ---- */
+makeMatch(document.getElementById('couplingHost'), {
+  name:'coupling',
+  options:['Increases','Decreases','Unchanged'],
+  items:[
+    {group:'A. The inner membrane suddenly becomes permeable to H\u207A',
+     text:'Rate of electron transport', ans:'Increases',
+     why:'With the gradient short-circuited, the pumps no longer work against back-pressure, so the chain runs faster and oxygen consumption rises.'},
+    {group:'A. The inner membrane suddenly becomes permeable to H\u207A',
+     text:'Size of the proton gradient', ans:'Decreases',
+     why:'Protons return as fast as they are pumped, so the gradient collapses.'},
+    {group:'A. The inner membrane suddenly becomes permeable to H\u207A',
+     text:'ATP synthesis', ans:'Decreases',
+     why:'The returning protons bypass ATP synthase, so their energy is released as heat rather than captured.'},
+
+    {group:'B. O\u2082 is removed',
+     text:'Rate of electron transport', ans:'Decreases',
+     why:'Complex IV has no acceptor, so every carrier upstream fills up and electron flow halts.'},
+    {group:'B. O\u2082 is removed',
+     text:'Size of the proton gradient', ans:'Decreases',
+     why:'Pumping stops while the small background leak continues, so the existing gradient dissipates.'},
+    {group:'B. O\u2082 is removed',
+     text:'ATP synthesis', ans:'Decreases',
+     why:'No gradient, no driving force for F\u2080F\u2081. The cell falls back on glycolysis.'},
+
+    {group:'C. ATP synthase is blocked',
+     text:'Rate of electron transport', ans:'Decreases',
+     why:'The gradient rises until the pumps cannot push against it. This is the clearest demonstration that the two processes are coupled.'},
+    {group:'C. ATP synthase is blocked',
+     text:'Size of the proton gradient', ans:'Increases',
+     why:'The main return route is closed, so protons accumulate in the intermembrane space.'},
+    {group:'C. ATP synthase is blocked',
+     text:'ATP synthesis', ans:'Decreases',
+     why:'The machine that makes ATP has been stopped directly.'},
+
+    {group:'D. ADP becomes unavailable',
+     text:'Rate of electron transport', ans:'Decreases',
+     why:'ATP synthase has no substrate, so protons stop returning and the chain stalls against a rising gradient. This is respiratory control.'},
+    {group:'D. ADP becomes unavailable',
+     text:'Size of the proton gradient', ans:'Increases',
+     why:'Same cause as an ATP synthase block: pumping continues into a space that is not draining.'},
+    {group:'D. ADP becomes unavailable',
+     text:'ATP synthesis', ans:'Decreases',
+     why:'There is no ADP to phosphorylate, whatever the gradient is doing.'}
+  ]
+});
+
+/* ---- M3S1 · who does what ---- */
+makeMatch(document.getElementById('partsHost'), {
+  name:'parts',
+  options:['Conducts protons and rotates','Transmits rotation into the F\u2081 head',
+           'Carries out ATP synthesis','Holds the proton gradient','Reduces oxygen to water'],
+  items:[
+    {text:'F\u2080', ans:'Conducts protons and rotates',
+     why:'The membrane-embedded rotor. Proton flow through it is the mechanical input for everything else.'},
+    {text:'\u03B3 subunit', ans:'Transmits rotation into the F\u2081 head',
+     why:'An asymmetric drive shaft. Its shape is what puts the three \u03B2 subunits in three different states at once.'},
+    {text:'F\u2081 \u03B2 subunits', ans:'Carries out ATP synthesis',
+     why:'Three catalytic sites cycling through open, loose, and tight.'},
+    {text:'Inner mitochondrial membrane', ans:'Holds the proton gradient',
+     why:'Its impermeability to free H\u207A is what allows a gradient to exist at all.'}
+  ]
+});
+
+/* ---- M3S2 · spin ATP synthase ---- */
+(function(){
+  var host = document.getElementById('rotorHost');
+  var STATES = ['O','L','T'];
+  var MEANING = {
+    O:'Open \u2014 ATP leaves, ADP + P\u1D62 enter',
+    L:'Loose \u2014 ADP + P\u1D62 are held but do not react',
+    T:'Tight \u2014 ATP forms'
+  };
+  var turn = 0;
+  if(state.activities.rotor && state.activities.rotor.turn) turn = state.activities.rotor.turn;
+
+  var stage = el('div','figure');
+  stage.style.maxWidth = '360px';
+  var tally = el('div','tally');
+  var msg   = el('div','note');
+  var ctrl  = bar();
+  var push  = el('button','btn','Push 4 H\u207A through F\u2080');
+  var reset = el('button','btn ghost','Reset the rotor');
+  ctrl.appendChild(push); ctrl.appendChild(reset);
+  host.appendChild(stage); host.appendChild(tally); host.appendChild(msg); host.appendChild(ctrl);
+
+  function stateOf(siteIndex){ return STATES[(siteIndex + turn) % 3]; }
+
+  function paint(){
+    var deg = (turn % 3) * 120;
+    var pos = [[150,72],[218,190],[82,190]];
+    var circles = '';
+    for(var i = 0; i < 3; i++){
+      var st = stateOf(i);
+      var fill = st === 'T' ? '#EFEBFC' : (st === 'L' ? '#FFF4E0' : '#E8EFFD');
+      var line = st === 'T' ? '#6B4FD8' : (st === 'L' ? '#B57614' : '#1E5FD0');
+      circles +=
+        '<circle cx="' + pos[i][0] + '" cy="' + pos[i][1] + '" r="34" fill="' + fill + '" stroke="' + line + '" stroke-width="2"/>' +
+        '<text x="' + pos[i][0] + '" y="' + (pos[i][1] + 6) + '" text-anchor="middle" font-size="19" font-weight="700" fill="' + line + '" font-family="system-ui,sans-serif">' + st + '</text>';
+    }
+    stage.innerHTML =
+      '<svg viewBox="0 0 300 260" role="img" aria-label="ATP synthase F1 head seen from the matrix, with three beta subunits in the open, loose and tight states and a gamma shaft rotated ' + deg + ' degrees.">' +
+      '<circle cx="150" cy="145" r="105" fill="#FAFCFD" stroke="#E4EAEE"/>' +
+      circles +
+      '<g transform="rotate(' + deg + ' 150 145)">' +
+        '<line x1="150" y1="145" x2="150" y2="96" stroke="#B57614" stroke-width="7" stroke-linecap="round"/>' +
+        '<circle cx="150" cy="145" r="13" fill="#B57614"/>' +
+        '<text x="150" y="150" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" font-family="system-ui,sans-serif">&#947;</text>' +
+      '</g>' +
+      '</svg>' +
+      '<p class="caption">' + (turn === 0
+          ? 'The &#947; shaft is at its starting position. Every push advances all three sites at once.'
+          : 'The &#947; shaft has turned ' + (turn * 120) + '&#176; in total' +
+            (deg === 0 ? ', returning to its starting orientation' : '') +
+            '. Every push advances all three sites at once.') + '</p>';
+
+    tally.innerHTML =
+      '<div><div class="k">Rotation</div><div class="v hi">' + (turn * 120) + '&#176;</div></div>' +
+      '<div><div class="k">H\u207A used</div><div class="v">' + (turn * 4) + '</div></div>' +
+      '<div><div class="k">ATP released</div><div class="v hi">' + turn + '</div></div>' +
+      '<div><div class="k">&#946; site states</div><div class="v">' +
+        stateOf(0) + ' &middot; ' + stateOf(1) + ' &middot; ' + stateOf(2) + '</div></div>';
+  }
+
+  push.onclick = function(){
+    turn++;
+    msg.innerHTML = '<strong>120&#176; step complete.</strong> One site moved out of the tight state and opened, releasing its ATP. ' +
+      MEANING[stateOf(0)] + '.';
+    if(turn >= 3){
+      msg.innerHTML = '<strong>One full 360&#176; rotation.</strong> Each of the three \u03B2 subunits passed through open, loose, and tight exactly once, so <strong>3 ATP</strong> were released for roughly <strong>12 H\u207A</strong>. That is the ~4 H\u207A per ATP figure, arrived at by counting rather than by memorizing.';
+      saveAct('rotor', {turn:turn});
+    }
+    paint();
+  };
+  reset.onclick = function(){ turn = 0; msg.innerHTML = 'Push protons through F\u2080 to begin.'; clearAct('rotor'); paint(); };
+  msg.innerHTML = turn >= 3
+    ? '<strong>Rotation already completed.</strong> Reset the rotor to run it again.'
+    : 'Push protons through F\u2080 to begin.';
+  paint();
+})();
+
+/* ---- M4S1 · ATP yield ledger ---- */
+(function(){
+  var host = document.getElementById('yieldHost');
+  var picks = {nadh:null, fadh:null};
+  var tissue = null;
+  var saved = state.activities.yield;
+  if(saved){ picks = saved.picks; tissue = saved.tissue; }
+
+  var table = el('div','stack');
+  var chips = el('div','mini');
+  var total = el('div','tally');
+  var ctrl  = bar();
+  var check = el('button','btn','Check the ledger');
+  var again = el('button','btn ghost','Start over');
+  var score = cap('');
+  var note  = el('div','stack');
+  ctrl.appendChild(check); ctrl.appendChild(again); ctrl.appendChild(score);
+  host.appendChild(table); host.appendChild(chips); host.appendChild(total);
+  host.appendChild(ctrl); host.appendChild(note);
+
+  var TISSUES = {
+    'Skeletal muscle / brain': {shuttle:'glycerol-3-phosphate', per:1.5},
+    'Liver / heart / kidney' : {shuttle:'malate-aspartate',      per:2.5}
+  };
+
+  function row(label, opts, key){
+    var r = el('div','sort-row');
+    r.appendChild(el('div','sort-text', label));
+    var strip = el('div','sort-opts');
+    opts.forEach(function(v){
+      var b = el('button','opt' + (picks[key] === v ? ' sel' : ''), v + ' ATP');
+      b.onclick = function(){
+        picks[key] = v;
+        strip.querySelectorAll('.opt').forEach(function(x){ x.classList.remove('sel'); });
+        b.classList.add('sel');
+        paint();
+      };
+      strip.appendChild(b);
+    });
+    r.appendChild(strip);
+    return r;
+  }
+
+  function paint(){
+    table.innerHTML = '';
+    var fixed = el('div','sort-row');
+    fixed.appendChild(el('div','sort-text','Substrate-level phosphorylation (glycolysis + citric acid cycle)'));
+    fixed.appendChild(el('div','sort-opts','<span class="opt sel">4 ATP &mdash; fixed</span>'));
+    table.appendChild(fixed);
+    table.appendChild(row('8 mitochondrial NADH \u00D7 ?', [1.5, 2.5, 3.0], 'nadh'));
+    table.appendChild(row('2 FADH\u2082 \u00D7 ?',          [1.5, 2.0, 2.5], 'fadh'));
+
+    chips.innerHTML = '<span class="caption" style="margin:0;width:100%">2 cytosolic NADH \u2014 which tissue?</span>';
+    Object.keys(TISSUES).forEach(function(t){
+      var c = el('button','chip' + (tissue === t ? ' on' : ''), t);
+      c.onclick = function(){ tissue = t; paint(); };
+      chips.appendChild(c);
+    });
+
+    var a = 4;
+    var b = picks.nadh !== null ? 8 * picks.nadh : null;
+    var c = picks.fadh !== null ? 2 * picks.fadh : null;
+    var d = tissue ? 2 * TISSUES[tissue].per : null;
+    var sum = (b !== null && c !== null && d !== null) ? a + b + c + d : null;
+
+    total.innerHTML =
+      '<div><div class="k">Substrate-level</div><div class="v">' + a + '</div></div>' +
+      '<div><div class="k">From 8 NADH</div><div class="v">' + (b === null ? '\u2014' : b) + '</div></div>' +
+      '<div><div class="k">From 2 FADH\u2082</div><div class="v">' + (c === null ? '\u2014' : c) + '</div></div>' +
+      '<div><div class="k">From 2 cytosolic NADH</div><div class="v">' + (d === null ? '\u2014' : d) + '</div></div>' +
+      '<div><div class="k">Total per glucose</div><div class="v hi">' + (sum === null ? '\u2014' : sum) + '</div></div>';
+  }
+
+  check.onclick = function(){
+    if(picks.nadh === null || picks.fadh === null || !tissue){
+      score.textContent = 'Choose a yield for each carrier and a tissue.';
+      return;
+    }
+    var right = (picks.nadh === 2.5) && (picks.fadh === 1.5);
+    var expected = tissue === 'Liver / heart / kidney' ? 32 : 30;
+    note.innerHTML = '';
+    if(right){
+      note.appendChild(el('div','note',
+        '<strong>Ledger correct: ' + expected + ' ATP per glucose.</strong><br>' +
+        '4 (substrate-level) + 20 (8 NADH \u00D7 2.5) + 3 (2 FADH\u2082 \u00D7 1.5) + ' +
+        (expected === 32 ? '5 (2 cytosolic NADH \u00D7 2.5 via the malate-aspartate shuttle)' :
+                           '3 (2 cytosolic NADH \u00D7 1.5 via the glycerol-3-phosphate shuttle)') +
+        '. Switch the tissue and watch only the last line change \u2014 that single line is the whole 30-versus-32 question.'));
+    } else {
+      note.appendChild(el('div','note',
+        '<strong>Check the carrier yields.</strong> Matrix NADH drives 10 H\u207A and FADH\u2082 drives 6, at roughly 4 H\u207A per ATP. ' +
+        'That gives 2.5 and 1.5 respectively.'));
+    }
+    score.textContent = right ? 'Correct.' : 'Not yet \u2014 see the note below.';
+    saveAct('yield', {picks:picks, tissue:tissue, right:right});
+  };
+  again.onclick = function(){
+    picks = {nadh:null, fadh:null}; tissue = null;
+    note.innerHTML = ''; score.textContent = '';
+    clearAct('yield'); paint();
+  };
+  paint();
+  if(saved) check.onclick();
+})();
+
+/* ---- M4S2 · shuttle tracer ---- */
+(function(){
+  var host = document.getElementById('shuttleHost');
+  var ROUTES = {
+    'Glycerol-3-phosphate shuttle': {
+      steps:['Cytosolic NADH reduces DHAP',
+             'Glycerol 3-phosphate is formed',
+             'G3P dehydrogenase 2 oxidizes G3P at the outer face of the inner membrane',
+             'Electrons are loaded onto FADH\u2082',
+             'Electrons are passed to coenzyme Q'],
+      reveal:'<strong>Entry point: coenzyme Q.</strong> Because the electrons arrive at Q rather than at complex I, ' +
+             'complex I\u2019s 4 H\u207A are never pumped. Six protons instead of ten is why each cytosolic NADH is worth ' +
+             'about 1.5 ATP in muscle and brain.'
+    },
+    'Malate-aspartate shuttle': {
+      steps:['Cytosolic NADH reduces oxaloacetate to malate',
+             'Malate is exchanged into the matrix for \u03B1-ketoglutarate',
+             'Matrix malate dehydrogenase oxidizes malate back to oxaloacetate',
+             'NADH is regenerated inside the matrix',
+             'Electrons enter the chain at complex I'],
+      reveal:'<strong>Entry point: complex I.</strong> The shuttle rebuilds NADH on the matrix side, so nothing is skipped. ' +
+             'All 10 H\u207A are pumped and the full 2.5 ATP is preserved \u2014 which is why liver, heart, and kidney reach 32 ATP per glucose. ' +
+             'The oxaloacetate is returned to the cytosol as aspartate, with glutamate and \u03B1-ketoglutarate carrying the amino group back and forth.'
+    }
+  };
+  var which = 'Glycerol-3-phosphate shuttle';
+  var done = (state.activities.shuttle && state.activities.shuttle.done) || {};
+
+  var chips = el('div','mini');
+  var seq   = el('div');
+  var status = el('div','note');
+  host.appendChild(chips); host.appendChild(seq); host.appendChild(status);
+
+  function paintStatus(){
+    var names = Object.keys(ROUTES);
+    status.innerHTML = 'Traced so far: ' + names.map(function(n){
+      return (done[n] ? '&#10003; ' : '&#9675; ') + n;
+    }).join(' &nbsp;&middot;&nbsp; ') +
+    (names.every(function(n){ return done[n]; })
+      ? '<br><strong>Both routes traced.</strong> The single difference between them \u2014 whether complex I is used \u2014 is worth 1 ATP per cytosolic NADH, and 2 ATP per glucose.'
+      : '');
+  }
+  function build(){
+    chips.innerHTML = '';
+    Object.keys(ROUTES).forEach(function(n){
+      var c = el('button','chip' + (n === which ? ' on' : ''), n);
+      c.onclick = function(){ which = n; build(); };
+      chips.appendChild(c);
+    });
+    makeSequencer(seq, {
+      name:'shuttleSeq_' + which,
+      steps:ROUTES[which].steps,
+      reveal:ROUTES[which].reveal,
+      onDone:function(ok){
+        if(ok){ done[which] = true; saveAct('shuttle', {done:done}); }
+        paintStatus();
+      }
+    });
+    paintStatus();
+  }
+  build();
+})();
+
+/* ---- M5S1 · inhibitor map ---- */
+makeDnD(document.getElementById('inhibHost'), {
+  name:'inhibmap',
+  pills:['Rotenone','Malonate','Antimycin A','Cyanide','Oligomycin','2,4-dinitrophenol'],
+  rows:[
+    {desc:'Complex I \u2014 NADH-Q oxidoreductase', ans:'Rotenone',
+     why:'A broad-spectrum insecticide. NADH-driven respiration stops; succinate-driven respiration through complex II continues.'},
+    {desc:'Complex II \u2014 succinate dehydrogenase', ans:'Malonate',
+     why:'A competitive inhibitor that resembles succinate closely enough to occupy the active site without being oxidized.'},
+    {desc:'Complex III \u2014 Q-cytochrome c oxidoreductase', ans:'Antimycin A',
+     why:'Blocks oxidation of ubiquinol, so QH\u2082 accumulates while cytochrome c downstream stays oxidized.'},
+    {desc:'Complex IV \u2014 cytochrome c oxidase', ans:'Cyanide',
+     why:'Binds the heme iron so oxygen cannot be reduced. Every carrier upstream backs up and ATP production fails.'},
+    {desc:'ATP synthase', ans:'Oligomycin',
+     why:'Blocks the F\u2080 proton channel. The gradient rises, and the chain eventually stalls against it.'},
+    {desc:'The inner membrane itself', ans:'2,4-dinitrophenol',
+     why:'Not an inhibitor at all. It ferries protons across the membrane, so the chain speeds up while ATP output collapses and heat rises.'}
+  ]
+});
+
+/* ---- M5S2 · metabolic detective ---- */
+(function(){
+  var host = document.getElementById('detectiveHost');
+  var READS = ['Electron transport rate','O\u2082 consumption','H\u207A gradient','ATP production','Heat production'];
+  var OPTS  = ['Increases','Decreases','Unchanged'];
+  var COMPOUNDS = {
+    'Rotenone': {
+      truth:['Decreases','Decreases','Decreases','Decreases','Decreases'],
+      why:'Complex I is blocked, so NADH-derived electrons cannot enter. Pumping falls, the gradient falls with it, and ATP output drops. Note that this dashboard is identical to cyanide\u2019s \u2014 telling them apart needs a second experiment: succinate restores respiration after rotenone but not after cyanide.'
+    },
+    'Cyanide': {
+      truth:['Decreases','Decreases','Decreases','Decreases','Decreases'],
+      why:'Complex IV is blocked, so no substrate can rescue the chain. Cells switch to glycolysis, and the resulting lactate produces a metabolic acidosis while blood oxygen stays normal.'
+    },
+    'Oligomycin': {
+      truth:['Decreases','Decreases','Increases','Decreases','Decreases'],
+      why:'The one pattern with a rising gradient. Protons are pumped but cannot return, so back-pressure builds until the chain stalls. Gradient up with oxygen consumption down is the signature of an ATP synthase block.'
+    },
+    '2,4-dinitrophenol': {
+      truth:['Increases','Increases','Decreases','Decreases','Increases'],
+      why:'The classic uncoupler pattern. Removing the back-pressure lets the chain run at full speed, and all that energy leaves as heat. Fatal hyperthermia is what ended its use as a weight-loss drug.'
+    },
+    'UCP-1 activation': {
+      truth:['Increases','Increases','Decreases','Decreases','Increases'],
+      why:'The same dashboard as DNP, because it is the same mechanism \u2014 but regulated and physiological. This is how brown adipose tissue warms an infant without shivering.'
+    }
+  };
+  var which = 'Rotenone';
+  var solved = (state.activities.detective && state.activities.detective.solved) || {};
+  var picks = new Array(READS.length).fill(null);
+
+  var chips = el('div','mini');
+  var grid  = el('div','stack');
+  var dash  = el('div','dash');
+  var ctrl  = bar();
+  var check = el('button','btn','Run the assay');
+  var next  = el('button','btn ghost','Clear predictions');
+  var score = cap('');
+  var out   = el('div','stack');
+  ctrl.appendChild(check); ctrl.appendChild(next); ctrl.appendChild(score);
+  host.appendChild(chips); host.appendChild(grid); host.appendChild(ctrl);
+  host.appendChild(dash); host.appendChild(out);
+
+  function paint(){
+    chips.innerHTML = '';
+    Object.keys(COMPOUNDS).forEach(function(c){
+      var b = el('button','chip' + (c === which ? ' on' : ''), (solved[c] ? '&#10003; ' : '') + c);
+      b.onclick = function(){
+        which = c; picks = new Array(READS.length).fill(null);
+        dash.innerHTML = ''; out.innerHTML = ''; score.textContent = '';
+        paint();
+      };
+      chips.appendChild(b);
+    });
+    grid.innerHTML = '';
+    grid.appendChild(el('p','caption','Administer <strong>' + which + '</strong>. Predict every reading before running the assay.'));
+    READS.forEach(function(r, i){
+      var row = el('div','sort-row');
+      row.appendChild(el('div','sort-text', r));
+      var strip = el('div','sort-opts');
+      OPTS.forEach(function(o){
+        var b = el('button','opt' + (picks[i] === o ? ' sel' : ''), o);
+        b.onclick = function(){
+          picks[i] = o;
+          strip.querySelectorAll('.opt').forEach(function(x){ x.classList.remove('sel'); });
+          b.classList.add('sel');
+        };
+        strip.appendChild(b);
+      });
+      row.appendChild(strip);
+      grid.appendChild(row);
+    });
+  }
+
+  check.onclick = function(){
+    if(picks.some(function(p){ return p === null; })){
+      score.textContent = 'Predict every reading first.';
+      return;
+    }
+    var truth = COMPOUNDS[which].truth, right = 0;
+    dash.innerHTML = '';
+    READS.forEach(function(r, i){
+      var t = truth[i];
+      var cls = t === 'Increases' ? 'up' : (t === 'Decreases' ? 'down' : 'same');
+      var arrow = t === 'Increases' ? '&#8593;' : (t === 'Decreases' ? '&#8595;' : '&#8776;');
+      if(picks[i] === t) right++;
+      dash.appendChild(el('div','dash-cell',
+        '<div class="k">' + r + '</div>' +
+        '<div class="v ' + cls + '">' + arrow + ' ' + t + '</div>' +
+        '<div class="k" style="margin-top:6px">you predicted: ' + picks[i] + '</div>'));
+    });
+    out.innerHTML = '';
+    out.appendChild(el('div','note', '<strong>' + which + '</strong><br>' + COMPOUNDS[which].why));
+    score.textContent = right + ' of ' + READS.length + ' predictions correct.';
+    solved[which] = true;
+    saveAct('detective', {solved:solved});
+    var n = Object.keys(solved).length;
+    if(n < 3){
+      out.appendChild(el('div','note', 'Compounds investigated: ' + n + ' of 3 minimum. Pick another compound above.'));
+    } else {
+      out.appendChild(el('div','note','<strong>Enough evidence to generalize.</strong> Oxygen consumption is the reading that separates an uncoupler from an inhibitor: an uncoupler drives it up, an inhibitor drives it down, and both end with less ATP.'));
+    }
+    paint();
+  };
+  next.onclick = function(){
+    picks = new Array(READS.length).fill(null);
+    dash.innerHTML = ''; out.innerHTML = ''; score.textContent = '';
+    paint();
+  };
+  paint();
+})();
+
+/* ---- LAB1 · case files ---- */
+makeMatch(document.getElementById('casesHost'), {
+  name:'cases',
+  options:['Uncoupler','Complex I inhibitor','Complex IV inhibitor','ATP synthase inhibitor','Loss of oxygen'],
+  items:[
+    {text:'Oxygen consumption rises, the gradient collapses, ATP output falls, and temperature rises.',
+     ans:'Uncoupler',
+     why:'Rising oxygen consumption rules out every inhibitor. Only a proton leak lets the chain speed up while ATP falls.'},
+    {text:'Succinate-driven respiration is normal; NADH-driven respiration has stopped.',
+     ans:'Complex I inhibitor',
+     why:'The two entry points are independent, so a lesion that spares succinate must lie on the NADH side of coenzyme Q.'},
+    {text:'The gradient is unusually high, oxygen consumption has fallen, and ATP output is near zero.',
+     ans:'ATP synthase inhibitor',
+     why:'A high gradient means protons are being pumped but cannot return. Nothing upstream would raise it.'},
+    {text:'Blood oxygen is normal, the tissues cannot use it, and lactate is rising.',
+     ans:'Complex IV inhibitor',
+     why:'Oxygen delivery is intact but oxygen use is blocked at the terminal step \u2014 the classic cyanide picture.'},
+    {text:'Every carrier in the chain is found in its reduced form and pumping has stopped.',
+     ans:'Loss of oxygen',
+     why:'With no terminal acceptor the whole chain fills up. An inhibitor would leave carriers downstream of the block oxidized instead.'},
+    {text:'Brown adipose tissue in a cold room: high oxygen use, high heat output, little ATP.',
+     ans:'Uncoupler',
+     why:'UCP-1 is a physiological uncoupler. The dashboard is the same as DNP\u2019s, but this is regulated and useful rather than toxic.'}
+  ]
+});
+</script>
+
+<!-- engine.js must load last: it builds the nav from MODULES, wires every
+     checkpoint and quiz, and shows the first section. -->
+<script src="shared/engine.js"></script>
+</body>
+</html>

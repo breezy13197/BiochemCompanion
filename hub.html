@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biochemistry Study Hub — PHA3134</title>
+<style>
+/* ============================================================
+   STUDY HUB v1.0 — design tokens
+   Companion colours are reserved for companions. The hub is
+   deliberately neutral so a student can tell "I am in the hub"
+   at a glance: charcoal shell, one azure accent, and each
+   companion's own colour used only where that companion appears.
+   ============================================================ */
+:root{
+  --accent:#2E8FE6; --accent-deep:#1E6FBF; --accent-soft:#E9F3FC; --accent-line:#C6E0F7;
+  --char:#1B1E24; --char-2:#252A32; --char-3:#333A45;
+  --moss:#1F7A54; --moss-soft:#E4F5EC; --moss-line:#BFE5D3;
+  --amber:#8F5906; --amber-soft:#FDF1DC; --amber-line:#F0D9AC;
+  --rose:#B3213B; --rose-soft:#FDEAEE; --rose-line:#F3C2CC;
+  --ink:#1B1E24; --ink-mid:#4E5661; --ink-soft:#7C8695;
+  --page:#F4F6F9; --card:#FFFFFF; --line:#E4E8EE; --line-soft:#F0F3F7;
+  --r-lg:20px; --r-md:14px; --r-sm:10px;
+  --shadow:0 1px 2px rgba(27,30,36,.04), 0 8px 24px rgba(27,30,36,.06);
+  --shadow-lift:0 2px 6px rgba(27,30,36,.07), 0 16px 38px rgba(27,30,36,.12);
+  --sans:"Segoe UI Variable Text","Segoe UI",Inter,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Cascadia Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em;line-height:1.25}
+p{margin:0 0 1em;max-width:70ch}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent-deep)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:252px 1fr;min-height:100vh}
+.rail{background:var(--char);color:#E8EBF0;padding:22px 16px;display:flex;flex-direction:column;gap:24px;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:11px}
+.brand .mark{width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
+  background:linear-gradient(140deg,var(--accent),#1D5FA8);color:#fff;font-weight:700;font-size:17px}
+.brand .name{font-weight:680;font-size:15.5px;line-height:1.15}
+.brand .sub{font-size:11.5px;color:#8B95A5}
+.rail nav{display:flex;flex-direction:column;gap:3px}
+.rail nav button{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:10px 12px;
+  border-radius:var(--r-sm);color:#B7C0CD;cursor:pointer;text-align:left;font-size:14.5px;min-height:42px}
+.rail nav button:hover{background:var(--char-2);color:#fff}
+.rail nav button[aria-current="true"]{background:var(--accent);color:#fff;font-weight:620}
+.rail nav .ic{width:18px;text-align:center;flex:0 0 auto;font-size:15px}
+.rail .railcap{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6E7887;padding:0 12px;margin-bottom:2px}
+.rail .foot{margin-top:auto;font-size:11.5px;color:#6E7887;line-height:1.5}
+.railring{background:var(--char-2);border-radius:var(--r-md);padding:14px;display:flex;align-items:center;gap:12px}
+.railring .num{font-size:1.05rem;font-weight:700;color:#fff}
+.railring .cap{font-size:11.5px;color:#8B95A5;line-height:1.35}
+
+.main{padding:26px 32px 70px;min-width:0}
+.topbar{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.topbar h1{font-size:23px}
+.topbar .sub{color:var(--ink-mid);font-size:13.5px;margin-top:3px}
+.actions{display:flex;gap:9px;flex-wrap:wrap}
+
+/* ---------- generic bits ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+.pad{padding:20px 22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:0 16px;
+  border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:560;
+  font-size:14px;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:#CBD3DE;box-shadow:var(--shadow)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-deep)}
+.btn.dark{background:var(--char);border-color:var(--char);color:#fff}
+.btn.dark:hover{background:var(--char-3)}
+.btn.small{min-height:32px;padding:0 11px;font-size:13px;border-radius:8px}
+.btn.danger{background:var(--rose-soft);border-color:var(--rose-line);color:var(--rose)}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:3px 9px;border-radius:999px;
+  background:var(--line-soft);color:var(--ink-mid);border:1px solid var(--line);white-space:nowrap}
+.chip.ok{background:var(--moss-soft);color:var(--moss);border-color:var(--moss-line)}
+.chip.warn{background:var(--amber-soft);color:var(--amber);border-color:var(--amber-line)}
+.chip.bad{background:var(--rose-soft);color:var(--rose);border-color:var(--rose-line)}
+.note{background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:var(--r-md);
+  padding:13px 15px;font-size:13.5px;color:var(--accent-deep);margin-bottom:16px}
+.note.warn{background:var(--amber-soft);border-color:var(--amber-line);color:#7A4C06}
+.note.bad{background:var(--rose-soft);border-color:var(--rose-line);color:#7D1226}
+.lead{color:var(--ink-mid);font-size:13.5px;margin:0 0 16px}
+.empty{padding:44px 24px;text-align:center;color:var(--ink-mid);font-size:14px}
+.empty strong{display:block;color:var(--ink);margin-bottom:6px;font-size:15.5px}
+.secthead{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:30px 0 14px;flex-wrap:wrap}
+.secthead h2{font-size:17px}
+.secthead .hint{font-size:13px;color:var(--ink-soft)}
+
+/* ---------- dashboard ---------- */
+.hero{background:linear-gradient(135deg,var(--char),#2C3440);color:#fff;border-radius:var(--r-lg);
+  padding:26px 28px;display:flex;gap:26px;align-items:center;flex-wrap:wrap;box-shadow:var(--shadow)}
+.hero .txt{flex:1 1 320px;min-width:0}
+.hero h2{font-size:20px;margin-bottom:6px}
+.hero p{color:#B7C0CD;font-size:13.5px;margin:0;max-width:60ch}
+.hero .cta{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.hero .btn{border-color:transparent}
+.bigring{flex:0 0 auto;display:flex;align-items:center;gap:16px}
+.bigring svg{width:112px;height:112px}
+.bigring .lbl{font-size:12.5px;color:#8B95A5;line-height:1.4}
+.bigring .pc{font-size:26px;font-weight:700;color:#fff}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:14px;margin-top:18px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:15px 17px;box-shadow:var(--shadow)}
+.stat .k{font-size:12.5px;color:var(--ink-mid)}
+.stat .v{font-size:25px;font-weight:680;margin-top:3px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:13px;font-weight:500;color:var(--ink-soft)}
+
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.ccard{position:relative;overflow:hidden;padding:20px 22px}
+.ccard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c,var(--accent))}
+.ccard h3{font-size:15.5px;padding-left:6px}
+.ccard .csub{font-size:12.5px;color:var(--ink-soft);padding-left:6px;margin-top:2px}
+.ccard .cbar{height:8px;border-radius:99px;background:var(--line-soft);overflow:hidden;margin:14px 0 6px}
+.ccard .cbar i{display:block;height:100%;border-radius:99px;background:var(--c,var(--accent))}
+.ccard .cpct{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-mid)}
+.mods{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;margin:14px 0 4px}
+.modrow{display:flex;align-items:center;gap:10px;font-size:12.5px;min-width:0}
+.modrow .mname{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-mid)}
+.modrow .mbar{flex:0 0 76px;height:6px;border-radius:99px;background:var(--line-soft);overflow:hidden}
+.modrow .mbar i{display:block;height:100%;background:var(--c,var(--accent));border-radius:99px}
+.modrow .mval{flex:0 0 52px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.modrow.done .mname{color:var(--ink)}
+.ccard .cfoot{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+.spark{display:flex;align-items:flex-end;gap:8px;height:96px;padding-top:8px}
+.spark .b{flex:1 1 0;min-width:14px;background:var(--accent-soft);border:1px solid var(--accent-line);
+  border-radius:6px 6px 3px 3px;position:relative;display:flex;align-items:flex-start;justify-content:center}
+.spark .b i{position:absolute;top:-19px;font-size:11.5px;color:var(--ink-mid);font-style:normal;font-variant-numeric:tabular-nums}
+.hist{display:grid;gap:8px}
+.histrow{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:var(--r-md);background:var(--line-soft);font-size:13px;flex-wrap:wrap}
+.histrow .hd{flex:1 1 auto;min-width:0}
+.histrow .hs{font-weight:650;font-variant-numeric:tabular-nums}
+
+/* ---------- setup forms ---------- */
+.setup{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.9fr);gap:18px;align-items:start}
+.fieldset{margin-bottom:22px}
+.flabel{font-size:13px;font-weight:650;color:var(--ink-mid);margin-bottom:9px;display:block}
+.fhint{font-size:12.5px;color:var(--ink-soft);margin:-4px 0 9px}
+.pickgrid{display:grid;gap:9px}
+.pick{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1.5px solid var(--line);
+  border-radius:var(--r-md);cursor:pointer;background:var(--card)}
+.pick:hover{border-color:#CBD3DE}
+.pick.on{border-color:var(--accent);background:var(--accent-soft)}
+.pick.locked{cursor:default;background:var(--line-soft);border-style:dashed;opacity:.85}
+.pick.locked .pname{color:var(--ink-mid)}
+.pick.locked input:disabled{accent-color:var(--ink-soft)}
+.pick input{width:18px;height:18px;flex:0 0 auto;accent-color:var(--accent)}
+.pick .pt{flex:1 1 auto;min-width:0}
+.pick .pname{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px}
+.pick .swatch{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.pick .pmeta{font-size:12px;color:var(--ink-soft);margin-top:1px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg button{min-height:38px;padding:0 15px;border-radius:9px;border:1.5px solid var(--line);background:var(--card);
+  cursor:pointer;font-size:14px}
+.seg button.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-deep);font-weight:620}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.numin{width:96px;border:1.5px solid var(--line);border-radius:9px;padding:8px 11px;min-height:40px}
+.textin{width:100%;max-width:420px;border:1.5px solid var(--line);border-radius:9px;padding:8px 12px;min-height:40px}
+.toggle{display:flex;align-items:center;gap:11px;padding:12px 14px;border:1.5px solid var(--line);border-radius:var(--r-md)}
+.toggle.on{border-color:var(--accent);background:var(--accent-soft)}
+.toggle input{width:18px;height:18px;accent-color:var(--accent)}
+.summary{position:sticky;top:26px}
+.summary dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:13.5px}
+.summary dt{color:var(--ink-soft)}
+.summary dd{margin:0;text-align:right;font-weight:600}
+
+/* ---------- exam runner ---------- */
+.examtop{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  background:var(--char);color:#fff;border-radius:var(--r-lg);padding:16px 22px;margin-bottom:18px}
+.examtop .et{font-size:14px;color:#B7C0CD}
+.examtop .en{font-size:18px;font-weight:650}
+.timer{font-variant-numeric:tabular-nums;font-size:22px;font-weight:700;letter-spacing:.02em}
+.timer.warn{color:#FFC46B}
+.timer.crit{color:#FF8A8A}
+.qcard{padding:26px 28px}
+.qmeta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.qstem{font-size:17px;font-weight:600;line-height:1.5;max-width:72ch;margin-bottom:18px}
+.choices{display:grid;gap:10px;max-width:72ch}
+.choice{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--card);
+  border:1.5px solid var(--line);border-radius:var(--r-md);padding:13px 16px;cursor:pointer;line-height:1.45}
+.choice:hover:not(:disabled){border-color:var(--accent-line);background:#FAFCFE}
+.choice .mk{flex:0 0 auto;width:24px;height:24px;border-radius:7px;background:var(--line-soft);
+  display:grid;place-items:center;font-size:12.5px;font-weight:700;color:var(--ink-mid)}
+.choice.picked{border-color:var(--accent);background:var(--accent-soft)}
+.choice.picked .mk{background:var(--accent);color:#fff}
+.choice.right{border-color:var(--moss);background:var(--moss-soft)}
+.choice.right .mk{background:var(--moss);color:#fff}
+.choice.wrong{border-color:var(--rose);background:var(--rose-soft)}
+.choice.wrong .mk{background:var(--rose);color:#fff}
+.choice:disabled{cursor:default}
+.qnav{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:24px;flex-wrap:wrap}
+.grid-nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.gn{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--line);background:var(--card);
+  font-size:12.5px;cursor:pointer;font-variant-numeric:tabular-nums}
+.gn.answered{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent-deep);font-weight:650}
+.gn.flagged{border-color:var(--amber);background:var(--amber-soft);color:var(--amber)}
+.gn.current{outline:3px solid var(--accent);outline-offset:1px}
+
+/* ---------- results ---------- */
+.scorehero{background:linear-gradient(135deg,var(--accent),#1D5FA8);color:#fff;border-radius:var(--r-lg);
+  padding:26px 28px;display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.scorehero .big{font-size:44px;font-weight:700;line-height:1}
+.scorehero p{color:rgba(255,255,255,.9);margin:6px 0 0;max-width:52ch;font-size:13.5px}
+.bd{display:grid;gap:10px}
+.bdrow{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--line-soft);
+  border-radius:var(--r-md);flex-wrap:wrap;font-size:13.5px}
+.bdname{flex:1 1 200px;font-weight:600}
+.bdbar{flex:1 1 110px;height:8px;background:#E4E9F0;border-radius:99px;overflow:hidden;min-width:90px}
+.bdbar i{display:block;height:100%;border-radius:99px}
+.bdstate{flex:0 0 auto;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+.review{display:grid;gap:14px}
+.rev{border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px}
+.rev .rstem{font-weight:600;margin-bottom:10px}
+.rev .ra{font-size:13.5px;margin:3px 0}
+.rev .ra.no{color:var(--rose)}
+.rev .ra.yes{color:var(--moss)}
+.rev .why{margin-top:10px;padding:12px 14px;background:var(--line-soft);border-left:4px solid var(--accent);
+  border-radius:var(--r-sm);font-size:13.5px}
+
+/* ---------- flashcards ---------- */
+.fcstage{perspective:1400px;margin:20px auto 12px;max-width:640px}
+.fc{position:relative;height:260px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.fc.flipped{transform:rotateY(180deg)}
+.fcface{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r-lg);display:grid;
+  place-items:center;text-align:center;padding:30px;box-shadow:var(--shadow)}
+.fcfront{background:linear-gradient(140deg,#F2F8FE,#E9F0F8);border:1px solid var(--accent-line)}
+.fcback{background:var(--card);border:1px solid var(--line);transform:rotateY(180deg)}
+.fcterm{font-size:20px;font-weight:650;max-width:34ch}
+.fchint{font-size:12.5px;color:var(--ink-soft);margin-top:14px}
+.fcdef{font-size:15px;color:var(--ink-mid);max-width:46ch}
+.fcbar{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:640px;margin:0 auto;flex-wrap:wrap}
+.fccount{font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.fctag{position:absolute;top:14px;left:16px;font-size:11.5px;color:var(--ink-soft)}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+table.tbl th,table.tbl td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line-soft)}
+table.tbl th{color:var(--ink-mid);font-weight:600;font-size:12.5px}
+table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--char);color:#fff;
+  padding:12px 18px;border-radius:11px;font-size:14px;box-shadow:var(--shadow-lift);z-index:60;max-width:min(560px,92vw)}
+#toast[hidden]{display:none}
+
+@media (max-width:1080px){
+  .app{grid-template-columns:1fr}
+  .rail{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:14px}
+  .rail nav{flex-direction:row;flex-wrap:wrap}
+  .rail .railcap,.rail .foot,.railring{display:none}
+  .main{padding:18px}
+  .setup{grid-template-columns:1fr}
+  .summary{position:static}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">H</div>
+      <div>
+        <div class="name">Study Hub</div>
+        <div class="sub">PHA3134 Biochemistry</div>
+      </div>
+    </div>
+
+    <nav id="nav" aria-label="Hub sections">
+      <div class="railcap">Study</div>
+      <button data-view="dash" aria-current="true"><span class="ic" aria-hidden="true">&#9635;</span>Dashboard</button>
+      <button data-view="companions"><span class="ic" aria-hidden="true">&#9776;</span>My companions</button>
+      <div class="railcap" style="margin-top:10px">Practice</div>
+      <button data-view="exam"><span class="ic" aria-hidden="true">&#9998;</span>Build an exam</button>
+      <button data-view="adaptive"><span class="ic" aria-hidden="true">&#10227;</span>Adaptive review</button>
+      <button data-view="cards"><span class="ic" aria-hidden="true">&#9634;</span>Flashcards</button>
+      <button data-view="flagged"><span class="ic" aria-hidden="true">&#9733;</span>Flagged questions</button>
+      <button data-view="history"><span class="ic" aria-hidden="true">&#8635;</span>Past results</button>
+      <div class="railcap" style="margin-top:10px">More</div>
+      <button data-view="backup"><span class="ic" aria-hidden="true">&#8681;</span>Save / load progress</button>
+      <button data-view="help"><span class="ic" aria-hidden="true">&#63;</span>How this works</button>
+    </nav>
+
+    <div class="railring" id="railring"></div>
+    <div class="foot">
+      Progress is saved in this browser only.<br>Use the same browser and device each time.
+    </div>
+  </aside>
+
+  <main class="main" id="main"></main>
+</div>
+
+<div id="toast" hidden role="status" aria-live="polite"></div>
+
+<!-- ============================================================
+     BANK LOADING
+     Every bank file declares the same global names (TOPIC_ID,
+     POOL, ...), so loading four of them in a row would leave only
+     the last one standing. HUB.capture() runs after each pair and
+     copies that topic's data somewhere safe before the next file
+     overwrites the globals.
+
+     TO ADD A NEW COMPANION: copy the three lines for one topic,
+     change the name in all three places. Nothing else to edit.
+     ============================================================ -->
+<script>
+var HUB = { topics:[], byId:{}, missing:[] };
+HUB.capture = function(expected){
+  var g = window;
+  if(typeof g.TOPIC_ID === 'undefined' || g.TOPIC_ID !== expected){
+    HUB.missing.push(expected);
+  } else {
+    var man = (typeof g.MANIFEST !== 'undefined' && g.MANIFEST && g.MANIFEST.topic === expected) ? g.MANIFEST : null;
+    var t = {
+      id: expected,
+      title: g.TOPIC_TITLE || expected,
+      pool: (typeof g.POOL !== 'undefined' && g.POOL) ? g.POOL : [],
+      checkpoints: (typeof g.CHECKPOINTS !== 'undefined' && g.CHECKPOINTS) ? g.CHECKPOINTS : {},
+      cards: (typeof g.CARDS !== 'undefined' && g.CARDS) ? g.CARDS : [],
+      manifest: man,
+      file: man ? man.file : null,
+      accent: man ? man.accent : '#2E8FE6',
+      accentSoft: man ? man.accentSoft : '#E9F3FC'
+    };
+    HUB.topics.push(t); HUB.byId[expected] = t;
+  }
+  /* Clear the globals so the next capture cannot mistake a file that
+     failed to load for one that did. */
+  g.TOPIC_ID = undefined; g.TOPIC_TITLE = undefined; g.POOL = undefined;
+  g.CHECKPOINTS = undefined; g.CARDS = undefined; g.MANIFEST = undefined;
+};
+</script>
+
+<script src="banks/enzymes.js"></script>
+<script src="banks/enzymes.manifest.js"></script>
+<script>HUB.capture('enzymes');</script>
+
+<script src="banks/aminoacids.js"></script>
+<script src="banks/aminoacids.manifest.js"></script>
+<script>HUB.capture('aminoacids');</script>
+
+<script src="banks/hemoglobin.js"></script>
+<script src="banks/hemoglobin.manifest.js"></script>
+<script>HUB.capture('hemoglobin');</script>
+
+<script src="banks/signaling.js"></script>
+<script src="banks/signaling.manifest.js"></script>
+<script>HUB.capture('signaling');</script>
+
+<script src="banks/nucleotides.js"></script>
+<script src="banks/nucleotides.manifest.js"></script>
+<script>HUB.capture('nucleotides');</script>
+
+<script src="banks/glycogen.js"></script>
+<script src="banks/glycogen.manifest.js"></script>
+<script>HUB.capture('glycogen');</script>
+
+<script src="banks/cac.js"></script>
+<script src="banks/cac.manifest.js"></script>
+<script>HUB.capture('cac');</script>
+
+<script src="banks/oxphos.js"></script>
+<script src="banks/oxphos.manifest.js"></script>
+<script>HUB.capture('oxphos');</script>
+
+<script src="banks/aametabolism.js"></script>
+<script src="banks/aametabolism.manifest.js"></script>
+<script>HUB.capture('aametabolism');</script>
+
+<script src="banks/integration.js"></script>
+<script src="banks/integration.manifest.js"></script>
+<script>HUB.capture('integration');</script>
+
+<!-- The hub's own bank has no companion page, so it has no manifest. -->
+<script src="banks/hub.js"></script>
+<script>HUB.capture('hub');</script>
+
+<script>
+/* ==========================================================================
+   STUDY HUB v1.0 — application
+   Reads each companion's saved progress out of this browser's storage,
+   draws a dashboard from it, and builds exams and flashcard decks from
+   the banks loaded above. No network, no server, no accounts.
+   ========================================================================== */
+"use strict";
+var VERSION = "1.0";
+var HUB_KEY = "hub.v1";
+
+/* ------------------------------------------------------------- helpers -- */
+function $(id){ return document.getElementById(id); }
+function el(tag, attrs, kids){
+  var n = document.createElement(tag);
+  if(attrs) for(var k in attrs){
+    if(k === "class") n.className = attrs[k];
+    else if(k === "text") n.textContent = attrs[k];
+    else if(k === "html") n.innerHTML = attrs[k];
+    else if(k.slice(0,2) === "on") n[k] = attrs[k];
+    else if(attrs[k] !== null && attrs[k] !== undefined && attrs[k] !== false) n.setAttribute(k, attrs[k]);
+  }
+  (kids||[]).forEach(function(c){ if(c) n.appendChild(c); });
+  return n;
+}
+var LETTERS = ["A","B","C","D","E","F"];
+function shuffle(a){ var x=a.slice(),i,j,t;
+  for(i=x.length-1;i>0;i--){ j=Math.floor(Math.random()*(i+1)); t=x[i]; x[i]=x[j]; x[j]=t; } return x; }
+function pct(n,d){ return d ? Math.round(n/d*100) : 0; }
+function toast(msg){
+  var t = $("toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast._t); toast._t = setTimeout(function(){ t.hidden = true; }, 4000);
+}
+function fmtDate(ts){
+  var d = new Date(ts);
+  return d.toLocaleDateString(undefined,{month:"short",day:"numeric"}) + " " +
+         d.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"});
+}
+function mmss(sec){
+  var m = Math.floor(sec/60), s = sec%60;
+  return m + ":" + (s<10?"0":"") + s;
+}
+
+/* ============================================================== STORAGE ==
+   Two separate things live in this browser:
+   1. Each companion's own progress, saved by that companion under
+      companion.<topic>.v1. The hub only ever READS these.
+   2. The hub's own record (exam history, which questions have been
+      seen, flashcard progress) under hub.v1. Only the hub writes this.
+   ======================================================================== */
+var storageWorks = (function(){
+  try{ localStorage.setItem("__t","1"); localStorage.removeItem("__t"); return true; }
+  catch(e){ return false; }
+})();
+var memory = {};
+function rawGet(k){ try{ return storageWorks ? localStorage.getItem(k) : (memory[k]||null); }catch(e){ return null; } }
+function rawSet(k,v){ try{ if(storageWorks) localStorage.setItem(k,v); else memory[k]=v; }catch(e){} }
+
+function blankHub(){
+  return { history:[], seen:{}, cards:{known:{},again:{}}, flags:{}, lastExam:null };
+}
+function loadHub(){
+  try{
+    var raw = rawGet(HUB_KEY);
+    var h = raw ? Object.assign(blankHub(), JSON.parse(raw)) : blankHub();
+    /* Saved data from before flags existed has no `flags` key, and
+       Object.assign copies the stored value over the blank default when
+       the key IS present, so guard rather than assume shape. */
+    if(!h.flags || typeof h.flags !== "object") h.flags = {};
+    if(!h.cards || typeof h.cards !== "object") h.cards = {known:{}, again:{}};
+    return h;
+  }
+  catch(e){ return blankHub(); }
+}
+function saveHub(){ try{ rawSet(HUB_KEY, JSON.stringify(H)); }catch(e){} }
+var H = loadHub();
+
+function companionState(topicId){
+  var blank = {checks:{}, activities:{}, best:{}, flags:{}};
+  try{
+    var raw = rawGet("companion." + topicId + ".v1");
+    return raw ? Object.assign(blank, JSON.parse(raw)) : blank;
+  }catch(e){ return blank; }
+}
+
+/* ---- the one place the hub WRITES to a companion's storage ----
+   Everywhere else the hub treats companion.<topic>.v1 as read-only, so
+   it can never corrupt progress a companion owns. Clearing a flag is the
+   single deliberate exception: a student who flagged a question inside a
+   companion should be able to tick it off from the hub's Flagged list
+   without hunting back through the module.
+
+   It is a read-modify-write against the CURRENT stored value rather than
+   a cached copy, and it touches only the `flags` key, so nothing else in
+   that companion's progress can be clobbered by it. The remaining risk is
+   the same one any two-tab edit has: if the companion is open in another
+   tab, that tab still holds an older `state` in memory and could write it
+   back on its next save. Clearing a flag is cheap to redo, so this is
+   worth the convenience — but it is why nothing heavier is written here. */
+function setCompanionFlag(topicId, qid, on){
+  var key = "companion." + topicId + ".v1";
+  var obj;
+  try{ obj = JSON.parse(rawGet(key) || "{}"); }
+  catch(e){ obj = {}; }
+  if(!obj || typeof obj !== "object") obj = {};
+  if(!obj.flags || typeof obj.flags !== "object") obj.flags = {};
+  if(on) obj.flags[qid] = Date.now();
+  else delete obj.flags[qid];
+  rawSet(key, JSON.stringify(obj));
+}
+
+/* ============================================================= PROGRESS ==
+   Rebuilds each companion's completion rules from its manifest, using
+   exactly the logic engine.js uses inside the companion itself:
+     - a section with `checks` is done when every one of those
+       checkpoints is answered CORRECTLY (and its activity, if any,
+       has been submitted at least once)
+     - a quiz section is done once submitted, at any score
+     - landing pages and flashcard decks are never gated
+   ======================================================================== */
+function sectionStatus(topic, st, sec){
+  if(sec.quiz !== undefined) return { gradable:true, done: st.best[sec.quiz] !== undefined };
+  if(!sec.checks && !sec.activity) return { gradable:false, done:true };
+  var cps = topic.checkpoints || {};
+  var checksOK = (sec.checks||[]).every(function(id){
+    return cps[id] && st.checks[id] !== undefined && st.checks[id] === cps[id].answer;
+  });
+  var actOK = !sec.activity || (st.activities[sec.activity] !== null && st.activities[sec.activity] !== undefined);
+  return { gradable:true, done: checksOK && actOK };
+}
+function modulesFrom(topic, st){
+  /* The module-by-module rollup, factored out of progressFor() so the
+     backup/restore preview (see BACKUP below) can run the exact same
+     completion math against a state object read from a FILE instead of
+     from this browser's storage — without duplicating the rule. */
+  var out = { modules:[], done:0, total:0 };
+  topic.manifest.modules.forEach(function(mod){
+    var d=0, t=0, quizBest;
+    mod.sections.forEach(function(sec){
+      var s = sectionStatus(topic, st, sec);
+      if(!s.gradable) return;
+      t++; if(s.done) d++;
+      if(sec.quiz !== undefined && st.best[sec.quiz] !== undefined) quizBest = st.best[sec.quiz];
+    });
+    out.done += d; out.total += t;
+    out.modules.push({ id:mod.id, title:mod.title, done:d, total:t, pct:pct(d,t), best:quizBest });
+  });
+  out.pct = pct(out.done, out.total);
+  return out;
+}
+function progressFor(topic){
+  var st = companionState(topic.id);
+  var out = { topic:topic, hasManifest:!!topic.manifest, modules:[], done:0, total:0, pct:0, best:st.best, state:st };
+  if(!topic.manifest){
+    /* No manifest: fall back to whatever quiz scores exist. */
+    var keys = Object.keys(st.best);
+    out.total = keys.length; out.done = keys.length;
+    out.pct = keys.length ? Math.round(keys.reduce(function(s,k){ return s+st.best[k]; },0)/keys.length) : 0;
+    return out;
+  }
+  return Object.assign(out, modulesFrom(topic, st));
+}
+function allProgress(){
+  return HUB.topics.filter(function(t){ return t.id !== "hub"; }).map(progressFor);
+}
+function overallPct(){
+  var p = allProgress(), d = 0, t = 0;
+  p.forEach(function(x){ if(x.hasManifest){ d += x.done; t += x.total; } });
+  return pct(d,t);
+}
+
+/* =========================================================== BACKUP/RESTORE
+   Every companion saves under companion.<topic>.v1, and the hub saves
+   under hub.v1 — both scoped to THIS browser, on THIS device (see
+   storageWorks above). There is no server here, so "sync across devices"
+   means the student carries the data themselves: download a single file
+   on one device, load that same file on the next one.
+
+   The one real danger in a feature like this is silent data loss — a
+   student loads an old backup over newer work without realising it. To
+   guard against that, importing never happens blind: the file is parsed
+   and compared against what's already in this browser BEFORE anything
+   is written, and only companions actually present in the file are
+   touched. Anything else already on this device — including companions
+   built after the backup was made — is left exactly as it is.
+   ============================================================ */
+var BACKUP = { file:null, payload:null, error:null };
+
+function backupCompanionIds(){
+  return HUB.topics.filter(function(t){ return t.id !== "hub"; }).map(function(t){ return t.id; });
+}
+function buildBackupPayload(label){
+  var companions = {};
+  backupCompanionIds().forEach(function(id){
+    var raw = rawGet("companion." + id + ".v1");
+    if(raw !== null) companions[id] = raw;
+  });
+  return {
+    kind: "biochem-hub-backup",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    label: (label || "").trim(),
+    hub: H,
+    companions: companions
+  };
+}
+function downloadBackup(label){
+  var payload = buildBackupPayload(label);
+  var blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  var url = URL.createObjectURL(blob);
+  var safe = payload.label.replace(/[^a-z0-9]+/gi,"-").replace(/^-+|-+$/g,"").toLowerCase();
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = "biochem-progress" + (safe ? "-" + safe : "") + "-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+}
+
+/* A JSON value is only really "an object" for our purposes if it's a
+   plain object — typeof null and typeof [] are BOTH "object" in JS,
+   which is exactly the trap that let a backup with companions: null
+   pass validation and then crash the preview at Object.keys(). Every
+   shape check below goes through this instead of a bare typeof. */
+function isPlainObject(v){ return v !== null && typeof v === "object" && !Array.isArray(v); }
+
+/* The one gate a companion's raw stored string has to pass before the
+   hub will ever preview it or write it back to localStorage: it must
+   be a string (not a number/object/array that JSON round-tripped into
+   one), it must parse, and if it carries any of the known top-level
+   fields those fields must be the right kind of value. This does NOT
+   require every field to be present — older or newer backups are
+   still expected to be missing fields the running code adds or
+   removes over time (see storage.js's own Object.assign(blank, ...)
+   pattern) — it only rejects a field that's present but the wrong
+   shape, which is what would otherwise corrupt that companion's
+   progress silently. previewRow(), the restore confirmation, and
+   applyBackup() all call this SAME function, so what the preview
+   promises is exactly what gets written — nothing is validated for
+   display and then written unchecked. */
+function validateCompanionRaw(raw){
+  if(typeof raw !== "string") return {ok:false};
+  var parsed;
+  try{ parsed = JSON.parse(raw); }catch(e){ return {ok:false}; }
+  if(!isPlainObject(parsed)) return {ok:false};
+  var mustBeObjectIfPresent = ["checks","activities","best","flags"];
+  for(var i=0;i<mustBeObjectIfPresent.length;i++){
+    var f = mustBeObjectIfPresent[i];
+    if(parsed[f] !== undefined && !isPlainObject(parsed[f])) return {ok:false};
+  }
+  if(parsed.lastSection !== undefined && parsed.lastSection !== null && typeof parsed.lastSection !== "string"){
+    return {ok:false};
+  }
+  return {ok:true, state:parsed};
+}
+
+/* Runs the SAME completion rule modulesFrom() uses on live storage, but
+   against a state object parsed out of a backup file instead — so the
+   "what's in this file" preview can never drift from "what the dashboard
+   actually shows" for the same data. */
+function previewRow(topic, rawJson){
+  if(rawJson === undefined) return null;
+  var v = validateCompanionRaw(rawJson);
+  if(!v.ok) return { unreadable:true };
+  var blank = {checks:{}, activities:{}, best:{}};
+  var st = Object.assign(blank, v.state);
+  if(!topic.manifest){
+    var keys = Object.keys(st.best);
+    var p = keys.length ? Math.round(keys.reduce(function(s,k){return s+st.best[k];},0)/keys.length) : 0;
+    return { pct:p, done:keys.length, total:keys.length, quizOnly:true };
+  }
+  var m = modulesFrom(topic, st);
+  return { pct:m.pct, done:m.done, total:m.total, quizOnly:false };
+}
+function parseBackupFile(text){
+  var payload;
+  try{ payload = JSON.parse(text); }
+  catch(e){ return { ok:false, error:"That file isn't valid JSON — it may be damaged, or not a backup file at all." }; }
+  if(!isPlainObject(payload) || payload.kind !== "biochem-hub-backup" || !isPlainObject(payload.companions)){
+    return { ok:false, error:"That file doesn't look like a backup made by this hub." };
+  }
+  return { ok:true, payload:payload };
+}
+function applyBackup(payload){
+  var written = [], skipped = [];
+  Object.keys(payload.companions).forEach(function(id){
+    if(validateCompanionRaw(payload.companions[id]).ok){
+      rawSet("companion." + id + ".v1", payload.companions[id]);
+      written.push(id);
+    }else{
+      skipped.push(id);
+    }
+  });
+  if(isPlainObject(payload.hub)){
+    H = Object.assign(blankHub(), payload.hub);
+    saveHub();
+  }
+  if(skipped.length){
+    toast(skipped.length + " compan" + (skipped.length===1?"y":"ies") + " in that file "+
+      (skipped.length===1?"was":"were")+" unreadable and left untouched — reloading…");
+    setTimeout(function(){ location.reload(); }, 2400);
+  }else{
+    toast("Progress restored — reloading…");
+    setTimeout(function(){ location.reload(); }, 700);
+  }
+  return { written:written, skipped:skipped };
+}
+
+/* ================================================================= GATING ==
+   A companion's questions can only be drawn into a hub exam once that
+   companion is genuinely done. Otherwise a student could skip the
+   checkpoints, activities and quizzes a companion requires and just sit
+   a hub exam covering the same material instead — which would undercut
+   every bit of the completion logic engine.js enforces (§8 of
+   companion-architecture.md).
+
+   Rules, decided deliberately rather than left implicit:
+     - the hub's own cross-topic bank ('hub') is never gated — it belongs
+       to no single companion, so there is nothing for a student to skip
+       by using it
+     - a companion with no manifest file can't have its 100% verified at
+       all, so it is treated as LOCKED, not as an exception. This mirrors
+       the "missing manifest -> fall back, don't guess" rule in §14.3 of
+       companion-architecture.md
+     - a companion counts as unlocked only at exactly 100% (progressFor's
+       pct), the same figure the companion's own progress ring shows —
+       there is no partial-credit unlock
+   Flashcards are NOT gated by this: they are a study aid, not a way to
+   sit a graded round, so restricting them would not close any real
+   loophole and would only get in the way of review.
+   ======================================================================== */
+function unlockStatus(topicId){
+  var t = HUB.byId[topicId];
+  if(!t) return { unlocked:false, reason:"missing" };
+  if(topicId === "hub") return { unlocked:true, reason:"hub" };
+  var p = progressFor(t);
+  if(!p.hasManifest) return { unlocked:false, reason:"no-manifest", pct:null };
+  if(p.pct < 100) return { unlocked:false, reason:"incomplete", pct:p.pct };
+  return { unlocked:true, reason:"complete", pct:100 };
+}
+function unlockedTopicIds(){
+  return HUB.topics.filter(function(t){ return unlockStatus(t.id).unlocked; }).map(function(t){ return t.id; });
+}
+function lockLine(status){
+  if(status.reason === "no-manifest") return "Locked — this companion has no manifest file yet, so the hub cannot confirm it is complete.";
+  if(status.reason === "incomplete") return "Locked at " + status.pct + "% — complete every section of the companion to unlock its questions here.";
+  return "Locked.";
+}
+
+/* ============================================================== WEAKNESS ==
+   A single 0-to-1 number per (companion, content area). 1 means "this is
+   the weakest thing you have". Three sources feed it:
+     1. hub exam history      — how you actually scored on that area here
+     2. companion quiz bests  — a low module quiz score weakens that
+                                module's areas
+     3. checkpoints           — a section whose checkpoints are still
+                                unanswered marks its area as unpracticed
+   Sources are blended, with exam history weighted most because it is
+   direct evidence and the newest.
+   ======================================================================== */
+function areaKey(topicId, area){ return topicId + "::" + area; }
+
+function weaknessMap(){
+  var W = {};   /* key -> {topic, area, score, why[], asked, right, practiced, status} */
+  function ensure(tid, area){
+    var k = areaKey(tid, area);
+    if(!W[k]) W[k] = { key:k, topic:tid, area:area, asked:0, right:0, parts:[], why:[], practiced:false };
+    return W[k];
+  }
+  /* Every area that exists anywhere gets an entry, so untouched areas
+     can still be offered. */
+  HUB.topics.forEach(function(t){
+    t.pool.forEach(function(q){ if(q.area) ensure(t.id, q.area); });
+  });
+
+  /* --- 1. hub exam history (newest attempts count most) --- */
+  var hist = H.history.slice(-12);
+  hist.forEach(function(a, i){
+    var recency = 0.5 + 0.5 * ((i+1) / hist.length);
+    Object.keys(a.byArea || {}).forEach(function(k){
+      var b = a.byArea[k];
+      var e = W[k]; if(!e) return;
+      e.asked += b.total; e.right += b.got;
+      var miss = 1 - (b.got / Math.max(1,b.total));
+      e.parts.push({ w: 1.6 * recency * Math.min(1, b.total/3 + .4), v: miss });
+      if(miss > 0) e.why.push("missed " + (b.total-b.got) + " of " + b.total + " here in a hub exam");
+    });
+  });
+
+  /* --- 2. companion quiz attempts, tracked per area, not per module ---
+     engine.js's grade() records real per-question right/wrong into
+     state.areaStats on every quiz submission — module quizzes, the
+     final exam, and in-companion "practice what you missed" rounds
+     alike. Reading that here means a specific concept area's evidence
+     comes from actual questions asked about that area, not from a
+     single overall score attributed to every area the quiz happened
+     to touch — a module quiz covering five areas used to flag all
+     five as equally weak the moment ANY one of them dragged the score
+     down, even areas the student answered perfectly. */
+  HUB.topics.forEach(function(t){
+    if(!t.manifest) return;
+    var st = companionState(t.id);
+    var stats = st.areaStats || {};
+    Object.keys(stats).forEach(function(area){
+      var s = stats[area];
+      if(!s || !s.asked) return;
+      var e = ensure(t.id, area);
+      e.asked += s.asked; e.right += s.right;
+      var missRate = 1 - (s.right / s.asked);
+      e.parts.push({ w: 1.4, v: missRate });
+      if(missRate > 0) e.why.push("missed " + (s.asked - s.right) + " of " + s.asked + " questions here across quizzes");
+      /* Regression signal: lifetime accuracy here looks fine, but the
+         most recent attempt on this exact area came back wrong — a
+         concept the student had before and is now missing, which a
+         plain lifetime average would bury under earlier correct
+         answers. This is a separate, lighter-weight nudge on top of
+         the accuracy part above, not a replacement for it. */
+      if(s.lastAcc !== null && s.lastAcc < 1 && (s.right / s.asked) >= 0.7){
+        e.parts.push({ w: 0.8, v: 1 - s.lastAcc });
+        e.why.push("got this wrong most recently, despite a good history here");
+      }
+    });
+  });
+
+  /* --- 3. section completion — a PRACTICE STATUS, never scored evidence.
+     An unfinished section means "hasn't been studied yet," which is not
+     the same claim as "struggling with it," and blending the two used to
+     let an untouched section outrank a genuinely evidenced gap. This
+     source only ever sets e.practiced; it never adds to e.parts. --- */
+  HUB.topics.forEach(function(t){
+    if(!t.manifest) return;
+    var st = companionState(t.id);
+    var secToAreas = {};
+    Object.keys(t.manifest.areaSection || {}).forEach(function(area){
+      var key = t.manifest.areaSection[area];
+      (secToAreas[key] = secToAreas[key] || []).push(area);
+    });
+    t.manifest.modules.forEach(function(mod){
+      mod.sections.forEach(function(sec){
+        var areas = secToAreas[sec.key]; if(!areas) return;
+        if(sec.quiz !== undefined) return;
+        var s = sectionStatus(t, st, sec);
+        if(!s.done) return;
+        areas.forEach(function(a){ ensure(t.id, a).practiced = true; });
+      });
+    });
+  });
+
+  /* --- blend --- */
+  Object.keys(W).forEach(function(k){
+    var e = W[k], sw = 0, sv = 0;
+    e.parts.forEach(function(p){ sw += p.w; sv += p.w * p.v; });
+    e.score = sw ? sv / sw : 0;   /* no assessed evidence -> no gap, not "middling" */
+    e.evidence = sw;
+    e.accuracy = e.asked ? Math.round(e.right / e.asked * 100) : null;
+    e.why = e.why.filter(function(v,i,arr){ return arr.indexOf(v) === i; }).slice(0,2);
+    /* "not-practiced": no assessed evidence anywhere AND the section
+       covering it hasn't been completed either — genuinely untouched.
+       "practiced-unassessed": the section is done but no quiz/exam has
+       asked about it yet, so there's nothing to call a gap.
+       "assessed": there is real evidence; rankedWeak()'s own threshold
+       decides whether that evidence amounts to "needs review". */
+    e.status = e.evidence > 0 ? "assessed" : (e.practiced ? "practiced-unassessed" : "not-practiced");
+  });
+  return W;
+}
+/* Areas with zero assessed evidence AND an unfinished section — material
+   the student genuinely hasn't gotten to, as distinct from rankedWeak()'s
+   evidenced gaps. Symmetric to rankedWeak() so callers can show both
+   lists without recomputing weaknessMap() twice. */
+function rankedNotPracticed(topicIds){
+  var W = weaknessMap();
+  return Object.keys(W).map(function(k){ return W[k]; })
+    .filter(function(e){ return (!topicIds || topicIds.indexOf(e.topic) > -1) && e.status === "not-practiced"; });
+}
+function rankedWeak(minEvidence){
+  var W = weaknessMap();
+  return Object.keys(W).map(function(k){ return W[k]; })
+    .filter(function(e){ return e.evidence >= (minEvidence||0.5) && e.score > 0.12; })
+    .sort(function(a,b){ return b.score - a.score; });
+}
+
+/* ================================================================ EXAMS ==
+   An exam is just a list of question objects pulled out of the banks,
+   each tagged with which companion it came from.
+   ======================================================================== */
+function poolFor(topicIds, levels){
+  var out = [];
+  /* Hub questions are tagged with their "home" companion in q.m (see §14.5
+     of companion-architecture.md). If the student picked specific,
+     UNLOCKED companions alongside the hub bank, only surface a hub
+     question whose home companion is one of those — otherwise "Enzymes +
+     Integration" would hand back hub questions about hemoglobin/signaling
+     that have nothing to do with either selection.
+     This is computed from unlocked companions only (never "hub" itself),
+     so a locked topic that somehow ended up in topicIds can't be used to
+     smuggle its hub questions in. If no unlocked companion is selected —
+     e.g. the student picked only the hub bank — there is nothing to
+     restrict against, so the full hub bank is used unfiltered. */
+  var selectedCompanions = topicIds.filter(function(id){
+    return id !== "hub" && unlockStatus(id).unlocked;
+  });
+  topicIds.forEach(function(id){
+    if(!unlockStatus(id).unlocked) return;   /* enforced here, not just in the UI — see "gating" above */
+    var t = HUB.byId[id]; if(!t) return;
+    t.pool.forEach(function(q){
+      if(levels && levels.length && levels.indexOf(q.level) === -1) return;
+      if(id === "hub" && selectedCompanions.length && selectedCompanions.indexOf(q.m) === -1) return;
+      out.push({ q:q, topic:id });
+    });
+  });
+  return out;
+}
+function seenCount(qid){ return (H.seen[qid] && H.seen[qid].n) || 0; }
+/* Find a question by id within a topic's bank. Returns null when the bank
+   no longer holds it (edited out, or that companion isn't loaded here) —
+   callers must handle null rather than assume a hit. */
+function findQuestion(topicId, qid){
+  var t = HUB.byId[topicId];
+  if(!t) return null;
+  for(var i = 0; i < t.pool.length; i++){ if(t.pool[i].id === qid) return t.pool[i]; }
+  return null;
+}
+
+/* ================================================================= FLAGS ==
+   A student can flag a question in two places, and both feed one list:
+     - inside a companion, after grading a module quiz or the mastery exam
+       -> stored in that companion's own state.flags
+     - inside a hub exam, during or after
+       -> stored in H.flags
+   collectFlags() merges the two into one array, newest first. Where the
+   same question is flagged in both places it appears once, tagged with
+   where it came from, because "flagged" is a property of the question,
+   not of the room the student happened to be in.
+   ======================================================================== */
+function isFlagged(topicId, qid){
+  if(H.flags && H.flags[qid]) return true;
+  var st = companionState(topicId);
+  return !!(st.flags && st.flags[qid]);
+}
+function toggleFlag(topicId, qid){
+  var on = !isFlagged(topicId, qid);
+  if(on){
+    H.flags[qid] = { topic:topicId, ts:Date.now() };
+    saveHub();
+  } else {
+    /* Clear from BOTH stores, or a flag set inside a companion would
+       silently come back the next time the list was built. */
+    if(H.flags[qid]){ delete H.flags[qid]; saveHub(); }
+    setCompanionFlag(topicId, qid, false);
+  }
+  return on;
+}
+function collectFlags(){
+  var out = [], seenIds = {};
+  HUB.topics.forEach(function(t){
+    if(t.id === "hub") return;
+    var st = companionState(t.id);
+    Object.keys(st.flags || {}).forEach(function(qid){
+      seenIds[qid] = 1;
+      out.push({ id:qid, topic:t.id, ts:st.flags[qid] || 0, origin:"companion" });
+    });
+  });
+  Object.keys(H.flags || {}).forEach(function(qid){
+    var rec = H.flags[qid];
+    if(seenIds[qid]){
+      out.forEach(function(f){ if(f.id === qid) f.origin = "both"; });
+      return;
+    }
+    out.push({ id:qid, topic:(rec && rec.topic) || "hub", ts:(rec && rec.ts) || 0, origin:"hub" });
+  });
+  out.sort(function(a,b){ return b.ts - a.ts; });
+  return out;
+}
+
+function buildExam(opts){
+  var items = poolFor(opts.topics, opts.levels);
+  if(opts.preferUnseen){
+    var fresh = shuffle(items.filter(function(x){ return seenCount(x.q.id) === 0; }));
+    var rest  = shuffle(items.filter(function(x){ return seenCount(x.q.id) > 0; }))
+                 .sort(function(a,b){ return seenCount(a.q.id) - seenCount(b.q.id); });
+    items = fresh.concat(rest);
+  } else {
+    items = shuffle(items);
+  }
+  return items.slice(0, opts.count);
+}
+function buildAdaptive(opts){
+  var weak = rankedWeak(0.5).filter(function(e){
+    return opts.topics.indexOf(e.topic) > -1;
+  });
+  if(!weak.length) return { items: buildExam(opts), areas: [] };
+
+  var focus = weak.slice(0, Math.max(3, Math.min(6, weak.length)));
+  var picked = [], used = {};
+  /* Every eligible question is pulled through poolFor() ONCE, up front —
+     the same gate buildExam() uses everywhere else, which applies both
+     opts.levels and companion-unlock gating. Filtering per weak area
+     used to re-read t.pool directly with a hand-rolled area-only check
+     that had drifted out of sync with poolFor() on both counts: a
+     concept-only adaptive request could return integration questions,
+     and — since rankedWeak() can surface a companion's weak areas
+     before that companion has reached the 100% poolFor() requires to
+     unlock it — a locked companion's questions could be served here
+     without going through poolFor()'s gating check at all. Sourcing
+     candidates from poolFor()'s own output instead of a second copy of
+     its filtering logic is what keeps this from drifting again. */
+  var eligible = poolFor(opts.topics, opts.levels);
+  /* Share the questions out across the weak areas, weakest area first,
+     preferring questions this student has seen least. */
+  var perArea = Math.max(2, Math.ceil(opts.count / focus.length));
+  focus.forEach(function(e){
+    var cand = eligible.filter(function(x){ return x.topic === e.topic && x.q.area === e.area; });
+    cand = shuffle(cand).sort(function(a,b){ return seenCount(a.q.id) - seenCount(b.q.id); });
+    cand.slice(0, perArea).forEach(function(x){ if(!used[x.q.id]){ used[x.q.id]=1; picked.push(x); } });
+  });
+  /* Top up from the same companions if the weak areas were thin. */
+  if(picked.length < opts.count){
+    buildExam({topics:opts.topics, levels:opts.levels, count:opts.count*3, preferUnseen:true})
+      .forEach(function(x){ if(picked.length < opts.count && !used[x.q.id]){ used[x.q.id]=1; picked.push(x); } });
+  }
+  return { items: shuffle(picked).slice(0, opts.count), areas: focus };
+}
+
+/* ================================================================= VIEWS = */
+var VIEW = "dash";
+var TITLES = {
+  dash:["Dashboard","Where you are across every companion."],
+  companions:["My companions","Every module, and what is left in it."],
+  exam:["Build an exam","Choose what to be tested on, then sit it."],
+  adaptive:["Adaptive review","A set built from the things you have missed."],
+  cards:["Flashcards","Retrieval practice across any companions you pick."],
+  flagged:["Flagged questions","Everything you marked to come back to, from any companion or hub exam."],
+  history:["Past results","Every exam you have sat, with its questions and explanations."],
+  backup:["Save & load your progress","Move your progress between devices and browsers."],
+  help:["How this works","What the hub does, and where your progress lives."]
+};
+function setView(v){
+  VIEW = v;
+  Array.prototype.forEach.call(document.querySelectorAll("#nav button"), function(b){
+    b.setAttribute("aria-current", b.dataset.view === v ? "true" : "false");
+  });
+  render();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+$("nav").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-view]");
+  if(!b) return;
+  if(EXAM.live && !confirm("Leave this exam? Your answers so far are discarded.")) return;
+  EXAM.stop();
+  setView(b.dataset.view);
+});
+
+function shell(title, sub, actions){
+  var M = $("main"); M.innerHTML = "";
+  var bar = el("div",{class:"topbar"},[
+    el("div",{},[ el("h1",{text:title}), el("div",{class:"sub", text:sub}) ]),
+    el("div",{class:"actions"}, actions||[])
+  ]);
+  M.appendChild(bar);
+  return M;
+}
+function ring(pctVal, size, colour, thick){
+  var r = 18, circ = 113;
+  var svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("viewBox","0 0 44 44");
+  svg.setAttribute("width",size); svg.setAttribute("height",size);
+  svg.setAttribute("aria-hidden","true");
+  svg.innerHTML =
+    '<circle cx="22" cy="22" r="'+r+'" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="'+(thick||5)+'"/>'+
+    '<circle cx="22" cy="22" r="'+r+'" fill="none" stroke="'+(colour||"#2E8FE6")+'" stroke-width="'+(thick||5)+'"'+
+    ' stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+(circ - circ*pctVal/100)+'"'+
+    ' transform="rotate(-90 22 22)"/>';
+  return svg;
+}
+function paintRail(){
+  var p = overallPct();
+  var box = $("railring"); box.innerHTML = "";
+  box.appendChild(ring(p, 48, "#2E8FE6", 5));
+  box.appendChild(el("div",{},[
+    el("div",{class:"num", text:p + "%"}),
+    el("div",{class:"cap", html:"of all companion<br>work complete"})
+  ]));
+}
+
+/* ------------------------------------------------------------ DASHBOARD -- */
+function renderDash(){
+  var M = shell(TITLES.dash[0], TITLES.dash[1], [
+    el("button",{class:"btn", text:"Flashcards", onclick:function(){ setView("cards"); }}),
+    el("button",{class:"btn primary", text:"Build an exam", onclick:function(){ setView("exam"); }})
+  ]);
+  var progs = allProgress();
+  var op = overallPct();
+
+  if(HUB.missing.length){
+    M.appendChild(el("div",{class:"note bad", text:
+      "These files did not load: " + HUB.missing.join(", ") +
+      ". Check that each one sits in the banks folder next to hub.html, spelled exactly the same way."}));
+  }
+  if(!storageWorks){
+    M.appendChild(el("div",{class:"note warn", text:
+      "This browser is blocking saved progress, so nothing from this session is remembered and no companion progress can be read. Private browsing mode is the usual cause."}));
+  }
+
+  /* hero */
+  var weak = rankedWeak(0.6);
+  var notPracticed = weak.length ? [] : rankedNotPracticed();
+  var heroTxt = el("div",{class:"txt"});
+  heroTxt.appendChild(el("h2",{text: op === 0 ? "Welcome — nothing started yet" :
+    op === 100 ? "Every companion is complete" : "You are " + op + "% of the way through"}));
+  heroTxt.appendChild(el("p",{text:
+    op === 0 ? "Open a companion to begin, or sit a practice exam here to see where you already stand."
+    : weak.length ? "Your weakest area right now is " + weak[0].area + " in " +
+        (HUB.byId[weak[0].topic] ? HUB.byId[weak[0].topic].title : weak[0].topic) + "."
+    : notPracticed.length ? notPracticed.length + " concept" + (notPracticed.length===1?"":"s") +
+        " " + (notPracticed.length===1?"hasn't":"haven't") + " been studied yet — nothing to review until then."
+    : "Nothing is flagged as weak yet. Sit an exam and the hub will start targeting what you miss."}));
+  var cta = el("div",{class:"cta"});
+  cta.appendChild(el("button",{class:"btn primary", text:"Start an adaptive review", onclick:function(){ setView("adaptive"); }}));
+  cta.appendChild(el("button",{class:"btn", text:"See all modules", onclick:function(){ setView("companions"); }}));
+  heroTxt.appendChild(cta);
+
+  var hero = el("div",{class:"hero"},[heroTxt]);
+  var rw = el("div",{class:"bigring"});
+  rw.appendChild(ring(op, 112, "#4FA9F5", 4));
+  rw.appendChild(el("div",{},[ el("div",{class:"pc", text:op+"%"}), el("div",{class:"lbl", html:"of all gradable<br>sections complete"}) ]));
+  hero.appendChild(rw);
+  M.appendChild(hero);
+
+  /* stats */
+  var attempts = H.history.length;
+  var avg = attempts ? Math.round(H.history.reduce(function(s,a){ return s + a.pct; },0)/attempts) : 0;
+  var seenN = Object.keys(H.seen).length;
+  var totalQ = HUB.topics.reduce(function(s,t){ return s + t.pool.length; },0);
+  var modsDone = 0, modsAll = 0;
+  progs.forEach(function(p){ p.modules.forEach(function(m){ if(m.total){ modsAll++; if(m.pct===100) modsDone++; } }); });
+  var stats = el("div",{class:"stats"});
+  function stat(k,v,sub){ stats.appendChild(el("div",{class:"stat"},[
+    el("div",{class:"k", text:k}), el("div",{class:"v", html: v + (sub? ' <small>'+sub+'</small>' : "")}) ]));}
+  stat("Modules complete", modsDone, "of " + modsAll);
+  stat("Questions met", seenN, "of " + totalQ);
+  stat("Hub exams taken", attempts);
+  stat("Average hub score", attempts ? avg + "%" : "—");
+  M.appendChild(stats);
+
+  /* companion cards */
+  M.appendChild(el("div",{class:"secthead"},[
+    el("h2",{text:"Progress by companion"}),
+    el("span",{class:"hint", text:"Read from each companion's own saved progress in this browser."})
+  ]));
+  var grid = el("div",{class:"cgrid"});
+  progs.forEach(function(p){ grid.appendChild(companionCard(p, 3)); });
+  M.appendChild(grid);
+
+  /* history */
+  if(H.history.length){
+    M.appendChild(el("div",{class:"secthead"},[
+      el("h2",{text:"Recent hub exams"}),
+      el("button",{class:"btn small", text:"See all past results", onclick:function(){ setView("history"); }})
+    ]));
+    var card = el("div",{class:"card pad"});
+    var last = H.history.slice(-8);
+    var sp = el("div",{class:"spark"});
+    last.forEach(function(a){
+      var b = el("div",{class:"b", title: fmtDate(a.ts) + " — " + a.pct + "%"});
+      b.style.height = Math.max(8, a.pct) + "%";
+      b.appendChild(el("i",{text:a.pct + "%"}));
+      sp.appendChild(b);
+    });
+    card.appendChild(sp);
+    var hist = el("div",{class:"hist", style:"margin-top:22px"});
+    H.history.slice(-5).reverse().forEach(function(a){
+      var reviewable = !!(a.items && a.items.length);
+      hist.appendChild(el("div",{class:"histrow"},[
+        el("span",{class:"chip" + (a.pct>=80?" ok":a.pct>=60?" warn":" bad"), text:a.pct + "%"}),
+        el("span",{class:"hd", text:(a.mode === "adaptive" ? "Adaptive review" : a.mode === "flagged" ? "Flagged questions" : "Practice exam") + " · " +
+          a.total + " questions · " + a.topics.map(function(t){ return HUB.byId[t] ? HUB.byId[t].title.split(":")[0] : t; }).join(", ")}),
+        el("span",{class:"hs", text:fmtDate(a.ts)}),
+        reviewable ? el("button",{class:"btn small", text:"Review", onclick:function(){ openAttempt(a); }}) : null
+      ]));
+    });
+    card.appendChild(hist);
+    M.appendChild(card);
+  }
+  paintRail();
+}
+
+function companionCard(p, maxModules){
+  var t = p.topic;
+  var c = el("div",{class:"card ccard"});
+  c.style.setProperty("--c", t.accent);
+  c.appendChild(el("h3",{text:t.title}));
+  c.appendChild(el("div",{class:"csub", text: t.pool.length + " questions · " + t.cards.length + " flashcards"}));
+  var bar = el("div",{class:"cbar"}); bar.appendChild(el("i",{style:"width:" + p.pct + "%"}));
+  c.appendChild(bar);
+  var status = unlockStatus(t.id);
+  c.appendChild(el("div",{class:"cpct"},[
+    el("span",{text: p.hasManifest ? p.done + " of " + p.total + " sections done" : "Quiz scores only"}),
+    el("span",{text: p.pct + "%"})
+  ]));
+  if(!status.unlocked){
+    c.appendChild(el("div",{style:"margin-top:8px"},[
+      el("span",{class:"chip warn", text: p.hasManifest ? "Hub exams locked until 100%" : "Hub exams locked — no manifest"})
+    ]));
+  }
+  if(p.hasManifest){
+    var mods = el("div",{class:"mods"});
+    p.modules.filter(function(m){ return m.total > 0; }).slice(0, maxModules || 99).forEach(function(m){
+      var row = el("div",{class:"modrow" + (m.pct===100?" done":"")},[
+        el("span",{class:"mname", text:m.title}),
+        el("span",{class:"mbar"},[ el("i",{style:"width:" + m.pct + "%"}) ]),
+        el("span",{class:"mval", text: m.pct + "%"})
+      ]);
+      mods.appendChild(row);
+    });
+    var shown = p.modules.filter(function(m){ return m.total > 0; }).length;
+    if(maxModules && shown > maxModules){
+      mods.appendChild(el("div",{class:"modrow"},[ el("span",{class:"mname",
+        text:"and " + (shown - maxModules) + " more"}) ]));
+    }
+    c.appendChild(mods);
+  } else {
+    c.appendChild(el("div",{class:"note warn", style:"margin:14px 0 0;font-size:12.5px", text:
+      "No manifest file for this companion, so the hub can show its quiz scores but not its section-by-section progress."}));
+  }
+  var foot = el("div",{class:"cfoot"});
+  if(t.file) foot.appendChild(el("a",{class:"btn small", href:t.file, text:"Open companion"}));
+  if(status.unlocked){
+    foot.appendChild(el("button",{class:"btn small", text:"Practice this topic", onclick:function(){
+      EXAMSETUP.topics = [t.id]; setView("exam");
+    }}));
+  } else {
+    foot.appendChild(el("button",{class:"btn small", text:"Hub exams locked", onclick:function(){
+      toast("Finish " + t.title.split(":")[0] + " to 100% to unlock it for hub exams — open the companion to keep going.");
+    }}));
+  }
+  c.appendChild(foot);
+  return c;
+}
+
+/* ----------------------------------------------------------- COMPANIONS -- */
+function renderCompanions(){
+  var M = shell(TITLES.companions[0], TITLES.companions[1]);
+  var progs = allProgress();
+  progs.forEach(function(p){
+    var card = el("div",{class:"card pad", style:"margin-bottom:16px;border-left:5px solid " + p.topic.accent});
+    card.appendChild(el("h3",{text:p.topic.title}));
+    card.appendChild(el("p",{class:"lead", text: p.hasManifest
+      ? p.done + " of " + p.total + " gradable sections complete (" + p.pct + "%)."
+      : "This companion has no manifest file, so only its quiz scores can be read."}));
+    var cstatus = unlockStatus(p.topic.id);
+    if(!cstatus.unlocked){
+      card.appendChild(el("div",{class:"note warn", style:"margin-bottom:14px", text:
+        "Locked for hub exams: " + lockLine(cstatus).replace(/^Locked( —)?\s*/i,"") }));
+    }
+    if(p.hasManifest){
+      var tb = el("table",{class:"tbl"});
+      tb.appendChild(el("tr",{},[el("th",{text:"Module"}),el("th",{class:"num",text:"Sections done"}),
+        el("th",{class:"num",text:"Quiz best"}),el("th",{text:"State"})]));
+      p.modules.forEach(function(m){
+        if(!m.total) return;
+        tb.appendChild(el("tr",{},[
+          el("td",{text:m.title}),
+          el("td",{class:"num", text:m.done + " / " + m.total}),
+          el("td",{class:"num", text: m.best === undefined ? "—" : m.best + "%"}),
+          el("td",{},[ el("span",{class:"chip" + (m.pct===100?" ok":m.pct>0?" warn":""),
+            text: m.pct===100 ? "Complete" : m.pct>0 ? m.pct + "% in progress" : "Not started"}) ])
+        ]));
+      });
+      card.appendChild(tb);
+    }
+    var foot = el("div",{class:"actions", style:"margin-top:16px"});
+    if(p.topic.file) foot.appendChild(el("a",{class:"btn", href:p.topic.file, text:"Open " + p.topic.title.split(":")[0]}));
+    if(cstatus.unlocked){
+      foot.appendChild(el("button",{class:"btn", text:"Exam on this companion", onclick:function(){
+        EXAMSETUP.topics = [p.topic.id]; setView("exam"); }}));
+    } else {
+      var lb = el("button",{class:"btn", text:"Exam locked until 100%"});
+      lb.disabled = true;
+      foot.appendChild(lb);
+    }
+    card.appendChild(foot);
+    M.appendChild(card);
+  });
+  paintRail();
+}
+
+/* ---------------------------------------------------------- EXAM SETUP --- */
+var EXAMSETUP = { topics:null, count:20, timed:false, minutes:30, levels:[], preferUnseen:true };
+function defaultTopics(){
+  return unlockedTopicIds();
+}
+function allTopicIds(){
+  /* Flashcards are deliberately not gated (see the gating note above), so
+     the deck picker defaults to every companion, not just unlocked ones. */
+  return HUB.topics.map(function(t){ return t.id; });
+}
+function renderExamSetup(adaptive){
+  var key = adaptive ? "adaptive" : "exam";
+  var M = shell(TITLES[key][0], TITLES[key][1]);
+  if(EXAMSETUP.topics === null) EXAMSETUP.topics = defaultTopics();
+  /* Defensive: strip anything locked out of a stale selection. Nothing
+     locked should ever reach here, but poolFor() also enforces this
+     independently — see the gating note near unlockStatus(). */
+  EXAMSETUP.topics = EXAMSETUP.topics.filter(function(id){ return unlockStatus(id).unlocked; });
+
+  var lockedTopics = HUB.topics.filter(function(t){ return !unlockStatus(t.id).unlocked; });
+  if(lockedTopics.length){
+    M.appendChild(el("div",{class:"note warn"}, [
+      el("div",{style:"font-weight:650;margin-bottom:4px", text:"Some companions are locked here"}),
+      el("div",{text:"A companion's questions only join hub exams once that companion is complete — otherwise a hub exam would let you skip the practice built into it. " +
+        lockedTopics.length + " " + (lockedTopics.length===1?"companion is":"companions are") + " not yet unlocked below."})
+    ]));
+  }
+
+  if(adaptive){
+    /* Scoped to EXAMSETUP.topics, the exact list buildAdaptive() will
+       draw from once the round starts (poolFor()'s gating means a
+       locked companion's questions can never actually be asked here) —
+       so this preview can't promise a target the round can't keep. */
+    var weakAll = rankedWeak(0.5).filter(function(e){ return EXAMSETUP.topics.indexOf(e.topic) > -1; });
+    if(!weakAll.length){
+      M.appendChild(el("div",{class:"note warn", text:
+        "There is not enough evidence yet to target anything. Finish some checkpoints inside a companion, or sit one ordinary practice exam, and the adaptive round will have something to work from. Until then it behaves like a normal exam."}));
+    } else {
+      var n = el("div",{class:"note"});
+      n.appendChild(el("div",{style:"font-weight:650;margin-bottom:6px", text:"What this round will target"}));
+      var ul = el("div",{});
+      weakAll.slice(0,5).forEach(function(e){
+        ul.appendChild(el("div",{style:"margin:3px 0"}, [
+          el("span",{class:"chip bad", text: Math.round(e.score*100) + "% gap"}),
+          el("span",{text:" " + e.area + " — " + (HUB.byId[e.topic] ? HUB.byId[e.topic].title.split(":")[0] : e.topic) +
+            (e.why.length ? " (" + e.why[0] + ")" : "")})
+        ]));
+      });
+      n.appendChild(ul);
+      M.appendChild(n);
+    }
+  }
+
+  var left = el("div",{});
+  var right = el("div",{class:"card pad summary"});
+
+  /* --- companions --- */
+  var fs1 = el("div",{class:"card pad fieldset"});
+  fs1.appendChild(el("span",{class:"flabel", text:"Draw questions from"}));
+  fs1.appendChild(el("div",{class:"fhint", text:"The hub's own bank holds cross-topic questions that appear nowhere inside a companion."}));
+  var pg = el("div",{class:"pickgrid"});
+  HUB.topics.forEach(function(t){
+    var status = unlockStatus(t.id);
+    if(!status.unlocked){
+      var lrow = el("div",{class:"pick locked"},[
+        el("input",{type:"checkbox", disabled:true}),
+        el("span",{class:"pt"},[
+          el("span",{class:"pname"},[
+            el("span",{class:"swatch", style:"background:" + t.accent}),
+            el("span",{text:t.title})
+          ]),
+          el("span",{class:"pmeta", text:lockLine(status)})
+        ]),
+        (t.file ? el("a",{class:"btn small", href:t.file, text:"Open"}) : null)
+      ]);
+      pg.appendChild(lrow);
+      return;
+    }
+    var on = EXAMSETUP.topics.indexOf(t.id) > -1;
+    var cb = el("input",{type:"checkbox"}); cb.checked = on;
+    var row = el("label",{class:"pick" + (on?" on":"")},[
+      cb,
+      el("span",{class:"pt"},[
+        el("span",{class:"pname"},[
+          el("span",{class:"swatch", style:"background:" + t.accent}),
+          el("span",{text: t.id === "hub" ? "Integration & review (hub only)" : t.title})
+        ]),
+        el("span",{class:"pmeta", text: t.pool.length + " questions available"})
+      ])
+    ]);
+    cb.onchange = function(){
+      var i = EXAMSETUP.topics.indexOf(t.id);
+      if(this.checked && i === -1) EXAMSETUP.topics.push(t.id);
+      if(!this.checked && i > -1) EXAMSETUP.topics.splice(i,1);
+      row.classList.toggle("on", this.checked);
+      refreshSummary();
+    };
+    pg.appendChild(row);
+  });
+  fs1.appendChild(pg);
+  left.appendChild(fs1);
+
+  /* --- length --- */
+  var fs2 = el("div",{class:"card pad fieldset"});
+  fs2.appendChild(el("span",{class:"flabel", text:"How many questions"}));
+  var seg = el("div",{class:"seg"});
+  [10,20,30,40].forEach(function(n){
+    var b = el("button",{class: EXAMSETUP.count===n ? "on":"", text:String(n), onclick:function(){
+      EXAMSETUP.count = n; numin.value = n; paintSeg(); refreshSummary();
+    }});
+    seg.appendChild(b);
+  });
+  function paintSeg(){
+    Array.prototype.forEach.call(seg.children, function(b){
+      b.classList.toggle("on", Number(b.textContent) === EXAMSETUP.count);
+    });
+  }
+  var numin = el("input",{type:"number", class:"numin", min:"1", max:"120", value:String(EXAMSETUP.count),
+    "aria-label":"Number of questions", oninput:function(){
+      var v = Math.max(1, Math.min(120, Number(this.value)||1));
+      EXAMSETUP.count = v; paintSeg(); refreshSummary();
+    }});
+  fs2.appendChild(el("div",{class:"row"},[seg, el("span",{class:"fhint", style:"margin:0", text:"or"}), numin]));
+  left.appendChild(fs2);
+
+  /* --- timing --- */
+  var fs3 = el("div",{class:"card pad fieldset"});
+  fs3.appendChild(el("span",{class:"flabel", text:"Timing"}));
+  fs3.appendChild(el("div",{class:"fhint", text:"A timed paper submits itself when the clock runs out, the way an exam does. Untimed lets you stop and think."}));
+  var tcb = el("input",{type:"checkbox"}); tcb.checked = EXAMSETUP.timed;
+  var mins = el("input",{type:"number", class:"numin", min:"1", max:"240", value:String(EXAMSETUP.minutes),
+    "aria-label":"Minutes", oninput:function(){ EXAMSETUP.minutes = Math.max(1, Number(this.value)||1); refreshSummary(); }});
+  mins.disabled = !EXAMSETUP.timed;
+  var tg = el("label",{class:"toggle" + (EXAMSETUP.timed?" on":"")},[ tcb, el("span",{text:"Put this exam on a clock"}) ]);
+  tcb.onchange = function(){
+    EXAMSETUP.timed = this.checked;
+    tg.classList.toggle("on", this.checked);
+    mins.disabled = !this.checked;
+    if(this.checked){ EXAMSETUP.minutes = Math.max(5, Math.round(EXAMSETUP.count * 1.5)); mins.value = EXAMSETUP.minutes; }
+    refreshSummary();
+  };
+  fs3.appendChild(el("div",{class:"row"},[ tg, mins, el("span",{class:"fhint", style:"margin:0", text:"minutes"}) ]));
+  left.appendChild(fs3);
+
+  /* --- levels + unseen --- */
+  var fs4 = el("div",{class:"card pad fieldset"});
+  fs4.appendChild(el("span",{class:"flabel", text:"Question level"}));
+  fs4.appendChild(el("div",{class:"fhint", text:"Leave all three off for a mixture, which is what a real exam looks like."}));
+  var lseg = el("div",{class:"seg"});
+  [["concept","Concept"],["application","Application"],["integration","Integration"]].forEach(function(p){
+    var b = el("button",{class: EXAMSETUP.levels.indexOf(p[0])>-1 ? "on":"", text:p[1], onclick:function(){
+      var i = EXAMSETUP.levels.indexOf(p[0]);
+      if(i>-1) EXAMSETUP.levels.splice(i,1); else EXAMSETUP.levels.push(p[0]);
+      b.classList.toggle("on", i === -1); refreshSummary();
+    }});
+    lseg.appendChild(b);
+  });
+  fs4.appendChild(lseg);
+  var ucb = el("input",{type:"checkbox"}); ucb.checked = EXAMSETUP.preferUnseen;
+  var ut = el("label",{class:"toggle" + (EXAMSETUP.preferUnseen?" on":""), style:"margin-top:14px"},
+    [ ucb, el("span",{text:"Show me questions I have not met yet, first"}) ]);
+  ucb.onchange = function(){ EXAMSETUP.preferUnseen = this.checked; ut.classList.toggle("on", this.checked); };
+  fs4.appendChild(ut);
+  left.appendChild(fs4);
+
+  /* --- summary --- */
+  function refreshSummary(){
+    right.innerHTML = "";
+    right.appendChild(el("h3",{text:"Your exam"}));
+    var avail = poolFor(EXAMSETUP.topics, EXAMSETUP.levels).length;
+    var real = Math.min(EXAMSETUP.count, avail);
+    var dl = el("dl");
+    function pair(k,v){ dl.appendChild(el("dt",{text:k})); dl.appendChild(el("dd",{text:v})); }
+    pair("Companions", EXAMSETUP.topics.length);
+    pair("Questions", real + (real < EXAMSETUP.count ? " (all there are)" : ""));
+    pair("Levels", EXAMSETUP.levels.length ? EXAMSETUP.levels.join(", ") : "mixed");
+    pair("Time", EXAMSETUP.timed ? EXAMSETUP.minutes + " min" : "untimed");
+    if(adaptive) pair("Targets", "your weakest areas");
+    right.appendChild(dl);
+    right.appendChild(el("div",{class:"lead", style:"margin:16px 0 0", text:
+      avail === 0 ? "Pick at least one companion to draw from."
+      : "Questions are drawn fresh each time, and the answer choices are reshuffled, so retaking never gives the same paper twice."}));
+    var go = el("button",{class:"btn primary", style:"width:100%;margin-top:16px",
+      text: adaptive ? "Start adaptive review" : "Start exam", onclick:function(){
+        if(!avail){ toast("Choose at least one companion first."); return; }
+        startExam(adaptive);
+      }});
+    go.disabled = !avail;
+    right.appendChild(go);
+  }
+  refreshSummary();
+
+  var wrap = el("div",{class:"setup"},[left, right]);
+  M.appendChild(wrap);
+  paintRail();
+}
+
+/* --------------------------------------------------------- EXAM RUNNER -- */
+var EXAM = {
+  live:false, items:[], picks:[], orders:[], flags:[], i:0, mode:"normal",
+  endsAt:null, tick:null, targets:[],
+  stop:function(){ if(EXAM.tick){ clearInterval(EXAM.tick); EXAM.tick = null; } EXAM.live = false; }
+};
+
+function startExam(adaptive){
+  var opts = { topics:EXAMSETUP.topics.slice(), levels:EXAMSETUP.levels.slice(),
+               count:EXAMSETUP.count, preferUnseen:EXAMSETUP.preferUnseen };
+  var built = adaptive ? buildAdaptive(opts) : { items: buildExam(opts), areas: [] };
+  if(!built.items.length){ toast("No questions matched those settings."); return; }
+  EXAM.items = built.items;
+  EXAM.targets = built.areas;
+  EXAM.picks = built.items.map(function(){ return null; });
+  EXAM.flags = built.items.map(function(){ return false; });
+  EXAM.orders = built.items.map(function(x){ return shuffle(x.q.options.map(function(_,i){ return i; })); });
+  EXAM.i = 0;
+  EXAM.mode = adaptive ? "adaptive" : "normal";
+  EXAM.live = true;
+  EXAM.endsAt = EXAMSETUP.timed ? Date.now() + EXAMSETUP.minutes*60000 : null;
+  if(EXAM.tick) clearInterval(EXAM.tick);
+  if(EXAM.endsAt) EXAM.tick = setInterval(paintTimer, 500);
+  renderExam();
+}
+function paintTimer(){
+  var t = $("timer"); if(!t || !EXAM.endsAt) return;
+  var left = Math.max(0, Math.round((EXAM.endsAt - Date.now())/1000));
+  t.textContent = mmss(left);
+  t.className = "timer" + (left <= 30 ? " crit" : left <= 120 ? " warn" : "");
+  if(left <= 0){ clearInterval(EXAM.tick); EXAM.tick = null; gradeExam(true); }
+}
+function renderExam(){
+  var M = $("main"); M.innerHTML = "";
+  var it = EXAM.items[EXAM.i], q = it.q, t = HUB.byId[it.topic];
+
+  var top = el("div",{class:"examtop"});
+  top.appendChild(el("div",{},[
+    el("div",{class:"et", text: EXAM.mode === "adaptive" ? "Adaptive review" : EXAM.mode === "flagged" ? "Flagged questions" : "Practice exam"}),
+    el("div",{class:"en", text:"Question " + (EXAM.i+1) + " of " + EXAM.items.length})
+  ]));
+  var answered = EXAM.picks.filter(function(p){ return p !== null; }).length;
+  top.appendChild(el("div",{},[
+    el("div",{class:"et", text:"Answered"}),
+    el("div",{class:"en", text: answered + " / " + EXAM.items.length})
+  ]));
+  if(EXAM.endsAt){
+    top.appendChild(el("div",{},[
+      el("div",{class:"et", text:"Time left"}),
+      el("div",{class:"timer", id:"timer", text:"--:--"})
+    ]));
+  }
+  top.appendChild(el("button",{class:"btn", text:"Submit", onclick:function(){ gradeExam(false); }}));
+  M.appendChild(top);
+
+  var card = el("div",{class:"card qcard"});
+  var meta = el("div",{class:"qmeta"});
+  meta.appendChild(el("span",{class:"chip", html:'<span style="width:8px;height:8px;border-radius:2px;display:inline-block;background:'+t.accent+'"></span>' +
+    (t.id === "hub" ? "Integration" : t.title.split(":")[0])}));
+  if(q.level) meta.appendChild(el("span",{class:"chip", text:q.level}));
+  if(q.area) meta.appendChild(el("span",{class:"chip", text:q.area}));
+  card.appendChild(meta);
+  card.appendChild(el("div",{class:"qstem", text:q.stem}));
+
+  var box = el("div",{class:"choices"});
+  EXAM.orders[EXAM.i].forEach(function(realIdx, pos){
+    var b = el("button",{class:"choice" + (EXAM.picks[EXAM.i] === realIdx ? " picked" : ""), onclick:function(){
+      EXAM.picks[EXAM.i] = realIdx; renderExam();
+    }},[
+      el("span",{class:"mk", text:LETTERS[pos]}),
+      el("span",{text:q.options[realIdx]})
+    ]);
+    box.appendChild(b);
+  });
+  card.appendChild(box);
+
+  var nav = el("div",{class:"qnav"});
+  var back = el("button",{class:"btn", text:"\u2190 Back", onclick:function(){ if(EXAM.i>0){ EXAM.i--; renderExam(); } }});
+  back.disabled = EXAM.i === 0;
+  var mid = el("div",{class:"row"},[
+    el("button",{class:"btn" + (EXAM.flags[EXAM.i]?" primary":""), text: EXAM.flags[EXAM.i] ? "Flagged" : "Flag for later",
+      onclick:function(){ EXAM.flags[EXAM.i] = !EXAM.flags[EXAM.i]; renderExam(); }}),
+    el("button",{class:"btn", text:"Clear answer", onclick:function(){ EXAM.picks[EXAM.i] = null; renderExam(); }})
+  ]);
+  var next = EXAM.i === EXAM.items.length - 1
+    ? el("button",{class:"btn primary", text:"Finish and submit", onclick:function(){ gradeExam(false); }})
+    : el("button",{class:"btn primary", text:"Next \u2192", onclick:function(){ EXAM.i++; renderExam(); }});
+  nav.appendChild(back); nav.appendChild(mid); nav.appendChild(next);
+  card.appendChild(nav);
+
+  var gn = el("div",{class:"grid-nav"});
+  EXAM.items.forEach(function(_, i){
+    gn.appendChild(el("button",{class:"gn" + (EXAM.picks[i]!==null?" answered":"") +
+      (EXAM.flags[i]?" flagged":"") + (i===EXAM.i?" current":""),
+      text:String(i+1), "aria-label":"Go to question " + (i+1),
+      onclick:function(){ EXAM.i = i; renderExam(); }}));
+  });
+  card.appendChild(el("div",{class:"lead", style:"margin:22px 0 0", text:"Jump to any question:"}));
+  card.appendChild(gn);
+  M.appendChild(card);
+  if(EXAM.endsAt) paintTimer();
+}
+
+function gradeExam(auto){
+  var missing = EXAM.picks.filter(function(p){ return p === null; }).length;
+  if(!auto && missing && !confirm(missing + " question" + (missing>1?"s are":" is") +
+     " still unanswered. Submit anyway?")) return;
+  EXAM.stop();
+
+  var byArea = {}, byTopic = {}, correct = 0, rows = [];
+  EXAM.items.forEach(function(it, i){
+    var q = it.q, right = (EXAM.picks[i] === q.answer);
+    if(right) correct++;
+    var ak = areaKey(it.topic, q.area || "General");
+    if(!byArea[ak]) byArea[ak] = {got:0, total:0, area:q.area || "General", topic:it.topic};
+    byArea[ak].total++; if(right) byArea[ak].got++;
+    if(!byTopic[it.topic]) byTopic[it.topic] = {got:0, total:0};
+    byTopic[it.topic].total++; if(right) byTopic[it.topic].got++;
+    rows.push({item:it, right:right, pick:EXAM.picks[i], flag:EXAM.flags[i]});
+    var s = H.seen[q.id] || {n:0, ok:0};
+    s.n++; if(right) s.ok++;
+    H.seen[q.id] = s;
+    /* A flag raised during the exam becomes a lasting one, so it turns up
+       in the Flagged questions list alongside anything flagged inside a
+       companion — not just in this one attempt's review. */
+    if(EXAM.flags[i]) H.flags[q.id] = { topic:it.topic, ts:Date.now() };
+  });
+  var score = pct(correct, EXAM.items.length);
+  H.history.push({ ts:Date.now(), mode:EXAM.mode, pct:score, correct:correct,
+    /* Derived from the questions actually in this attempt (byTopic, built
+       just above) rather than from EXAMSETUP.topics. EXAMSETUP reflects
+       whatever checkboxes were last ticked in the exam-builder screen —
+       it has no meaning for a round built another way, like Practice
+       flagged questions, which sets up EXAM directly and never touches
+       EXAMSETUP. Reading it here breaks the moment a round doesn't come
+       from that one screen; reading it from EXAM.items itself can't. */
+    total:EXAM.items.length, topics:Object.keys(byTopic),
+    byArea: Object.keys(byArea).reduce(function(o,k){ o[k] = {got:byArea[k].got, total:byArea[k].total}; return o; }, {}),
+    /* The questions themselves, so this attempt stays re-readable in the
+       History tab. Only ids and the student's picks are stored — never the
+       question text, which is looked up from the banks at read time so an
+       edited rationale shows its current wording rather than a stale copy.
+       Flags are kept because the student's own "come back to this" signal
+       is worth more later than it is during the exam. */
+    items: EXAM.items.map(function(it, i){
+      return { id:it.q.id, topic:it.topic, pick:EXAM.picks[i], flag:EXAM.flags[i] ? 1 : 0 };
+    }) });
+  if(H.history.length > 60) H.history = H.history.slice(-60);
+  saveHub();
+  renderResults(score, correct, byArea, byTopic, rows, auto);
+}
+
+function renderResults(score, correct, byArea, byTopic, rows, auto){
+  var M = $("main"); M.innerHTML = "";
+  var hero = el("div",{class:"scorehero"});
+  hero.appendChild(el("div",{},[ el("div",{class:"big", text:score + "%"}) ]));
+  hero.appendChild(el("div",{style:"flex:1 1 280px"},[
+    el("h2",{text: correct + " of " + rows.length + " correct" + (auto ? " — time ran out" : "")}),
+    el("p",{text:
+      score >= 88 ? "Strong across the board. Push into the areas you have met least."
+      : score >= 63 ? "A solid base with clear gaps. The breakdown below shows where."
+      : "Worth going back into the companions for the weak areas before testing again."})
+  ]));
+  M.appendChild(hero);
+
+  /* by companion */
+  M.appendChild(el("div",{class:"secthead"},[el("h2",{text:"By companion"})]));
+  var c1 = el("div",{class:"card pad"});
+  var bd1 = el("div",{class:"bd"});
+  Object.keys(byTopic).forEach(function(tid){
+    var b = byTopic[tid], p = pct(b.got, b.total), t = HUB.byId[tid];
+    bd1.appendChild(bdRow(t ? (tid === "hub" ? "Integration & review" : t.title) : tid, p, b.got, b.total, t ? t.accent : null));
+  });
+  c1.appendChild(bd1); M.appendChild(c1);
+
+  /* by area */
+  M.appendChild(el("div",{class:"secthead"},[el("h2",{text:"By content area"}),
+    el("span",{class:"hint", text:"This is what the adaptive round reads next time."})]));
+  var c2 = el("div",{class:"card pad"});
+  var bd2 = el("div",{class:"bd"});
+  var weakAreas = [];
+  Object.keys(byArea).forEach(function(k){
+    var b = byArea[k], p = pct(b.got, b.total);
+    if(p < 100) weakAreas.push(b);
+    bd2.appendChild(bdRow(b.area + "  ·  " + (HUB.byId[b.topic] ? HUB.byId[b.topic].title.split(":")[0] : b.topic),
+      p, b.got, b.total, null));
+  });
+  c2.appendChild(bd2);
+  if(weakAreas.length){
+    var links = el("div",{class:"note warn", style:"margin:18px 0 0"});
+    links.appendChild(el("div",{style:"font-weight:650;margin-bottom:8px", text:"Where to go back to"}));
+    var seenLink = {};
+    weakAreas.forEach(function(b){
+      var t = HUB.byId[b.topic];
+      if(!t || !t.manifest) return;
+      var sec = t.manifest.areaSection[b.area];
+      if(!sec || seenLink[b.topic + sec]) return;
+      seenLink[b.topic + sec] = 1;
+      var label = "";
+      t.manifest.modules.forEach(function(m){ m.sections.forEach(function(s){ if(s.key === sec) label = s.label; }); });
+      links.appendChild(el("div",{style:"margin:4px 0"},[
+        el("a",{href: t.file, text: t.title.split(":")[0] + " \u2014 " + (label || sec)})
+      ]));
+    });
+    links.appendChild(el("div",{style:"margin-top:8px;font-size:12.5px", text:
+      "Opening a companion takes you to its own page; use its sidebar to reach that section."}));
+    c2.appendChild(links);
+  }
+  M.appendChild(c2);
+
+  /* review */
+  M.appendChild(el("div",{class:"secthead"},[el("h2",{text:"Every question, with the reasoning"})]));
+  var c3 = el("div",{class:"card pad"});
+  c3.appendChild(reviewListEl(rows)); M.appendChild(c3);
+
+  var act = el("div",{class:"actions", style:"margin-top:20px"});
+  if(weakAreas.length){
+    act.appendChild(el("button",{class:"btn primary", text:"Practice what you missed (" + weakAreas.length + " areas)",
+      onclick:function(){
+        EXAMSETUP.count = Math.max(8, Math.min(20, weakAreas.length * 4));
+        setView("adaptive");
+      }}));
+  }
+  act.appendChild(el("button",{class:"btn", text:"Build another exam", onclick:function(){ setView("exam"); }}));
+  act.appendChild(el("button",{class:"btn", text:"Back to dashboard", onclick:function(){ setView("dash"); }}));
+  M.appendChild(act);
+  paintRail();
+}
+/* Builds the per-question review list. Shared by a just-finished exam and
+   by a past attempt reopened from the History tab, so the two can never
+   drift apart. `rows` entries are {item:{q,topic}, right, pick, flag}.
+   A row whose question could not be found (q === null) is rendered as a
+   placeholder rather than crashing — that happens when a past attempt
+   references a question later edited out of a bank, or a companion that
+   is not currently loaded on this page. */
+function reviewListEl(rows){
+  var rev = el("div",{class:"review"});
+  rows.forEach(function(r, i){
+    var q = r.item.q;
+    if(!q){
+      var gone = el("div",{class:"rev", style:"border-left:4px solid var(--line)"});
+      gone.appendChild(el("div",{class:"qmeta"},[
+        el("span",{class:"chip", text:"Q" + (i+1)}),
+        el("span",{class:"chip", text: r.item.id || "unknown id"})
+      ]));
+      gone.appendChild(el("div",{class:"lead", style:"margin:0", text:
+        "This question is no longer in the bank, so it can't be shown. It still counted toward the score above."}));
+      rev.appendChild(gone);
+      return;
+    }
+    var box = el("div",{class:"rev", style:"border-left:4px solid " + (r.right ? "var(--moss)" : "var(--rose)")});
+    var meta = [
+      el("span",{class:"chip" + (r.right?" ok":" bad"), text: r.right ? "Correct" : "Missed"}),
+      el("span",{class:"chip", text:"Q" + (i+1)}),
+      el("span",{class:"chip", text: q.area || "General"}),
+      el("span",{class:"chip", text: q.id})
+    ];
+    if(r.flag) meta.push(el("span",{class:"chip warn", text:"you flagged this"}));
+    box.appendChild(el("div",{class:"qmeta"}, meta));
+    var topicId = r.item.topic;
+    var fbtn = el("button",{class:"btn small", style:"float:right;margin-left:12px",
+      text: isFlagged(topicId, q.id) ? "\u2605 Flagged" : "\u2606 Flag for review"});
+    fbtn.onclick = function(){
+      var on = toggleFlag(topicId, q.id);
+      fbtn.textContent = on ? "\u2605 Flagged" : "\u2606 Flag for review";
+    };
+    box.appendChild(fbtn);
+    box.appendChild(el("div",{class:"rstem", text:q.stem}));
+    if(!r.right){
+      box.appendChild(el("div",{class:"ra no", text:"You chose: " +
+        (r.pick === null || r.pick === undefined ? "nothing" : q.options[r.pick])}));
+    }
+    box.appendChild(el("div",{class:"ra yes", text:"Correct answer: " + q.options[q.answer]}));
+    box.appendChild(el("div",{class:"why", text:q.why}));
+    rev.appendChild(box);
+  });
+  return rev;
+}
+function bdRow(name, p, got, total, colour){
+  var col = colour || (p === 100 ? "var(--moss)" : p >= 50 ? "var(--amber)" : "var(--rose)");
+  var state = p === 100 ? "Strong" : p >= 50 ? "Developing" : "Needs review";
+  return el("div",{class:"bdrow"},[
+    el("span",{class:"bdname", text:name}),
+    el("span",{class:"bdbar"},[ el("i",{style:"width:" + p + "%;background:" + col}) ]),
+    el("span",{class:"bdstate", text: state + " · " + got + "/" + total})
+  ]);
+}
+
+/* ------------------------------------------------------------ FLASHCARDS - */
+var DECK = { topics:null, cards:[], i:0, flipped:false, running:false };
+function renderCards(){
+  if(DECK.topics === null) DECK.topics = allTopicIds();
+  if(DECK.running) return renderDeck();
+  var M = shell(TITLES.cards[0], TITLES.cards[1]);
+  var left = el("div",{});
+  var fs = el("div",{class:"card pad fieldset"});
+  fs.appendChild(el("span",{class:"flabel", text:"Build a deck from"}));
+  fs.appendChild(el("div",{class:"fhint", text:"Cards are shuffled together, so a mixed deck forces you to recognise which topic a term belongs to."}));
+  var pg = el("div",{class:"pickgrid"});
+  HUB.topics.forEach(function(t){
+    if(!t.cards.length) return;
+    var on = DECK.topics.indexOf(t.id) > -1;
+    var cb = el("input",{type:"checkbox"}); cb.checked = on;
+    var row = el("label",{class:"pick" + (on?" on":"")},[
+      cb, el("span",{class:"pt"},[
+        el("span",{class:"pname"},[ el("span",{class:"swatch", style:"background:"+t.accent}),
+          el("span",{text: t.id==="hub" ? "Integration & review (hub only)" : t.title}) ]),
+        el("span",{class:"pmeta", text: t.cards.length + " cards"})
+      ])
+    ]);
+    cb.onchange = function(){
+      var i = DECK.topics.indexOf(t.id);
+      if(this.checked && i === -1) DECK.topics.push(t.id);
+      if(!this.checked && i > -1) DECK.topics.splice(i,1);
+      row.classList.toggle("on", this.checked);
+      count();
+    };
+    pg.appendChild(row);
+  });
+  fs.appendChild(pg);
+  left.appendChild(fs);
+
+  var right = el("div",{class:"card pad summary"});
+  function count(){
+    right.innerHTML = "";
+    var n = DECK.topics.reduce(function(s,id){ return s + (HUB.byId[id] ? HUB.byId[id].cards.length : 0); }, 0);
+    var known = Object.keys(H.cards.known).length;
+    right.appendChild(el("h3",{text:"Your deck"}));
+    var dl = el("dl");
+    dl.appendChild(el("dt",{text:"Cards"})); dl.appendChild(el("dd",{text:String(n)}));
+    dl.appendChild(el("dt",{text:"Marked known"})); dl.appendChild(el("dd",{text:String(known)}));
+    right.appendChild(dl);
+    var go = el("button",{class:"btn primary", style:"width:100%;margin-top:16px", text:"Start the deck",
+      onclick:function(){ startDeck(false); }});
+    go.disabled = !n;
+    right.appendChild(go);
+    var again = el("button",{class:"btn", style:"width:100%;margin-top:9px", text:"Only cards I marked for review",
+      onclick:function(){ startDeck(true); }});
+    again.disabled = !Object.keys(H.cards.again).length;
+    right.appendChild(again);
+    if(known){
+      right.appendChild(el("button",{class:"btn small", style:"width:100%;margin-top:14px", text:"Reset my card marks",
+        onclick:function(){ if(confirm("Clear which cards you marked known or for review?")){
+          H.cards = {known:{}, again:{}}; saveHub(); count(); } }}));
+    }
+  }
+  count();
+  M.appendChild(el("div",{class:"setup"},[left, right]));
+  paintRail();
+}
+function startDeck(onlyAgain){
+  var all = [];
+  DECK.topics.forEach(function(id){
+    var t = HUB.byId[id]; if(!t) return;
+    t.cards.forEach(function(c){
+      if(onlyAgain && !H.cards.again[c.id]) return;
+      all.push({card:c, topic:id});
+    });
+  });
+  if(!all.length){ toast("No cards match that."); return; }
+  DECK.cards = shuffle(all); DECK.i = 0; DECK.flipped = false; DECK.running = true;
+  renderDeck();
+}
+function renderDeck(){
+  var M = shell("Flashcards", DECK.cards.length + " cards, shuffled", [
+    el("button",{class:"btn", text:"Change deck", onclick:function(){ DECK.running = false; renderCards(); }})
+  ]);
+  var d = DECK.cards[DECK.i], t = HUB.byId[d.topic];
+  var stage = el("div",{class:"fcstage"});
+  var fc = el("div",{class:"fc" + (DECK.flipped?" flipped":""), tabindex:"0", role:"button",
+    "aria-label":"Flashcard. Press Enter to flip."});
+  fc.appendChild(el("div",{class:"fcface fcfront", style:"border-color:" + t.accent},[
+    el("div",{},[
+      el("div",{class:"fctag", text: t.id==="hub" ? "Integration" : t.title.split(":")[0]}),
+      el("div",{class:"fcterm", text:d.card.t}),
+      el("div",{class:"fchint", text:"click, tap, or press Enter to flip"})
+    ])
+  ]));
+  fc.appendChild(el("div",{class:"fcface fcback"},[ el("div",{class:"fcdef", text:d.card.d}) ]));
+  var flip = function(){ DECK.flipped = !DECK.flipped; fc.classList.toggle("flipped", DECK.flipped); };
+  fc.onclick = flip;
+  fc.onkeydown = function(e){ if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flip(); } };
+  stage.appendChild(fc);
+  M.appendChild(stage);
+
+  var bar = el("div",{class:"fcbar"});
+  bar.appendChild(el("button",{class:"btn", text:"\u2190 Previous", onclick:function(){
+    DECK.i = (DECK.i - 1 + DECK.cards.length) % DECK.cards.length; DECK.flipped = false; renderDeck(); }}));
+  bar.appendChild(el("span",{class:"fccount", text:"Card " + (DECK.i+1) + " of " + DECK.cards.length}));
+  bar.appendChild(el("button",{class:"btn", text:"Next \u2192", onclick:function(){
+    DECK.i = (DECK.i + 1) % DECK.cards.length; DECK.flipped = false; renderDeck(); }}));
+  M.appendChild(bar);
+
+  var marks = el("div",{class:"actions", style:"justify-content:center;margin-top:18px"});
+  marks.appendChild(el("button",{class:"btn", text:"Mark for review", onclick:function(){
+    H.cards.again[d.card.id] = 1; delete H.cards.known[d.card.id]; saveHub();
+    DECK.i = (DECK.i + 1) % DECK.cards.length; DECK.flipped = false; renderDeck(); toast("Kept for review."); }}));
+  marks.appendChild(el("button",{class:"btn primary", text:"I know this one", onclick:function(){
+    H.cards.known[d.card.id] = 1; delete H.cards.again[d.card.id]; saveHub();
+    DECK.i = (DECK.i + 1) % DECK.cards.length; DECK.flipped = false; renderDeck(); }}));
+  M.appendChild(marks);
+  paintRail();
+}
+
+/* ---------------------------------------------------------------- FLAGGED - */
+var FLAGFILTER = null;   /* null = all companions */
+function renderFlagged(){
+  var M = shell(TITLES.flagged[0], TITLES.flagged[1]);
+  var flags = collectFlags();
+
+  if(!flags.length){
+    M.appendChild(el("div",{class:"card"},[
+      el("div",{class:"empty"},[
+        el("strong",{text:"Nothing flagged yet"}),
+        el("span",{text:"After you grade a module quiz or mastery exam inside a companion, each question gets a \u201cFlag for review\u201d button. You can also flag questions during a hub exam. Everything you flag, from either place, collects here."})
+      ])
+    ]));
+    paintRail();
+    return;
+  }
+
+  /* filter chips */
+  var counts = {};
+  flags.forEach(function(f){ counts[f.topic] = (counts[f.topic]||0) + 1; });
+  var bar = el("div",{class:"seg", style:"margin-bottom:18px"});
+  bar.appendChild(el("button",{class: FLAGFILTER===null ? "on" : "", text:"All (" + flags.length + ")",
+    onclick:function(){ FLAGFILTER = null; renderFlagged(); }}));
+  Object.keys(counts).forEach(function(tid){
+    var t = HUB.byId[tid];
+    bar.appendChild(el("button",{class: FLAGFILTER===tid ? "on" : "",
+      text: (t ? (tid==="hub" ? "Integration" : t.title.split(":")[0]) : tid) + " (" + counts[tid] + ")",
+      onclick:function(){ FLAGFILTER = tid; renderFlagged(); }}));
+  });
+  M.appendChild(bar);
+
+  var shown = flags.filter(function(f){ return FLAGFILTER === null || f.topic === FLAGFILTER; });
+
+  var act = el("div",{class:"actions", style:"margin-bottom:18px"});
+  act.appendChild(el("button",{class:"btn primary", text:"Practice these " + shown.length + " question" + (shown.length===1?"":"s"),
+    onclick:function(){ startFlaggedPractice(shown); }}));
+  M.appendChild(act);
+
+  var card = el("div",{class:"card pad"});
+  var list = el("div",{class:"review"});
+  shown.forEach(function(f){
+    var q = findQuestion(f.topic, f.id);
+    var t = HUB.byId[f.topic];
+    var box = el("div",{class:"rev", style:"border-left:4px solid " + (t ? t.accent : "var(--line)")});
+    var meta = [
+      el("span",{class:"chip", text: t ? (f.topic==="hub" ? "Integration" : t.title.split(":")[0]) : f.topic }),
+      el("span",{class:"chip", text:f.id})
+    ];
+    if(q && q.area) meta.push(el("span",{class:"chip", text:q.area}));
+    meta.push(el("span",{class:"chip", text: f.origin === "hub" ? "flagged in a hub exam"
+      : f.origin === "both" ? "flagged in both" : "flagged in the companion"}));
+    box.appendChild(el("div",{class:"qmeta"}, meta));
+    if(!q){
+      box.appendChild(el("div",{class:"lead", style:"margin:0", text:
+        "This question is no longer in the bank, so it can't be shown."}));
+    } else {
+      box.appendChild(el("div",{class:"rstem", text:q.stem}));
+      box.appendChild(el("div",{class:"ra yes", text:"Correct answer: " + q.options[q.answer]}));
+      box.appendChild(el("div",{class:"why", text:q.why}));
+    }
+    var foot = el("div",{class:"actions", style:"margin-top:12px"});
+    foot.appendChild(el("button",{class:"btn small", text:"Remove flag", onclick:function(){
+      toggleFlag(f.topic, f.id);
+      toast("Flag removed.");
+      renderFlagged();
+    }}));
+    if(t && t.file) foot.appendChild(el("a",{class:"btn small", href:t.file, text:"Open companion"}));
+    box.appendChild(foot);
+    list.appendChild(box);
+  });
+  card.appendChild(list);
+  M.appendChild(card);
+  paintRail();
+}
+
+/* Builds a practice round from flagged questions only. This deliberately
+   ignores the 100% unlock gate: a question can only be flagged after the
+   student has already answered it in a graded quiz, so re-practising it
+   gives away nothing they have not already seen and completed. */
+function startFlaggedPractice(flags){
+  var items = [];
+  flags.forEach(function(f){
+    var q = findQuestion(f.topic, f.id);
+    if(q) items.push({ q:q, topic:f.topic });
+  });
+  if(!items.length){ toast("None of these questions are available to practice."); return; }
+  EXAM.items = shuffle(items);
+  EXAM.targets = [];
+  EXAM.picks = EXAM.items.map(function(){ return null; });
+  EXAM.flags = EXAM.items.map(function(){ return false; });
+  EXAM.orders = EXAM.items.map(function(x){ return shuffle(x.q.options.map(function(_,i){ return i; })); });
+  EXAM.i = 0;
+  EXAM.mode = "flagged";
+  EXAM.live = true;
+  EXAM.endsAt = null;
+  if(EXAM.tick){ clearInterval(EXAM.tick); EXAM.tick = null; }
+  renderExam();
+}
+
+/* ---------------------------------------------------------------- HISTORY - */
+function attemptLabel(a){
+  return (a.mode === "adaptive" ? "Adaptive review" : a.mode === "flagged" ? "Flagged questions" : "Practice exam");
+}
+function renderHistory(){
+  var M = shell(TITLES.history[0], TITLES.history[1]);
+  if(!H.history.length){
+    M.appendChild(el("div",{class:"card"},[
+      el("div",{class:"empty"},[
+        el("strong",{text:"No exams yet"}),
+        el("span",{text:"Once you sit a practice exam or an adaptive review, it will be saved here so you can reread the questions and explanations any time."})
+      ])
+    ]));
+    M.appendChild(el("div",{class:"actions", style:"margin-top:16px"},[
+      el("button",{class:"btn primary", text:"Build an exam", onclick:function(){ setView("exam"); }})
+    ]));
+    paintRail();
+    return;
+  }
+
+  var attempts = H.history.slice().reverse();
+  var avg = Math.round(H.history.reduce(function(s,a){ return s+a.pct; },0) / H.history.length);
+  var best = H.history.reduce(function(m,a){ return Math.max(m, a.pct); }, 0);
+  var stats = el("div",{class:"stats", style:"margin-top:0"});
+  [["Exams taken", H.history.length],["Average score", avg + "%"],["Best score", best + "%"]].forEach(function(p){
+    stats.appendChild(el("div",{class:"stat"},[ el("div",{class:"k", text:p[0]}), el("div",{class:"v", text:String(p[1])}) ]));
+  });
+  M.appendChild(stats);
+
+  M.appendChild(el("div",{class:"secthead"},[
+    el("h2",{text:"Every attempt"}),
+    el("span",{class:"hint", text:"Newest first. Open one to reread its questions and explanations."})
+  ]));
+
+  var card = el("div",{class:"card pad"});
+  var list = el("div",{class:"hist"});
+  attempts.forEach(function(a){
+    var reviewable = !!(a.items && a.items.length);
+    var row = el("div",{class:"histrow"},[
+      el("span",{class:"chip" + (a.pct>=80?" ok":a.pct>=60?" warn":" bad"), text:a.pct + "%"}),
+      el("span",{class:"hd"},[
+        el("div",{style:"font-weight:600", text: attemptLabel(a) + " · " + a.correct + " of " + a.total + " correct"}),
+        el("div",{style:"font-size:12.5px;color:var(--ink-soft)", text:
+          (a.topics||[]).map(function(t){ return HUB.byId[t] ? (t==="hub" ? "Integration" : HUB.byId[t].title.split(":")[0]) : t; }).join(", ")})
+      ]),
+      el("span",{class:"hs", text:fmtDate(a.ts)}),
+      reviewable
+        ? el("button",{class:"btn small", text:"Review", onclick:function(){ openAttempt(a); }})
+        : el("span",{class:"chip", text:"summary only"})
+    ]);
+    list.appendChild(row);
+  });
+  card.appendChild(list);
+
+  var legacy = H.history.filter(function(a){ return !(a.items && a.items.length); }).length;
+  if(legacy){
+    card.appendChild(el("div",{class:"note", style:"margin:18px 0 0", text:
+      legacy + " earlier attempt" + (legacy===1?"":"s") + " " + (legacy===1?"was":"were") +
+      " taken before question-by-question review was added, so only the score is stored for " +
+      (legacy===1?"it":"them") + ". Exams from now on are fully re-readable."}));
+  }
+  M.appendChild(card);
+  paintRail();
+}
+
+/* Rebuilds a finished attempt from stored ids + picks. Question text and
+   rationales come from the banks as they are NOW, so a corrected
+   explanation shows its current wording. */
+function openAttempt(a){
+  var byArea = {}, byTopic = {}, correct = 0, rows = [], missing = 0;
+  a.items.forEach(function(rec){
+    var q = findQuestion(rec.topic, rec.id);
+    if(!q){
+      missing++;
+      rows.push({ item:{ q:null, id:rec.id, topic:rec.topic }, right:false, pick:rec.pick, flag:rec.flag });
+      return;
+    }
+    var right = (rec.pick === q.answer);
+    if(right) correct++;
+    var ak = areaKey(rec.topic, q.area || "General");
+    if(!byArea[ak]) byArea[ak] = {got:0, total:0, area:q.area || "General", topic:rec.topic};
+    byArea[ak].total++; if(right) byArea[ak].got++;
+    if(!byTopic[rec.topic]) byTopic[rec.topic] = {got:0, total:0};
+    byTopic[rec.topic].total++; if(right) byTopic[rec.topic].got++;
+    rows.push({ item:{ q:q, topic:rec.topic }, right:right, pick:rec.pick, flag:rec.flag });
+  });
+  renderPastAttempt(a, correct, byArea, byTopic, rows, missing);
+}
+
+function renderPastAttempt(a, correct, byArea, byTopic, rows, missing){
+  var M = $("main"); M.innerHTML = "";
+  M.appendChild(el("div",{class:"actions", style:"margin-bottom:16px"},[
+    el("button",{class:"btn", text:"\u2190 Back to history", onclick:function(){ setView("history"); }})
+  ]));
+
+  var hero = el("div",{class:"scorehero"});
+  hero.appendChild(el("div",{},[ el("div",{class:"big", text:a.pct + "%"}) ]));
+  hero.appendChild(el("div",{style:"flex:1 1 280px"},[
+    el("h2",{text: attemptLabel(a) + " \u00b7 " + a.correct + " of " + a.total + " correct"}),
+    el("p",{text:"Taken " + fmtDate(a.ts) + ". The explanations below are the current ones from each question bank."})
+  ]));
+  M.appendChild(hero);
+
+  if(missing){
+    M.appendChild(el("div",{class:"note warn", style:"margin-top:16px", text:
+      missing + " question" + (missing===1?"":"s") + " from this attempt " + (missing===1?"is":"are") +
+      " no longer in the banks and can't be shown. The score above is the one you actually got at the time."}));
+  }
+
+  if(Object.keys(byTopic).length){
+    M.appendChild(el("div",{class:"secthead"},[el("h2",{text:"By companion"})]));
+    var c1 = el("div",{class:"card pad"});
+    var bd1 = el("div",{class:"bd"});
+    Object.keys(byTopic).forEach(function(tid){
+      var b = byTopic[tid], p = pct(b.got, b.total), t = HUB.byId[tid];
+      bd1.appendChild(bdRow(t ? (tid === "hub" ? "Integration & review" : t.title) : tid, p, b.got, b.total, t ? t.accent : null));
+    });
+    c1.appendChild(bd1); M.appendChild(c1);
+  }
+
+  var weakAreas = [];
+  if(Object.keys(byArea).length){
+    M.appendChild(el("div",{class:"secthead"},[el("h2",{text:"By content area"})]));
+    var c2 = el("div",{class:"card pad"});
+    var bd2 = el("div",{class:"bd"});
+    Object.keys(byArea).forEach(function(k){
+      var b = byArea[k], p = pct(b.got, b.total);
+      if(p < 100) weakAreas.push(b);
+      bd2.appendChild(bdRow(b.area + "  \u00b7  " + (HUB.byId[b.topic] ? HUB.byId[b.topic].title.split(":")[0] : b.topic),
+        p, b.got, b.total, null));
+    });
+    c2.appendChild(bd2); M.appendChild(c2);
+  }
+
+  M.appendChild(el("div",{class:"secthead"},[el("h2",{text:"Every question, with the reasoning"})]));
+  var c3 = el("div",{class:"card pad"});
+  c3.appendChild(reviewListEl(rows));
+  M.appendChild(c3);
+
+  var act = el("div",{class:"actions", style:"margin-top:20px"});
+  if(weakAreas.length){
+    act.appendChild(el("button",{class:"btn primary", text:"Practice these areas again", onclick:function(){
+      EXAMSETUP.count = Math.max(8, Math.min(20, weakAreas.length * 4));
+      setView("adaptive");
+    }}));
+  }
+  act.appendChild(el("button",{class:"btn", text:"Back to history", onclick:function(){ setView("history"); }}));
+  M.appendChild(act);
+  paintRail();
+}
+
+/* --------------------------------------------------------- BACKUP/RESTORE - */
+function renderBackup(){
+  var M = shell(TITLES.backup[0], TITLES.backup[1]);
+  M.appendChild(el("div",{class:"note", text:
+    "Everything you've done lives only in this browser, on this device — that's true of every companion and of the hub itself. " +
+    "To keep the same progress when you switch computers or browsers, download a backup file here, then load that exact file on the other device."}));
+
+  /* ---------- section 1: download ---------- */
+  var out = el("div",{class:"card pad", style:"margin-bottom:18px"});
+  out.appendChild(el("h3",{text:"Download a backup"}));
+  out.appendChild(el("p",{class:"lead", text:"This captures your progress in every companion listed below, plus your hub exam history and flashcard marks."}));
+
+  var labelIn = el("input",{type:"text", class:"textin", placeholder:"Name this backup (optional) — e.g. your name",
+    "aria-label":"Backup label"});
+  out.appendChild(el("div",{style:"margin-bottom:16px"},[labelIn]));
+
+  var progs = allProgress();
+  var tb = el("table",{class:"tbl"});
+  tb.appendChild(el("tr",{},[el("th",{text:"Companion"}),el("th",{class:"num",text:"Progress that will be saved"})]));
+  progs.forEach(function(p){
+    tb.appendChild(el("tr",{},[
+      el("td",{text:p.topic.title}),
+      el("td",{class:"num", text: p.hasManifest ? p.pct+"% ("+p.done+"/"+p.total+")" : (Object.keys(p.state.best).length? "quiz scores only" : "no progress yet")})
+    ]));
+  });
+  tb.appendChild(el("tr",{},[
+    el("td",{text:"Hub (exam history, flashcard marks)"}),
+    el("td",{class:"num", text: H.history.length + " exam" + (H.history.length===1?"":"s") + " · " + Object.keys(H.cards.known).length + " cards marked known"})
+  ]));
+  out.appendChild(tb);
+  out.appendChild(el("button",{class:"btn primary", style:"margin-top:16px", text:"Download backup file", onclick:function(){
+    downloadBackup(labelIn.value);
+    toast("Backup downloaded. Keep the file somewhere you can find it on the other device.");
+  }}));
+  M.appendChild(out);
+
+  /* ---------- section 2: load ---------- */
+  var load = el("div",{class:"card pad"});
+  load.appendChild(el("h3",{text:"Load a backup"}));
+  load.appendChild(el("p",{class:"lead", text:
+    "Choose a backup file you downloaded earlier. Nothing is changed yet — you'll see exactly what would happen first."}));
+
+  var fileIn = el("input",{type:"file", accept:".json,application/json", "aria-label":"Choose a backup file"});
+  var result = el("div",{style:"margin-top:16px"});
+  load.appendChild(fileIn);
+  load.appendChild(result);
+  M.appendChild(load);
+
+  fileIn.onchange = function(){
+    result.innerHTML = "";
+    var f = fileIn.files && fileIn.files[0];
+    if(!f) return;
+    var reader = new FileReader();
+    reader.onerror = function(){
+      result.appendChild(el("div",{class:"note bad", text:"Couldn't read that file. Try choosing it again."}));
+    };
+    reader.onload = function(){
+      var parsed = parseBackupFile(String(reader.result));
+      if(!parsed.ok){
+        result.appendChild(el("div",{class:"note bad", text:parsed.error}));
+        return;
+      }
+      renderBackupPreview(result, parsed.payload);
+    };
+    reader.readAsText(f);
+  };
+  paintRail();
+}
+
+function renderBackupPreview(host, payload){
+  host.innerHTML = "";
+  var when = "";
+  try{ when = new Date(payload.exportedAt).toLocaleString(undefined,{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}); }
+  catch(e){ when = "unknown date"; }
+
+  host.appendChild(el("div",{class:"note"},[
+    el("div",{style:"font-weight:650;margin-bottom:3px", text: payload.label ? "Backup: \u201c"+payload.label+"\u201d" : "Backup file"}),
+    el("div",{text:"Made " + when + "."})
+  ]));
+
+  var tb = el("table",{class:"tbl"});
+  tb.appendChild(el("tr",{},[el("th",{text:"Companion"}),el("th",{class:"num",text:"Currently on this device"}),el("th",{class:"num",text:"In this backup"})]));
+  var knownIds = HUB.topics.map(function(t){ return t.id; });
+  var backupIds = Object.keys(payload.companions);
+
+  HUB.topics.forEach(function(t){
+    if(t.id === "hub") return;
+    var live = progressFor(t);
+    var liveTxt = live.hasManifest ? live.pct+"%" : (Object.keys(live.state.best).length ? "quiz scores only" : "no progress");
+    var row = previewRow(t, payload.companions[t.id]);
+    var backTxt = row === null ? "not in this file"
+      : row.unreadable ? "unreadable"
+      : row.quizOnly ? "quiz scores only"
+      : row.pct + "%";
+    tb.appendChild(el("tr",{},[
+      el("td",{text:t.title}),
+      el("td",{class:"num", text:liveTxt}),
+      el("td",{class:"num", text:backTxt, style: row ? "font-weight:650" : ""})
+    ]));
+  });
+  var liveExams = H.history.length;
+  var backExams = (payload.hub && payload.hub.history) ? payload.hub.history.length : 0;
+  tb.appendChild(el("tr",{},[
+    el("td",{text:"Hub exam history"}),
+    el("td",{class:"num", text: liveExams + " exam" + (liveExams===1?"":"s")}),
+    el("td",{class:"num", text: backExams + " exam" + (backExams===1?"":"s"), style:"font-weight:650"})
+  ]));
+  host.appendChild(tb);
+
+  var unknown = backupIds.filter(function(id){ return knownIds.indexOf(id) === -1; });
+  if(unknown.length){
+    host.appendChild(el("div",{class:"note", style:"margin-top:14px", text:
+      "This file also includes " + unknown.length + " companion" + (unknown.length===1?"":"s") + " not currently loaded on this page (" +
+      unknown.join(", ") + "). Their progress will be kept and will appear once that companion is added here."}));
+  }
+
+  host.appendChild(el("div",{class:"note warn", style:"margin-top:14px"},[
+    el("div",{style:"font-weight:650;margin-bottom:3px", text:"Before you load this"}),
+    el("div",{text:"Only the companions and hub history shown above will be replaced. Anything else already on this device is left alone. " +
+      "If a row above shows this device with MORE progress than the backup, loading it will move that companion backwards."})
+  ]));
+
+  var actions = el("div",{class:"actions", style:"margin-top:16px"});
+  actions.appendChild(el("button",{class:"btn danger", text:"Replace my progress with this backup", onclick:function(){
+    var invalidIds = backupIds.filter(function(id){ return !validateCompanionRaw(payload.companions[id]).ok; });
+    var msg = "This will overwrite the progress shown above on this device with what's in the backup file. This can't be undone. Continue?";
+    if(invalidIds.length){
+      msg = invalidIds.length + " compan" + (invalidIds.length===1?"y":"ies") + " in this file (" + invalidIds.join(", ") +
+        ") could not be read and will be left untouched rather than overwriting what's on this device. " + msg;
+    }
+    if(!confirm(msg)) return;
+    applyBackup(payload);
+  }}));
+  actions.appendChild(el("button",{class:"btn", text:"Cancel", onclick:function(){ host.innerHTML = ""; }}));
+  host.appendChild(actions);
+}
+
+/* ------------------------------------------------------------------ HELP - */
+function renderHelp(){
+  var M = shell(TITLES.help[0], TITLES.help[1]);
+  var c = el("div",{class:"card pad"});
+  c.innerHTML =
+    '<h3>What the hub is</h3>'
+  + '<p class="lead">The hub sits alongside your study companions. It does not teach anything new on its own; it reads the work you have already done in each companion, shows it in one place, and lets you practice across all of them at once.</p>'
+  + '<h3 style="margin-top:22px">Where your progress lives</h3>'
+  + '<p class="lead">Everything is stored inside this browser, on this device. Nothing is uploaded and there is no account. Use the same browser each time, and avoid private browsing, or the hub will look empty even though you have done the work. Clearing your browser data clears this too. To carry your progress to a different device or browser, use "Save / load progress" in the sidebar — it downloads a single file you can load back in on the other one.</p>'
+  + '<h3 style="margin-top:22px">The dashboard</h3>'
+  + '<p class="lead">Each companion counts a section as done when every checkpoint in it has been answered correctly and any activity in it has been submitted, and counts a quiz as done once submitted at any score. The hub applies exactly the same rules, so the percentage here matches the ring inside the companion itself.</p>'
+  + '<h3 style="margin-top:22px">Building an exam</h3>'
+  + '<p class="lead">Pick which companions to draw from, how many questions, and whether to run a clock. A timed paper submits itself when time runs out. Questions and their answer choices are reshuffled every time, so the same settings never produce the same paper twice.</p>'
+  + '<h3 style="margin-top:22px">The adaptive review</h3>'
+  + '<p class="lead">This builds a set aimed at your weak spots rather than a random one. It weighs three things: how you scored on each content area in previous hub exams, your best score on each module quiz inside a companion, and which in-section checkpoints you have yet to answer correctly. Areas with the largest gap get the most questions, and it prefers questions you have not met before.</p>'
+  + '<h3 style="margin-top:22px">The hub question bank</h3>'
+  + '<p class="lead">Alongside the companion banks there is a bank belonging to the hub itself, listed as "Integration &amp; review". Every question in it deliberately spans two or more topics, so it can only be answered by joining them up. Those questions appear nowhere inside a companion.</p>'
+  + '<h3 style="margin-top:22px">Why some companions are locked</h3>'
+  + '<p class="lead">A companion\u2019s own questions only become available for hub exams and adaptive review once that companion reaches 100% \u2014 the same figure shown on its progress ring. Below 100%, sitting a hub exam on it would let you skip the checkpoints, activities and quizzes that companion is built to walk you through, so the hub keeps its questions out of the pool until that work is actually done. A companion with no manifest file is treated the same way, since the hub has no way to confirm its progress at all. This does not apply to the hub\u2019s own "Integration &amp; review" bank, which is never gated, or to flashcards, which stay open regardless of progress since they are a study aid rather than a graded round.</p>'
+  + '<h3 style="margin-top:22px">If a companion is missing from the dashboard</h3>'
+  + '<p class="lead">The hub loads each bank as a separate file. If one fails to load, a red note appears at the top of the dashboard naming it. That almost always means the file is not in the banks folder next to this page, or its name is spelled differently.</p>';
+  M.appendChild(c);
+
+  var c2 = el("div",{class:"card pad", style:"margin-top:16px"});
+  c2.appendChild(el("h3",{text:"What is loaded right now"}));
+  var tb = el("table",{class:"tbl"});
+  tb.appendChild(el("tr",{},[el("th",{text:"Bank"}),el("th",{class:"num",text:"Questions"}),
+    el("th",{class:"num",text:"Checkpoints"}),el("th",{class:"num",text:"Cards"}),el("th",{text:"Structure map"}),
+    el("th",{text:"Hub exams"})]));
+  HUB.topics.forEach(function(t){
+    var us = unlockStatus(t.id);
+    tb.appendChild(el("tr",{},[
+      el("td",{text:t.title}),
+      el("td",{class:"num", text:String(t.pool.length)}),
+      el("td",{class:"num", text:String(Object.keys(t.checkpoints).length)}),
+      el("td",{class:"num", text:String(t.cards.length)}),
+      el("td",{}, [el("span",{class:"chip" + (t.manifest ? " ok" : ""), text: t.manifest ? "manifest loaded" : (t.id==="hub" ? "not needed" : "missing")})]),
+      el("td",{}, [el("span",{class:"chip" + (us.unlocked ? " ok" : " warn"),
+        text: us.unlocked ? "unlocked" : (us.pct === null ? "locked" : "locked · " + us.pct + "%")})])
+    ]));
+  });
+  c2.appendChild(tb);
+  c2.appendChild(el("div",{class:"actions", style:"margin-top:18px"},[
+    el("button",{class:"btn danger", text:"Clear my hub history", onclick:function(){
+      if(!confirm("Clear your hub exam history, question history and flashcard marks?\n\nThis does not touch your progress inside the companions themselves.")) return;
+      H = blankHub(); saveHub(); toast("Hub history cleared."); setView("dash");
+    }})
+  ]));
+  M.appendChild(c2);
+  paintRail();
+}
+
+/* =================================================================== BOOT = */
+function render(){
+  if(VIEW === "dash") renderDash();
+  else if(VIEW === "companions") renderCompanions();
+  else if(VIEW === "exam") renderExamSetup(false);
+  else if(VIEW === "adaptive") renderExamSetup(true);
+  else if(VIEW === "cards") renderCards();
+  else if(VIEW === "flagged") renderFlagged();
+  else if(VIEW === "history") renderHistory();
+  else if(VIEW === "backup") renderBackup();
+  else renderHelp();
+}
+window.addEventListener("beforeunload", function(e){
+  if(EXAM.live){ e.preventDefault(); e.returnValue = ""; }
+});
+if(!HUB.topics.length){
+  $("main").innerHTML = '<div class="card pad"><div class="empty"><strong>No question banks loaded</strong>' +
+    '<span>hub.html expects a folder called <code>banks</code> sitting next to it, holding each companion\u2019s ' +
+    '<code>.js</code> bank file and its <code>.manifest.js</code> file. None of them were found.</span></div></div>';
+} else {
+  render();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glycogen Metabolism · PHA3134 Biochemistry</title>
+<link rel="stylesheet" href="shared/styles.css">
+<style>
+/* ------------------------------------------------------------
+   THIS COMPANION'S ACCENT — burnt orange / terracotta.
+   The token names stay --green* on purpose: they mean "this
+   companion's primary colour", and every shared component in
+   styles.css already reads them. Renaming them would mean
+   editing the shared stylesheet, which would re-theme every
+   other companion at once.
+   ------------------------------------------------------------ */
+:root{
+  --green:#C0562A; --green-bright:#E07A43;
+  --green-soft:#FCEEE5; --green-line:#F0C6AA;
+}
+/* Three places hold literal hex values that the tokens above
+   cannot reach on their own. Each override is listed in §7 of
+   the architecture doc. */
+.btn:hover{background:#A2461F}
+.opt.sel{color:#8F3A12}
+.btn.ghost.on{color:#8F3A12}
+.mod-head.current,.mod-head.current .mod-badge,.mod-badge.done,
+.sub button.current,.pill,.ring-num,.apply .tag,
+.home-num.done,.home-status.done,.s-strong{color:#8F3A12}
+.ring-cap{color:#A2603F}
+.fc-front{background:linear-gradient(140deg,#FDF1E8,#FBE7DA)}
+.score-hero{background:linear-gradient(135deg,#E07A43,#B04A22)}
+.bd-fill{background:var(--green)!important}
+
+/* Small additions this topic needs and the shared stylesheet
+   does not already provide. Everything else reuses existing
+   classes. */
+.stage{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);
+  padding:16px;margin:14px 0}
+.stage svg{width:100%;height:auto;display:block}
+.tally{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.tally span{background:var(--green-soft);border:1px solid var(--green-line);
+  border-radius:999px;padding:5px 12px;font-size:.78rem;font-weight:600;color:#8F3A12}
+.reveal-panel{margin-top:16px;padding:16px 18px;border-radius:var(--r-md);
+  background:#fff;border-left:4px solid var(--green);font-size:.94rem}
+.case-card{background:#FAFCFD;border:1px solid var(--line);border-radius:var(--r-md);
+  padding:16px 18px;margin:14px 0}
+.case-card h4{margin:0 0 6px;font-size:.95rem}
+.case-card p{margin:0 0 10px;color:var(--ink-mid);font-size:.92rem}
+.chainbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chainbar .step{background:#fff;border:1.5px solid var(--line);border-radius:var(--r-sm);
+  padding:8px 12px;font-size:.85rem}
+.chainbar .step.on{border-color:var(--green);background:var(--green-soft);color:#8F3A12;font-weight:600}
+.dim{opacity:.28;transition:opacity .4s ease}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <a class="back-to-hub" href="hub.html"><span class="arrow">&#8592;</span> Back to hub</a>
+    <div class="brand">
+      <div class="brand-mark">G</div>
+      <div>
+        <div class="brand-title">Glycogen Metabolism</div>
+        <div class="brand-sub">PHA3134 · Study Companion</div>
+      </div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#F0C6AA" stroke-width="5"/>
+        <circle id="ringFill" cx="22" cy="22" r="18" fill="none" stroke="#C0562A" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+                transform="rotate(-90 22 22)"/>
+      </svg>
+      <div>
+        <div class="ring-num" id="ringPct">0%</div>
+        <div class="ring-cap">of the companion<br>complete</div>
+      </div>
+    </div>
+    <button class="reset" id="resetBtn">Clear my saved progress</button>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="topTitle">Welcome</h1>
+        <div class="meta" id="topMeta">Work through a module, or jump straight to the mastery exam.</div>
+      </div>
+      <div class="pill" id="topPill">Not started</div>
+    </div>
+
+<!-- ============================================================
+     MODULE 1 · WHY GLYCOGEN?
+     ============================================================ -->
+
+<section class="section" data-key="m1home">
+  <div class="card">
+    <div class="eyebrow">Module 1</div>
+    <h2>Why glycogen? Structure, branching, and tissue roles</h2>
+    <p>Before any pathway makes sense, one question has to be settled: why does a cell go to the
+       trouble of polymerizing glucose at all? The answer explains the branching, the branching
+       explains the speed, and the tissue differences explain almost everything about regulation
+       later on.</p>
+    <div class="keypoints">
+      <h4>By the end of this module you should be able to</h4>
+      <ul>
+        <li>Explain the osmotic argument for storing glucose as a polymer.</li>
+        <li>Distinguish &alpha;1&rarr;4 from &alpha;1&rarr;6 linkages, and reducing from nonreducing ends.</li>
+        <li>Predict how branch frequency changes the rate of synthesis and degradation.</li>
+        <li>Assign a given property to hepatic or skeletal-muscle glycogen and say why.</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m1s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">The osmotic problem</span>
+          <span class="home-desc">Predict, then watch what 20,000 free glucose molecules do to a cell.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Bonds, ends, and branching</span>
+          <span class="home-desc">Build a glycogen particle and watch the worksites multiply.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Liver or muscle?</span>
+          <span class="home-desc">Sort the properties that separate the two stores.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m1quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 1 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s1">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 1</div>
+    <h2>The osmotic problem</h2>
+
+    <div class="box predict">
+      <h3><span class="tag">PREDICT FIRST</span></h3>
+      <p>A hepatocyte needs to bank 20,000 glucose molecules. Commit to an answer before you
+         run the simulation below.</p>
+      <div class="cp-item" data-check="c1">
+        <p>Which arrangement lets the cell hold that much fuel without swelling?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <h3>Now run it</h3>
+    <p>Drag the slider to change how much glucose the cell banks, then switch between the two
+       storage strategies. Watch the particle count, not the glucose count.</p>
+    <div id="act-osmo"></div>
+
+    <div class="box apply">
+      <h3><span class="tag">1 &middot; APPLY</span></h3>
+      <div class="cp-item" data-check="c1b">
+        <p>Compactness is one payoff of polymerizing glucose. Speed is a separate one. Which
+           structural feature makes glycogen a <em>rapidly</em> mobilized store?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="keypoints">
+      <h4>Worth carrying forward</h4>
+      <ul>
+        <li>Osmotic pressure counts particles, not mass.</li>
+        <li>Storage capacity and mobilization speed are two different properties, solved by two
+            different features of the same molecule.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s2">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 2</div>
+    <h2>Bonds, ends, and branching</h2>
+    <p>Glycogen is glucose joined by &alpha;1&rarr;4 bonds along its linear stretches, with
+       &alpha;1&rarr;6 bonds at every branch point &mdash; roughly one every 8 to 12 residues. A
+       particle holds somewhere between 2,000 and 60,000 residues.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 210" role="img" aria-label="A glycogen particle showing the glycogenin core with the single reducing end, alpha 1 to 4 linear linkages, and an alpha 1 to 6 branch point creating an additional nonreducing end.">
+        <rect x="0" y="0" width="640" height="210" fill="none"/>
+        <!-- core -->
+        <circle cx="70" cy="118" r="26" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>
+        <text x="70" y="122" text-anchor="middle" font-size="11" font-weight="700" fill="#8F3A12">core</text>
+        <text x="70" y="168" text-anchor="middle" font-size="11" fill="var(--ink-soft)">glycogenin</text>
+        <text x="70" y="182" text-anchor="middle" font-size="11" fill="var(--ink-soft)">1 reducing end</text>
+        <!-- main chain -->
+        <line x1="96" y1="118" x2="410" y2="118" stroke="var(--green-line)" stroke-width="3"/>
+        <circle cx="130" cy="118" r="14" fill="#fff" stroke="var(--green)" stroke-width="2"/>
+        <circle cx="180" cy="118" r="14" fill="#fff" stroke="var(--green)" stroke-width="2"/>
+        <circle cx="230" cy="118" r="14" fill="#fff" stroke="var(--green)" stroke-width="2"/>
+        <circle cx="280" cy="118" r="14" fill="#fff" stroke="var(--green)" stroke-width="2"/>
+        <circle cx="330" cy="118" r="14" fill="#fff" stroke="var(--green)" stroke-width="2"/>
+        <circle cx="380" cy="118" r="14" fill="var(--green)" stroke="var(--green)" stroke-width="2"/>
+        <text x="205" y="146" text-anchor="middle" font-size="12" fill="var(--ink-mid)">&alpha;1&rarr;4</text>
+        <text x="418" y="122" font-size="11" font-weight="600" fill="#8F3A12">nonreducing end</text>
+        <!-- branch -->
+        <line x1="230" y1="104" x2="290" y2="52" stroke="var(--green-line)" stroke-width="3"/>
+        <line x1="290" y1="52" x2="370" y2="52" stroke="var(--green-line)" stroke-width="3"/>
+        <circle cx="290" cy="52" r="14" fill="#fff" stroke="var(--green)" stroke-width="2"/>
+        <circle cx="340" cy="52" r="14" fill="var(--green)" stroke="var(--green)" stroke-width="2"/>
+        <text x="238" y="72" font-size="12" font-weight="600" fill="var(--green)">&alpha;1&rarr;6</text>
+        <text x="378" y="56" font-size="11" font-weight="600" fill="#8F3A12">nonreducing end</text>
+      </svg>
+      <p class="caption">One reducing end, buried at the core. Every branch adds another nonreducing
+         end at the surface &mdash; and every nonreducing end is a place an enzyme can work.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c2">
+        <p>In a glycogen particle, which linkage joins a branch to the chain it extends from?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c2b">
+        <p>A glycogen particle has a single reducing end but many nonreducing ends. What accounts
+           for that asymmetry?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <h3>Build a glycogen particle</h3>
+    <p>Add residues with glycogen synthase, then add branches. Watch the count of nonreducing
+       ends &mdash; and the number of enzymes that can work at once &mdash; as you go.</p>
+    <div id="act-build"></div>
+
+    <div class="box apply">
+      <h3><span class="tag">1 &middot; APPLY</span></h3>
+      <div class="cp-item" data-check="c2c">
+        <p>Branch points occur roughly every 8 to 12 residues. What does that particular spacing
+           accomplish?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s3">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Section 3</div>
+    <h2>Liver or muscle?</h2>
+    <p>The same molecule serves two different jobs in two different tissues, and almost every
+       regulatory difference in Module 4 traces back to this split. About 10% of liver mass is
+       glycogen in the fed state; across the whole body, roughly 15 g per kg of body mass.</p>
+
+    <h3>Sort each property</h3>
+    <p>Drag each statement to the tissue it describes.</p>
+    <div id="act-tissue"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c3">
+        <p>Skeletal muscle glycogen supports the muscle itself and contributes nothing to blood
+           glucose. Which absent enzyme explains that restriction?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c3b">
+        <p>Epinephrine mobilizes glycogen in both liver and skeletal muscle. Glucagon acts on the
+           liver alone. What accounts for the difference?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1quiz">
+  <div class="card">
+    <div class="eyebrow">Module 1 &middot; Mastery check</div>
+    <h2>Module 1 quiz</h2>
+    <p>Eight questions drawn from a larger pool, reshuffled every attempt. After you submit, any
+       concept area below 100% unlocks a targeted round built from questions on just those areas.</p>
+    <div class="quiz-body" data-quiz="m1"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 2 · GLYCOGENOLYSIS
+     ============================================================ -->
+
+<section class="section" data-key="m2home">
+  <div class="card">
+    <div class="eyebrow">Module 2</div>
+    <h2>Glycogenolysis: take the particle apart</h2>
+    <p>Three enzymes dismantle glycogen, and each one stops where the next has to begin. Rather
+       than reading the pathway, you will operate it: choose which enzyme acts next, watch what it
+       produces, and find out for yourself why it stalls.</p>
+    <div class="figure">
+      <svg viewBox="0 0 640 132" role="img" aria-label="Glycogen degradation pathway: glycogen to glucose 1 phosphate by phosphorylase, then to glucose 6 phosphate by phosphoglucomutase, then either to free glucose in liver or into glycolysis in muscle.">
+        <rect x="8" y="46" width="104" height="40" rx="10" fill="var(--green-soft)" stroke="var(--green-line)"/>
+        <text x="60" y="71" text-anchor="middle" font-size="12" font-weight="600" fill="#8F3A12">glycogen</text>
+        <line x1="112" y1="66" x2="176" y2="66" stroke="var(--green)" stroke-width="2"/>
+        <polygon points="176,66 168,62 168,70" fill="var(--green)"/>
+        <text x="144" y="56" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">phosphorylase</text>
+        <rect x="178" y="46" width="94" height="40" rx="10" fill="#fff" stroke="var(--line)"/>
+        <text x="225" y="71" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">G1P</text>
+        <line x1="272" y1="66" x2="336" y2="66" stroke="var(--green)" stroke-width="2"/>
+        <polygon points="336,66 328,62 328,70" fill="var(--green)"/>
+        <text x="304" y="56" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">mutase</text>
+        <rect x="338" y="46" width="94" height="40" rx="10" fill="#fff" stroke="var(--line)"/>
+        <text x="385" y="71" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)">G6P</text>
+        <line x1="432" y1="58" x2="492" y2="26" stroke="var(--green)" stroke-width="2"/>
+        <polygon points="492,26 483,26 487,33" fill="var(--green)"/>
+        <line x1="432" y1="76" x2="492" y2="108" stroke="var(--green)" stroke-width="2"/>
+        <polygon points="492,108 483,108 487,101" fill="var(--green)"/>
+        <rect x="494" y="6" width="140" height="40" rx="10" fill="var(--green-soft)" stroke="var(--green-line)"/>
+        <text x="564" y="24" text-anchor="middle" font-size="10.5" font-weight="600" fill="#8F3A12">LIVER: free glucose</text>
+        <text x="564" y="38" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">to the bloodstream</text>
+        <rect x="494" y="88" width="140" height="40" rx="10" fill="var(--green-soft)" stroke="var(--green-line)"/>
+        <text x="564" y="106" text-anchor="middle" font-size="10.5" font-weight="600" fill="#8F3A12">MUSCLE: glycolysis</text>
+        <text x="564" y="120" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">to ATP for itself</text>
+      </svg>
+      <p class="caption">The same three enzymes in both tissues, and then a fork that depends
+         entirely on whether the cell owns glucose-6-phosphatase.</p>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m2s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Glycogen phosphorylase</span>
+          <span class="home-desc">Run the enzyme until it stops, then work out why.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">The debranching enzyme</span>
+          <span class="home-desc">Perform its two activities yourself, in the right order.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">The metabolic fork</span>
+          <span class="home-desc">Decide where glucose-6-phosphate goes, tissue by tissue.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m2quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 2 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s1">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 1</div>
+    <h2>Glycogen phosphorylase</h2>
+    <p>Phosphorylase cleaves terminal &alpha;1&rarr;4 bonds using inorganic phosphate rather than
+       water. Run it on the particle below and keep an eye on both the products and the point at
+       which it refuses to continue.</p>
+
+    <div id="act-phos"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c4">
+        <p>Phosphorylase cleaves a terminal &alpha;1&rarr;4 bond using inorganic phosphate. What is
+           the glucose-containing product?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c4b">
+        <p>Phosphorolysis releases a sugar that already carries a phosphate. What does that buy the
+           cell?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">1 &middot; APPLY</span></h3>
+      <div class="cp-item" data-check="c4c">
+        <p>Phosphorylase halts with roughly four residues still attached above the branch point.
+           What does that stall reveal about the enzyme?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s2">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 2</div>
+    <h2>The debranching enzyme</h2>
+    <p>One protein, two catalytic activities, in a fixed order. Perform them yourself on the stalled
+       particle. If you reach for the second activity first, the simulation will tell you why it
+       cannot work.</p>
+
+    <div id="act-debranch"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c5">
+        <p>The debranching enzyme first transfers three glucose residues to a nearby chain. Why is
+           that transfer necessary?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c5b">
+        <p>Which product does the &alpha;1&rarr;6 glucosidase activity release?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box clinical">
+      <h3><span class="tag">CLINICAL CONNECTION</span></h3>
+      <p>Hold on to the contrast between the two products &mdash; glucose-1-phosphate from
+         phosphorylase, free glucose from the glucosidase activity. In Module 5 it explains why a
+         patient with a debranching defect accumulates glycogen with stubby outer branches, while a
+         patient with a branching defect accumulates the opposite.</p>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s3">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Section 3</div>
+    <h2>The metabolic fork</h2>
+    <p>Phosphoglucomutase moves the phosphate from carbon 1 to carbon 6, and at that point the
+       pathway splits. Which branch a cell takes is not a matter of preference &mdash; it is a
+       matter of which enzymes that cell owns.</p>
+
+    <h3>Route the molecule</h3>
+    <p>Pick a tissue and a physiological state, then decide where glucose-6-phosphate should go.</p>
+    <div id="act-fork"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c6">
+        <p>Glycogen degradation in skeletal muscle produces glucose-1-phosphate. Which enzyme
+           prepares this molecule to enter glycolysis?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c6b">
+        <p>In a fasting hepatocyte, glucose-6-phosphate is converted to free glucose before export.
+           Which enzyme catalyzes that step?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">1 &middot; APPLY</span></h3>
+      <div class="cp-item" data-check="c6c">
+        <p>A myocyte converts glucose-6-phosphate to fructose-6-phosphate rather than to free
+           glucose. Which enzyme carries out that conversion?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2quiz">
+  <div class="card">
+    <div class="eyebrow">Module 2 &middot; Mastery check</div>
+    <h2>Module 2 quiz</h2>
+    <p>Eight questions on glycogenolysis. Anything below 100% in a concept area unlocks a targeted
+       round built from that area alone.</p>
+    <div class="quiz-body" data-quiz="m2"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 3 · GLYCOGENESIS
+     ============================================================ -->
+
+<section class="section" data-key="m3home">
+  <div class="card">
+    <div class="eyebrow">Module 3</div>
+    <h2>Glycogenesis: build it up</h2>
+    <p>Synthesis is not degradation run backward. It uses five enzymes, an activated sugar that
+       degradation never touches, and a primer protein that solves a problem most students do not
+       notice until it is pointed out.</p>
+    <div class="figure">
+      <svg viewBox="0 0 640 118" role="img" aria-label="Glycogen synthesis pathway from glucose 6 phosphate through glucose 1 phosphate and UDP-glucose, onto the glycogenin primer, extended by glycogen synthase and branched by branching enzyme.">
+        <rect x="4" y="42" width="76" height="38" rx="10" fill="#fff" stroke="var(--line)"/>
+        <text x="42" y="66" text-anchor="middle" font-size="11.5" font-weight="600">G6P</text>
+        <line x1="80" y1="61" x2="122" y2="61" stroke="var(--green)" stroke-width="2"/><polygon points="122,61 114,57 114,65" fill="var(--green)"/>
+        <text x="101" y="52" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">mutase</text>
+        <rect x="124" y="42" width="76" height="38" rx="10" fill="#fff" stroke="var(--line)"/>
+        <text x="162" y="66" text-anchor="middle" font-size="11.5" font-weight="600">G1P</text>
+        <line x1="200" y1="61" x2="242" y2="61" stroke="var(--green)" stroke-width="2"/><polygon points="242,61 234,57 234,65" fill="var(--green)"/>
+        <text x="221" y="52" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">+ UTP</text>
+        <rect x="244" y="42" width="104" height="38" rx="10" fill="var(--green-soft)" stroke="var(--green-line)"/>
+        <text x="296" y="66" text-anchor="middle" font-size="11.5" font-weight="600" fill="#8F3A12">UDP-glucose</text>
+        <line x1="348" y1="61" x2="390" y2="61" stroke="var(--green)" stroke-width="2"/><polygon points="390,61 382,57 382,65" fill="var(--green)"/>
+        <text x="369" y="52" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">glycogenin</text>
+        <rect x="392" y="42" width="82" height="38" rx="10" fill="#fff" stroke="var(--line)"/>
+        <text x="433" y="66" text-anchor="middle" font-size="11.5" font-weight="600">primer</text>
+        <line x1="474" y1="61" x2="516" y2="61" stroke="var(--green)" stroke-width="2"/><polygon points="516,61 508,57 508,65" fill="var(--green)"/>
+        <text x="495" y="52" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">synthase</text>
+        <rect x="518" y="42" width="118" height="38" rx="10" fill="var(--green-soft)" stroke="var(--green-line)"/>
+        <text x="577" y="60" text-anchor="middle" font-size="11" font-weight="600" fill="#8F3A12">glycogen</text>
+        <text x="577" y="73" text-anchor="middle" font-size="8.5" fill="var(--ink-soft)">+ branching enzyme</text>
+      </svg>
+      <p class="caption">Five enzymes. Note that glucose-1-phosphate is shared with degradation,
+         but UDP-glucose belongs to synthesis alone.</p>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m3s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Activating glucose</span>
+          <span class="home-desc">Assemble the route from G6P to UDP-glucose.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Who starts the molecule?</span>
+          <span class="home-desc">Press start with synthase alone and watch nothing happen.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Extending and branching</span>
+          <span class="home-desc">Grow a particle with two enzymes and count your worksites.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m3quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 3 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s1">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 1</div>
+    <h2>Activating glucose</h2>
+    <p>Glucose cannot be added to glycogen as it stands. It has to be activated first, and the
+       currency is UTP rather than ATP.</p>
+
+    <h3>Order the steps</h3>
+    <p>Click the steps in the sequence a hepatocyte would run them, starting from glucose-6-phosphate.</p>
+    <div id="act-udp"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c7">
+        <p>Which two substrates does UDP-glucose pyrophosphorylase combine?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c7b">
+        <p>The pyrophosphate released in that reaction is promptly hydrolyzed. What does the
+           hydrolysis accomplish?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s2">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 2</div>
+    <h2>Who starts the molecule?</h2>
+    <p>You have UDP-glucose in hand and a fully active glycogen synthase. That should be enough.
+       Try it.</p>
+
+    <div id="act-primer"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c8">
+        <p>Glycogen synthase cannot begin a new particle from free glucose units. Which protein
+           supplies the chain it needs?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c8b">
+        <p>Glycogenin attaches roughly eight glucose units to one of its own side chains. Which
+           residue accepts them?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s3">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Section 3</div>
+    <h2>Extending and branching</h2>
+    <p>Two enzymes, two jobs. Synthase makes the chain longer; branching enzyme makes the particle
+       wider. Only one of them adds glucose &mdash; and the other one is what makes the first one
+       fast.</p>
+
+    <div id="act-synth"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c9">
+        <p>Glycogen synthase extends a chain by adding glucose to which end, and through which
+           linkage?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c9b">
+        <p>Branching enzyme relocates a block of about seven residues. Where does it attach them?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">1 &middot; APPLY</span></h3>
+      <div class="cp-item" data-check="c9c">
+        <p>A cell without branching enzyme activity would still make &alpha;1&rarr;4 chains. What
+           would happen to the rate of glycogen synthesis?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3quiz">
+  <div class="card">
+    <div class="eyebrow">Module 3 &middot; Mastery check</div>
+    <h2>Module 3 quiz</h2>
+    <p>Eight questions on glycogenesis. Anything below 100% in a concept area unlocks a targeted
+       round built from that area alone.</p>
+    <div class="quiz-body" data-quiz="m3"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 4 · REGULATION
+     ============================================================ -->
+
+<section class="section" data-key="m4home">
+  <div class="card">
+    <div class="eyebrow">Module 4</div>
+    <h2>The glycogen control room</h2>
+    <p>This is the hardest section of the lecture, and a static diagram is not enough for it. The
+       approach here is to give you the controls: set a physiological condition, predict what the
+       two pathways will do, and then check yourself against the dashboard.</p>
+    <div class="keypoints">
+      <h4>Four ideas do most of the work</h4>
+      <ul>
+        <li>One cascade serves two hormones: GPCR &rarr; cAMP &rarr; PKA &rarr; phosphorylase kinase.</li>
+        <li>The same PKA switches degradation on and synthesis off &mdash; reciprocal regulation.</li>
+        <li>Phosphorylation is a tag, not a verdict. Its meaning depends on the protein.</li>
+        <li>Muscle phosphorylase reads energy charge and calcium; liver phosphorylase reads glucose
+            and hormones.</li>
+      </ul>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m4s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">The cAMP cascade</span>
+          <span class="home-desc">Put the amplification steps in order, then turn the signal off.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">Phosphorylation detective</span>
+          <span class="home-desc">Predict what one phosphate does to two different enzymes.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s3">
+        <span class="home-num">3</span>
+        <span class="home-body">
+          <span class="home-title">Isoforms and allostery</span>
+          <span class="home-desc">Sort a, b, R, T, and the effectors that move them.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4s4">
+        <span class="home-num">4</span>
+        <span class="home-body">
+          <span class="home-title">Run the control room</span>
+          <span class="home-desc">Five physiological states. Predict first, then read the dashboard.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m4quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 4 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s1">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 1</div>
+    <h2>The cAMP cascade</h2>
+    <p>Glucagon and epinephrine both act through G protein-coupled receptors, and from the receptor
+       onward the pathway is identical. Each tier amplifies the one above it, which is how a few
+       hormone molecules produce a large metabolic response.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 250" role="img" aria-label="The cAMP cascade: hormone binds a GPCR, adenylate cyclase raises cAMP, PKA is activated, PKA phosphorylates phosphorylase kinase, which phosphorylates glycogen phosphorylase; PKA also phosphorylates and inactivates glycogen synthase. Phosphodiesterase and protein phosphatase 1 reverse the signal.">
+        <rect x="20" y="12" width="200" height="34" rx="9" fill="var(--green-soft)" stroke="var(--green-line)"/>
+        <text x="120" y="34" text-anchor="middle" font-size="11.5" font-weight="600" fill="#8F3A12">glucagon or epinephrine</text>
+        <line x1="120" y1="46" x2="120" y2="66" stroke="var(--green)" stroke-width="2"/><polygon points="120,66 116,58 124,58" fill="var(--green)"/>
+        <rect x="20" y="68" width="200" height="34" rx="9" fill="#fff" stroke="var(--line)"/>
+        <text x="120" y="90" text-anchor="middle" font-size="11.5">GPCR &rarr; adenylate cyclase</text>
+        <line x1="120" y1="102" x2="120" y2="122" stroke="var(--green)" stroke-width="2"/><polygon points="120,122 116,114 124,114" fill="var(--green)"/>
+        <rect x="20" y="124" width="200" height="34" rx="9" fill="#fff" stroke="var(--line)"/>
+        <text x="120" y="146" text-anchor="middle" font-size="11.5">cAMP &uarr;</text>
+        <line x1="120" y1="158" x2="120" y2="178" stroke="var(--green)" stroke-width="2"/><polygon points="120,178 116,170 124,170" fill="var(--green)"/>
+        <rect x="20" y="180" width="200" height="34" rx="9" fill="var(--green-soft)" stroke="var(--green-line)"/>
+        <text x="120" y="202" text-anchor="middle" font-size="11.5" font-weight="600" fill="#8F3A12">protein kinase A</text>
+
+        <line x1="220" y1="197" x2="300" y2="150" stroke="var(--green)" stroke-width="2"/><polygon points="300,150 292,150 296,157" fill="var(--green)"/>
+        <line x1="220" y1="197" x2="300" y2="228" stroke="var(--rose)" stroke-width="2"/><polygon points="300,228 292,227 295,220" fill="var(--rose)"/>
+
+        <rect x="302" y="126" width="180" height="34" rx="9" fill="#fff" stroke="var(--line)"/>
+        <text x="392" y="148" text-anchor="middle" font-size="11.5">phosphorylase kinase-P</text>
+        <line x1="482" y1="143" x2="522" y2="143" stroke="var(--green)" stroke-width="2"/><polygon points="522,143 514,139 514,147" fill="var(--green)"/>
+        <rect x="452" y="60" width="180" height="46" rx="9" fill="var(--green-soft)" stroke="var(--green)"/>
+        <text x="542" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#8F3A12">phosphorylase a</text>
+        <text x="542" y="96" text-anchor="middle" font-size="10" fill="var(--ink-soft)">breakdown ON</text>
+        <line x1="524" y1="140" x2="560" y2="110" stroke="var(--green)" stroke-width="2"/><polygon points="560,110 552,110 556,117" fill="var(--green)"/>
+
+        <rect x="302" y="210" width="180" height="34" rx="9" fill="var(--rose-soft)" stroke="var(--rose)"/>
+        <text x="392" y="232" text-anchor="middle" font-size="11.5" fill="var(--rose)">glycogen synthase-P</text>
+        <rect x="492" y="204" width="140" height="46" rx="9" fill="var(--rose-soft)" stroke="var(--rose)"/>
+        <text x="562" y="224" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--rose)">INACTIVE</text>
+        <text x="562" y="240" text-anchor="middle" font-size="10" fill="var(--ink-soft)">synthesis OFF</text>
+        <line x1="482" y1="227" x2="492" y2="227" stroke="var(--rose)" stroke-width="2"/>
+
+        <text x="248" y="26" font-size="10" fill="var(--ink-soft)">OFF-SWITCHES</text>
+        <text x="248" y="42" font-size="10" fill="var(--ink-soft)">PDE: cAMP &rarr; AMP</text>
+        <text x="248" y="58" font-size="10" fill="var(--ink-soft)">PP1: removes the phosphates</text>
+      </svg>
+      <p class="caption">One kinase, two opposite outcomes. PDE acts on the messenger; PP1 acts one
+         tier lower, on the enzymes the cascade already modified.</p>
+    </div>
+
+    <h3>Put the cascade in order</h3>
+    <div id="act-cascade"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c10">
+        <p>Glucagon binds its receptor on a hepatocyte. Which second messenger rises next?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c10b">
+        <p>PKA becomes active in that hepatocyte. Which protein does it phosphorylate to promote
+           glycogen breakdown?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">1 &middot; APPLY</span></h3>
+      <div class="cp-item" data-check="c10c">
+        <p>Which enzyme ends the signal by converting cAMP to AMP?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s2">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 2</div>
+    <h2>Phosphorylation detective</h2>
+    <p>Most students arrive with a shortcut: phosphorylation means activation. Glycogen metabolism
+       is the cleanest place in biochemistry to break that habit, because one kinase acts on two
+       enzymes in the same response and does opposite things to them.</p>
+
+    <div id="act-detective"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c11">
+        <p>PKA phosphorylates both phosphorylase kinase and glycogen synthase during a glucagon
+           response. What happens to the two pathways?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c11b">
+        <p>Phosphorylation activates glycogen phosphorylase and inactivates glycogen synthase. What
+           does that pairing illustrate?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s3">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 3</div>
+    <h2>Isoforms and allostery</h2>
+    <p>Glycogen phosphorylase is a homodimer that exists in four interconvertible forms: the
+       covalent state (a, phosphorylated; b, unphosphorylated) crossed with the conformational state
+       (R, more active; T, less active). Allosteric effectors move a molecule between R and T without
+       changing its covalent state at all.</p>
+
+    <div class="figure">
+      <svg viewBox="0 0 640 200" role="img" aria-label="Comparison of muscle phosphorylase b and liver phosphorylase a: muscle b is unphosphorylated, favors the T state, and is activated by AMP and calcium and inhibited by ATP and glucose 6 phosphate; liver a is phosphorylated, favors the R state, and is inhibited by glucose.">
+        <rect x="6" y="10" width="304" height="180" rx="12" fill="#FAFCFD" stroke="var(--line)"/>
+        <text x="158" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">SKELETAL MUSCLE</text>
+        <text x="158" y="56" text-anchor="middle" font-size="11.5" fill="var(--ink-mid)">phosphorylase b &middot; unphosphorylated</text>
+        <text x="158" y="74" text-anchor="middle" font-size="11.5" fill="var(--ink-mid)">favors T &mdash; quiet at rest</text>
+        <rect x="26" y="88" width="126" height="42" rx="9" fill="var(--green-soft)" stroke="var(--green)"/>
+        <text x="89" y="106" text-anchor="middle" font-size="10.5" font-weight="700" fill="#8F3A12">toward R (on)</text>
+        <text x="89" y="121" text-anchor="middle" font-size="10" fill="var(--ink-mid)">AMP, Ca&sup2;&#8314;, epi</text>
+        <rect x="164" y="88" width="126" height="42" rx="9" fill="var(--rose-soft)" stroke="var(--rose)"/>
+        <text x="227" y="106" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--rose)">toward T (off)</text>
+        <text x="227" y="121" text-anchor="middle" font-size="10" fill="var(--ink-mid)">ATP, G6P</text>
+        <text x="158" y="156" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">Reads its own energy charge.</text>
+        <text x="158" y="172" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">No glucagon receptor here.</text>
+
+        <rect x="330" y="10" width="304" height="180" rx="12" fill="#FAFCFD" stroke="var(--line)"/>
+        <text x="482" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">LIVER</text>
+        <text x="482" y="56" text-anchor="middle" font-size="11.5" fill="var(--ink-mid)">phosphorylase a &middot; phosphorylated</text>
+        <text x="482" y="74" text-anchor="middle" font-size="11.5" fill="var(--ink-mid)">favors R &mdash; ready to export</text>
+        <rect x="350" y="88" width="126" height="42" rx="9" fill="var(--green-soft)" stroke="var(--green)"/>
+        <text x="413" y="106" text-anchor="middle" font-size="10.5" font-weight="700" fill="#8F3A12">toward R (on)</text>
+        <text x="413" y="121" text-anchor="middle" font-size="10" fill="var(--ink-mid)">glucagon, epi</text>
+        <rect x="488" y="88" width="126" height="42" rx="9" fill="var(--rose-soft)" stroke="var(--rose)"/>
+        <text x="551" y="106" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--rose)">toward T (off)</text>
+        <text x="551" y="121" text-anchor="middle" font-size="10" fill="var(--ink-mid)">glucose, insulin</text>
+        <text x="482" y="156" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">Reads blood glucose and hormones.</text>
+        <text x="482" y="172" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">Works whatever hepatic ATP is doing.</text>
+      </svg>
+      <p class="caption">Two isozymes, two jobs. Muscle spends glycogen on itself, so it listens to
+         its own energy charge; the liver spends glycogen on everyone else, so it listens to the blood.</p>
+    </div>
+
+    <h3>Sort the effectors</h3>
+    <div id="act-iso"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c12">
+        <p>AMP accumulates in a contracting myocyte. How does it affect phosphorylase b?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c12b">
+        <p>Glucose binds hepatic phosphorylase a during the fed state. What conformational shift
+           follows?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+
+    <div class="box apply">
+      <h3><span class="tag">1 &middot; APPLY</span></h3>
+      <div class="cp-item" data-check="c12c">
+        <p>Hepatic phosphorylase a keeps working when liver ATP is plentiful. What does that tell
+           you about how it is regulated?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s4">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Section 4</div>
+    <h2>Run the control room</h2>
+    <p>Choose a physiological condition. Commit to a prediction for each pathway before you look at
+       the readout &mdash; the prediction is the part that does the learning.</p>
+
+    <div id="act-control"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c13">
+        <p>A sprinter's quadriceps are contracting hard. Which combination of signals raises
+           glycogen phosphorylase activity there?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c13b">
+        <p>Insulin rises after a carbohydrate meal. Which pair of changes follows in the liver?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4quiz">
+  <div class="card">
+    <div class="eyebrow">Module 4 &middot; Mastery check</div>
+    <h2>Module 4 quiz</h2>
+    <p>Eight questions on regulation &mdash; the section most worth a targeted second round. Anything
+       below 100% in a concept area unlocks one.</p>
+    <div class="quiz-body" data-quiz="m4"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     MODULE 5 · CLINICAL INTEGRATION
+     ============================================================ -->
+
+<section class="section" data-key="m5home">
+  <div class="card">
+    <div class="eyebrow">Module 5</div>
+    <h2>When the pathway breaks</h2>
+    <p>Glycogen storage disorders are worth learning as reasoning practice rather than as a list of
+       names. The chain runs in one direction: <strong>presentation &rarr; tissue &rarr; pathway
+       &rarr; enzyme</strong>. Work it that way and the disease name falls out at the end instead of
+       having to be memorized at the start.</p>
+    <div class="box clinical">
+      <h3><span class="tag">SCOPE FOR THIS COURSE</span></h3>
+      <p>Five disorders are covered in depth and you should be able to reason your way to each one:
+         <strong>Von Gierke (I), Pompe (II), Cori (III), Andersen (IV), and McArdle (V)</strong>.
+         Three more &mdash; Hers (VI), type VII, and type VIII &mdash; appear for recognition only,
+         so that the pattern of "which step, how completely blocked" makes sense. You will not be
+         asked to recall their details.</p>
+    </div>
+    <div class="home-list">
+      <button class="home-item" data-goto="m5s1">
+        <span class="home-num">1</span>
+        <span class="home-body">
+          <span class="home-title">Reasoning from the patient</span>
+          <span class="home-desc">Four cases, worked tissue-first rather than name-first.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5s2">
+        <span class="home-num">2</span>
+        <span class="home-body">
+          <span class="home-title">The disease matrix</span>
+          <span class="home-desc">Match each defect to its tissue, its glycogen, and its clue.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+      <button class="home-item" data-goto="m5quiz">
+        <span class="home-num">&#10003;</span>
+        <span class="home-body">
+          <span class="home-title">Module 5 quiz</span>
+          <span class="home-desc">Eight questions, with a targeted round on anything you miss.</span>
+        </span>
+        <span class="home-status">Not started</span>
+      </button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s1">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Section 1</div>
+    <h2>Reasoning from the patient</h2>
+    <p>Each case asks you three questions in order. Resist naming the disease until the third.</p>
+
+    <div id="act-cases"></div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c14">
+        <p>A toddler presents with fasting hypoglycemia and marked hepatomegaly. Which tissue
+           function has failed?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c14b">
+        <p>An adult reports cramps and fatigue in the first minutes of vigorous exercise, with
+           normal fasting blood glucose. Where does the defect lie?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5s2">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Section 2</div>
+    <h2>The disease matrix</h2>
+    <p>Five disorders you are responsible for. Fill in the row for each one, then check yourself.</p>
+
+    <div id="act-matrix"></div>
+
+    <div class="box clinical">
+      <h3><span class="tag">FOR RECOGNITION ONLY</span></h3>
+      <p>Three further types round out the pattern. <strong>Hers (VI)</strong> is a hepatic
+         phosphorylase defect and resembles a mild type I. <strong>Type VII</strong> is a muscle
+         phosphofructokinase defect and resembles type V. <strong>Type VIII</strong> is a hepatic
+         phosphorylase kinase defect, milder still, because the hormonal route to phosphorylase is
+         weakened rather than the enzyme removed. Severity tracks how completely a step is blocked.</p>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">CAN YOU PREDICT IT?</span></h3>
+      <div class="cp-item" data-check="c15">
+        <p>Von Gierke disease results from deficient glucose-6-phosphatase. Which finding follows
+           most directly?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+      <div class="cp-item" data-check="c15b">
+        <p>Andersen disease results from deficient branching enzyme. What does the glycogen in these
+           patients look like?</p>
+        <div class="choices"></div><div class="feedback"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m5quiz">
+  <div class="card">
+    <div class="eyebrow">Module 5 &middot; Mastery check</div>
+    <h2>Module 5 quiz</h2>
+    <p>Eight questions on clinical integration. Anything below 100% in a concept area unlocks a
+       targeted round built from that area alone.</p>
+    <div class="quiz-body" data-quiz="m5"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- ============================================================
+     PATHWAY MAP · FLASHCARDS · FINAL EXAM
+     ============================================================ -->
+
+<section class="section" data-key="pathmap">
+  <div class="card">
+    <div class="eyebrow">Pathway Map</div>
+    <h2>Your glycogen map</h2>
+    <p>This map starts almost empty. Each module you finish unlocks another piece of it, so by the
+       end you will have assembled the whole system yourself rather than being shown it on day one.
+       Nothing here is graded.</p>
+    <div id="act-map"></div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="flashcards">
+  <div class="card">
+    <div class="eyebrow">Retrieval Practice</div>
+    <h2>Flashcards</h2>
+    <p>Thirty cards covering enzymes, linkages, regulators, and the five disorders. Click a card, or
+       press Enter, to flip it. Nothing here is graded &mdash; use it for spaced review.</p>
+    <div class="fc-stage">
+      <div class="fc" id="fcCard" tabindex="0" role="button" aria-label="Flashcard. Press Enter to flip.">
+        <div class="fc-face fc-front"><div>
+          <div class="fc-term" id="fcFront"></div>
+          <div class="fc-hint">click, tap, or press Enter to flip</div>
+        </div></div>
+        <div class="fc-face fc-back"><div class="fc-def" id="fcBack"></div></div>
+      </div>
+    </div>
+    <div class="fc-bar">
+      <button class="btn ghost" id="fcPrev">Previous</button>
+      <span class="fc-count" id="fcCount"></span>
+      <button class="btn ghost" id="fcNext">Next</button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="final">
+  <div class="card">
+    <div class="eyebrow">Final Mastery Exam</div>
+    <h2>25-question mastery exam</h2>
+    <p>Drawn across all five modules and stratified by cognitive level: 8 recall, 10 application,
+       7 integration. Submit it and the results screen breaks your performance down by concept area,
+       then offers an adaptive round built only from the areas you missed.</p>
+    <div class="quiz-body" data-quiz="final"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit exam</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+  </main>
+</div>
+
+<!-- ============================================================
+     LOAD ORDER MATTERS. Do not reorder these six lines.
+     1. the bank      - TOPIC_ID, CHECKPOINTS, CARDS, POOL
+     2. the manifest  - MANIFEST (module/section structure)
+     3. storage.js    - defines `state`; needs TOPIC_ID
+     4. helpers.js    - el(), shuffle(), order(), LETTERS
+     5. this page's own content script
+     6. engine.js     - LAST; builds the nav and wires everything
+     ============================================================ -->
+<script src="banks/glycogen.js"></script>
+<script src="banks/glycogen.manifest.js"></script>
+<script src="shared/storage.js"></script>
+<script src="shared/helpers.js"></script>
+<script>
+/* ============================================================
+   CONTENT SCRIPT — glycogen only. No reusable logic lives here;
+   anything reusable belongs in shared/.
+
+   PART A  derive the engine's globals from MANIFEST
+   PART B  small activity builders used by several sections
+   PART C  the glycogen particle renderer (shared by 4 activities)
+   PART D  the fifteen activities, in section order
+   PART E  the pathway map
+   ============================================================ */
+
+/* ---------- PART A · derivation ----------------------------
+   MODULES, FLOW, SECTION_REQ, QUIZ_KEY_FOR_SECTION and
+   AREA_SECTION are all built from MANIFEST rather than typed a
+   second time, so the page and the hub can never disagree. */
+
+var BADGES = {m1:'1', m2:'2', m3:'3', m4:'4', m5:'5',
+              map:'&#9781;', flash:'&#10022;', final:'&#9733;'};
+
+var MODULES = MANIFEST.modules.map(function(m){
+  var mod = {id:m.id, badge:BADGES[m.id]||'&#8226;', title:m.title,
+             sections:m.sections.map(function(s){return {key:s.key, label:s.label};})};
+  if(m.unlockAfter) mod.unlockAfter = m.unlockAfter;
+  return mod;
+});
+
+var UNGRADED = [];
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(!s.checks && !s.activity && !s.quiz) UNGRADED.push(s.key);
+});});
+
+/* FLOW is the flat study path. engine.js reads it more than any
+   other global. It is not derived automatically — omit it and
+   the page renders a sidebar and nothing else. */
+var FLOW = []; MODULES.forEach(function(m){ m.sections.forEach(function(s){ FLOW.push(s); }); });
+
+var AREA_SECTION = MANIFEST.areaSection;
+
+var SECTION_REQ = {}, QUIZ_KEY_FOR_SECTION = {};
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(s.checks || s.activity){
+    SECTION_REQ[s.key] = {checks: s.checks || []};
+    if(s.activity) SECTION_REQ[s.key].activity = s.activity;
+  }
+  if(s.quiz) QUIZ_KEY_FOR_SECTION[s.key] = s.quiz;
+});});
+
+var MODULE_QUIZ_SIZE = 8;
+var FINAL_EXAM_MIX   = {concept:8, application:10, integration:7};
+
+
+/* ---------- PART B · activity plumbing ---------------------- */
+
+/* Every activity writes through these two functions so the save
+   and clear behaviour is identical everywhere. paintNav() lives
+   in engine.js, which has not loaded yet while this script is
+   first running, so the guard matters: restore code calls
+   repaint() at load time, click handlers call it later. */
+function saveAct(name, value){
+  state.activities[name] = value; saveState(); repaint();
+}
+function clearAct(name){
+  state.activities[name] = null; saveState(); repaint();
+}
+function repaint(){ if(typeof paintNav === 'function') paintNav(); }
+function done(name){ return state.activities[name] != null; }
+
+/* A row of buttons, returned as an element the caller appends. */
+function controlsRow(){ return el('div','controls'); }
+
+/* ---- Builder 1: sort rows (used by three sections) ----------
+   rows    [{text, ans}]  ans must be one of `options`
+   options [String]       the pill choices offered on every row  */
+function actSort(hostId, actName, rows, options, blurb){
+  var host = document.getElementById(hostId); if(!host) return;
+  var picks = (state.activities[actName] || []).slice();
+  var checked = done(actName);
+
+  function draw(){
+    host.innerHTML = '';
+    if(blurb) host.appendChild(el('p','caption', blurb));
+    var board = el('div');
+    rows.forEach(function(item, r){
+      var row = el('div','sort-row');
+      row.appendChild(el('div','sort-text', item.text));
+      var opts = el('div','sort-opts');
+      shuffle(options).forEach(function(o){
+        var b = el('button','opt', o); b.dataset.val = o;
+        if(picks[r] === o) b.classList.add('sel');
+        if(checked){
+          b.disabled = true;
+          if(o === item.ans) b.classList.add('reveal');
+          if(picks[r] === o && o !== item.ans) b.classList.add('bad');
+        }
+        b.onclick = function(){
+          picks[r] = o;
+          opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+          b.classList.add('sel');
+          score.textContent = picks.filter(Boolean).length + ' of ' + rows.length + ' answered.';
+        };
+        opts.appendChild(b);
+      });
+      row.appendChild(opts); board.appendChild(row);
+    });
+    host.appendChild(board);
+
+    var bar = controlsRow();
+    var check = el('button','btn','Check my answers');
+    var again = el('button','btn ghost','Try again');
+    var score = el('span','caption'); score.style.margin = '0';
+    check.onclick = function(){
+      if(picks.filter(Boolean).length < rows.length){
+        score.textContent = 'Answer every row first.'; return;
+      }
+      checked = true; saveAct(actName, picks); draw();
+    };
+    again.onclick = function(){
+      picks = []; checked = false; clearAct(actName); draw();
+    };
+    if(checked){
+      var right = rows.filter(function(it,i){return picks[i] === it.ans;}).length;
+      score.textContent = right + ' of ' + rows.length + ' correct. Correct answers are outlined.';
+      check.disabled = true;
+    }else{
+      score.textContent = picks.filter(Boolean).length + ' of ' + rows.length + ' answered.';
+    }
+    bar.appendChild(check); bar.appendChild(again); bar.appendChild(score);
+    host.appendChild(bar);
+  }
+  draw();
+}
+
+/* ---- Builder 2: put the steps in order ---------------------
+   steps must be supplied in the CORRECT order. */
+function actSeq(hostId, actName, steps, blurb){
+  var host = document.getElementById(hostId); if(!host) return;
+  var placed = done(actName) ? steps.length : 0;
+
+  function draw(){
+    host.innerHTML = '';
+    if(blurb) host.appendChild(el('p','caption', blurb));
+    var list = el('div','chainbar');
+    for(var i=0;i<placed;i++){
+      list.appendChild(el('div','step on', (i+1) + '. ' + steps[i]));
+    }
+    host.appendChild(list);
+
+    var msg = el('div','caption');
+    if(placed < steps.length){
+      var tray = el('div','dnd-tray');
+      shuffle(steps.slice(placed)).forEach(function(s){
+        var p = el('button','dnd-pill', s);
+        p.onclick = function(){
+          if(s === steps[placed]){
+            placed++;
+            if(placed === steps.length) saveAct(actName, placed);
+            draw();
+          }else{
+            msg.textContent = 'Not that one yet — something has to happen before it.';
+          }
+        };
+        tray.appendChild(p);
+      });
+      host.appendChild(tray);
+    }else{
+      msg.textContent = 'Sequence complete.';
+    }
+    host.appendChild(msg);
+
+    var bar = controlsRow();
+    var again = el('button','btn ghost','Start over');
+    again.onclick = function(){ placed = 0; clearAct(actName); draw(); };
+    bar.appendChild(again); host.appendChild(bar);
+  }
+  draw();
+}
+
+/* ---- Builder 3: predict, then reveal -----------------------
+   items [{group, prompt, options[], answer, explain}]
+   Retry until correct, matching how checkpoints behave, so one
+   mistake never permanently blocks the section. */
+function actPanel(hostId, actName, items, blurb){
+  var host = document.getElementById(hostId); if(!host) return;
+  var got = (state.activities[actName] || []).slice();
+
+  function draw(){
+    host.innerHTML = '';
+    if(blurb) host.appendChild(el('p','caption', blurb));
+    items.forEach(function(it, i){
+      var card = el('div','case-card');
+      if(it.group) card.appendChild(el('h4', null, it.group));
+      card.appendChild(el('p', null, it.prompt));
+      var box = el('div','choices');
+      var fb  = el('div','feedback');
+      var ord = order(it.options.length);
+      ord.forEach(function(real, pos){
+        var b = el('button','choice','<span class="mark">' + LETTERS[pos] + '</span>' + it.options[real]);
+        if(got[i] === true){
+          b.disabled = true;
+          if(real === it.answer) b.classList.add('right');
+        }
+        b.onclick = function(){
+          if(real === it.answer){
+            got[i] = true;
+            box.querySelectorAll('.choice').forEach(function(x){x.disabled = true;});
+            b.classList.add('right');
+            fb.className = 'feedback show';
+            fb.innerHTML = '<strong>Correct.</strong>' + it.explain;
+            if(got.filter(Boolean).length === items.length) saveAct(actName, got);
+          }else{
+            b.classList.add('wrong'); b.disabled = true;
+            fb.className = 'feedback show miss';
+            fb.innerHTML = '<strong>Not quite — try again.</strong>Work from the tissue first, then the pathway.';
+          }
+        };
+        box.appendChild(b);
+      });
+      if(got[i] === true){
+        fb.className = 'feedback show';
+        fb.innerHTML = '<strong>Correct.</strong>' + it.explain;
+      }
+      card.appendChild(box); card.appendChild(fb);
+      host.appendChild(card);
+    });
+    var bar = controlsRow();
+    var again = el('button','btn ghost','Reset this activity');
+    var note  = el('span','caption'); note.style.margin = '0';
+    note.textContent = got.filter(Boolean).length + ' of ' + items.length + ' resolved.';
+    again.onclick = function(){ got = []; clearAct(actName); draw(); };
+    bar.appendChild(again); bar.appendChild(note);
+    host.appendChild(bar);
+  }
+  draw();
+}
+
+
+/* ---------- PART C · the glycogen particle renderer ---------
+   One drawing function, used by four different activities.
+   model = { main:Number, branches:[{at:Number, len:Number}] }
+   `at` is an index into the main chain; `len` counts residues
+   on that branch. Solid-filled residues are nonreducing ends. */
+
+function nonReducingEnds(model){
+  var n = 1;                                   /* the main chain tip */
+  model.branches.forEach(function(b){ if(b.len > 0) n++; });
+  return n;
+}
+function totalResidues(model){
+  var n = model.main;
+  model.branches.forEach(function(b){ n += b.len; });
+  return n;
+}
+function drawGlycogen(model, caption){
+  var R = 10, SP = 26, X0 = 92, CY = 132, H = 250;
+  /* The viewBox widens to fit the longest chain rather than letting
+     residues run off the right edge. Because .stage svg is width:100%,
+     a wider viewBox simply scales the whole particle down to fit. */
+  var far = X0 + (model.main - 1) * SP;
+  model.branches.forEach(function(b){
+    if(b.len > 0) far = Math.max(far, X0 + b.at * SP + 20 + (b.len - 1) * SP);
+  });
+  var W = Math.max(620, far + 60);
+  var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' +
+          (caption || 'A glycogen particle') + '">';
+  /* glycogenin core, and the single reducing end it anchors */
+  s += '<circle cx="46" cy="' + CY + '" r="24" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>';
+  s += '<text x="46" y="' + (CY+4) + '" text-anchor="middle" font-size="10" font-weight="700" fill="#8F3A12">core</text>';
+  s += '<text x="46" y="' + (CY+42) + '" text-anchor="middle" font-size="9" fill="var(--ink-soft)">reducing end</text>';
+  /* main chain */
+  var lastX = X0 + (model.main - 1) * SP;
+  s += '<line x1="70" y1="' + CY + '" x2="' + lastX + '" y2="' + CY + '" stroke="var(--green-line)" stroke-width="3"/>';
+  for(var i = 0; i < model.main; i++){
+    var x = X0 + i * SP;
+    var tip = (i === model.main - 1);
+    s += '<circle cx="' + x + '" cy="' + CY + '" r="' + R + '" fill="' +
+         (tip ? 'var(--green)' : '#fff') + '" stroke="var(--green)" stroke-width="2"/>';
+  }
+  if(model.main > 0){
+    s += '<text x="' + (lastX + 16) + '" y="' + (CY + 4) + '" font-size="9" font-weight="600" fill="#8F3A12">end</text>';
+  }
+  /* branches: first one above the chain, second one below */
+  model.branches.forEach(function(b, j){
+    if(b.len <= 0) return;
+    var up = (j % 2 === 0);
+    var by = up ? CY - 78 : CY + 78;
+    var rootX = X0 + b.at * SP;
+    var firstX = rootX + 20;
+    s += '<line x1="' + rootX + '" y1="' + (up ? CY - R : CY + R) + '" x2="' + firstX + '" y2="' + by + '" stroke="var(--green)" stroke-width="3"/>';
+    s += '<text x="' + (rootX - 34) + '" y="' + (up ? CY - 34 : CY + 42) + '" font-size="10" font-weight="700" fill="var(--green)">&#945;1&#8594;6</text>';
+    var lastBX = firstX + (b.len - 1) * SP;
+    s += '<line x1="' + firstX + '" y1="' + by + '" x2="' + lastBX + '" y2="' + by + '" stroke="var(--green-line)" stroke-width="3"/>';
+    for(var k = 0; k < b.len; k++){
+      var bx = firstX + k * SP;
+      var btip = (k === b.len - 1);
+      s += '<circle cx="' + bx + '" cy="' + by + '" r="' + R + '" fill="' +
+           (btip ? 'var(--green)' : '#fff') + '" stroke="var(--green)" stroke-width="2"/>';
+    }
+    s += '<text x="' + (lastBX + 16) + '" y="' + (by + 4) + '" font-size="9" font-weight="600" fill="#8F3A12">end</text>';
+  });
+  s += '</svg>';
+  return s;
+}
+function tallyBar(pairs){
+  var t = el('div','tally');
+  pairs.forEach(function(p){ t.appendChild(el('span', null, p)); });
+  return t;
+}
+
+
+/* ---------- PART D · the activities, in section order -------- */
+
+/* --- m1s1 · osmotic simulator (predict → interact → explain) --- */
+(function(){
+  var host = document.getElementById('act-osmo'); if(!host) return;
+  var n = 12000, mode = 'free', seen = {};
+  if(done('osmo')){ seen = {free:true, glycogen:true}; }
+
+  var stage = el('div','stage');
+  var slideWrap = el('div');
+  slideWrap.innerHTML = '<label class="caption" style="margin:0">Glucose molecules to store: ' +
+    '<strong id="osmoN"></strong></label>';
+  var slider = document.createElement('input');
+  slider.type = 'range'; slider.min = '2000'; slider.max = '20000'; slider.step = '1000'; slider.value = n;
+  var modeBar = controlsRow();
+  var bFree = el('button','btn ghost','Store as free glucose');
+  var bGly  = el('button','btn ghost','Store as one glycogen particle');
+  var read  = el('div','readout');
+  var note  = el('div','caption');
+
+  function paint(){
+    var particles = (mode === 'free') ? n : 1;
+    var swell = (mode === 'free') ? Math.min(1 + n/9000, 3.2) : 1.02;
+    document.getElementById('osmoN').textContent = n.toLocaleString();
+    bFree.classList.toggle('on', mode === 'free');
+    bGly.classList.toggle('on', mode === 'glycogen');
+
+    var dots = '';
+    if(mode === 'free'){
+      var shown = Math.min(70, Math.round(n / 260));
+      for(var i = 0; i < shown; i++){
+        var a = (i * 2.399), r = 22 + (i % 9) * 8;
+        dots += '<circle cx="' + (150 + r * Math.cos(a)).toFixed(1) + '" cy="' +
+                (110 + r * Math.sin(a)).toFixed(1) + '" r="3.4" fill="var(--green)"/>';
+      }
+    }else{
+      dots = '<circle cx="150" cy="110" r="26" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>' +
+             '<circle cx="150" cy="110" r="15" fill="var(--green)" opacity=".35"/>' +
+             '<text x="150" y="150" text-anchor="middle" font-size="10" fill="var(--ink-soft)">1 particle</text>';
+    }
+    var cellR = 66 * Math.min(swell, 2.4) / 1.4;
+    stage.innerHTML = '<svg viewBox="0 0 300 220" role="img" aria-label="A cell holding glucose ' +
+      'either as free molecules or as one glycogen particle, with cell size reflecting water influx.">' +
+      '<circle cx="150" cy="110" r="' + cellR.toFixed(1) + '" fill="#FAFCFD" stroke="var(--green-line)" stroke-width="2"/>' +
+      dots + '</svg>';
+
+    read.innerHTML =
+      '<div><div class="k">Glucose stored</div><div class="v">' + n.toLocaleString() + '</div></div>' +
+      '<div><div class="k">Osmotically active particles</div><div class="v">' + particles.toLocaleString() + '</div></div>' +
+      '<div><div class="k">Relative water influx</div><div class="v">' + swell.toFixed(2) + '&times;</div></div>';
+    note.textContent = (mode === 'free')
+      ? 'Every free glucose molecule counts as one dissolved particle. Water follows.'
+      : 'The same glucose, polymerized: the cell now presents roughly one particle to the surrounding water.';
+  }
+
+  slider.oninput = function(){ n = +slider.value; paint(); };
+  bFree.onclick = function(){ mode = 'free'; seen.free = true; paint(); update(); };
+  bGly.onclick  = function(){ mode = 'glycogen'; seen.glycogen = true; paint(); update(); };
+
+  var bar = controlsRow();
+  var check = el('button','btn','I have compared both');
+  var again = el('button','btn ghost','Reset');
+  var status = el('span','caption'); status.style.margin = '0';
+  function update(){
+    var both = seen.free && seen.glycogen;
+    check.disabled = !both;
+    status.textContent = done('osmo') ? 'Recorded.'
+      : both ? 'Both strategies compared — record it to complete this section.'
+             : 'Try both storage strategies at the current slider setting.';
+  }
+  check.onclick = function(){ saveAct('osmo', {n:n}); update(); };
+  again.onclick = function(){ seen = {}; clearAct('osmo'); update(); };
+
+  modeBar.appendChild(bFree); modeBar.appendChild(bGly);
+  host.appendChild(slideWrap); host.appendChild(slider);
+  host.appendChild(modeBar); host.appendChild(stage);
+  host.appendChild(read); host.appendChild(note);
+  bar.appendChild(check); bar.appendChild(again); bar.appendChild(status);
+  host.appendChild(bar);
+  paint(); update();
+})();
+
+/* --- shared builder, used by m1s2 (structure) and m3s3 (synthesis) ---
+   Glycogen synthase adds one residue to EVERY nonreducing end at
+   once, which is the point being made: worksites, not molecules,
+   set the rate. Branching enzyme moves seven residues off the main
+   chain to create a new branch, adding no glucose at all. */
+function makeBuilder(hostId, actName, cfg){
+  var host = document.getElementById(hostId); if(!host) return;
+  var fresh = {main:12, branches:[], bySynthase:0, byBranching:0};
+  var model = state.activities[actName] ? JSON.parse(JSON.stringify(state.activities[actName])) : JSON.parse(JSON.stringify(fresh));
+
+  var stage = el('div','stage');
+  var tally = el('div');
+  var msg   = el('div','caption');
+  var bar   = controlsRow();
+  var bSyn  = el('button','btn', 'Glycogen synthase &mdash; one round');
+  var bSyn5 = el('button','btn ghost', 'Synthase &times; 5 rounds');
+  var bBr   = el('button','btn', 'Branching enzyme &mdash; create an &#945;1&#8594;6 branch');
+  var bChk  = el('button','btn ghost','Check');
+  var bRst  = el('button','btn ghost','Start over');
+
+  /* Branching enzyme takes seven residues off the main chain tip and
+     roots them four residues below the new tip. Requiring a slightly
+     longer chain for each successive branch is what keeps the two
+     branch points at distinct positions instead of stacking them
+     both at the base of the chain. */
+  function branchNeeds(){ return 13 + 2 * model.branches.length; }
+
+  function paint(){
+    stage.innerHTML = drawGlycogen(model, 'A glycogen particle under construction');
+    var ends = nonReducingEnds(model);
+    tally.innerHTML = '';
+    tally.appendChild(tallyBar(cfg.tally(model, ends)));
+    bBr.disabled = (model.main < branchNeeds() || model.branches.length >= 2);
+    bChk.disabled = (model.branches.length < 2);
+    if(model.branches.length >= 2){
+      msg.textContent = cfg.doneText;
+    }else if(model.main < branchNeeds()){
+      msg.textContent = 'Branching enzyme needs a longer main chain — it moves seven residues and has to ' +
+                        'leave enough behind on both sides. Currently ' + model.main + ', needs ' + branchNeeds() + '.';
+    }else{
+      msg.textContent = 'The main chain is long enough to branch.';
+    }
+    if(done(actName)) msg.textContent = 'Saved. ' + cfg.doneText;
+  }
+  function synthaseRound(){
+    var added = nonReducingEnds(model);
+    model.main += 1;
+    model.branches.forEach(function(b){ if(b.len>0) b.len += 1; });
+    model.bySynthase += added;
+  }
+  bSyn.onclick  = function(){ synthaseRound(); paint(); };
+  bSyn5.onclick = function(){ for(var i=0;i<5;i++) synthaseRound(); paint(); };
+  bBr.onclick = function(){
+    model.main -= 7;
+    model.branches.push({at: model.main - 4, len: 7});
+    paint();
+  };
+  bChk.onclick = function(){ saveAct(actName, model); paint(); };
+  bRst.onclick = function(){ model = JSON.parse(JSON.stringify(fresh)); clearAct(actName); paint(); };
+
+  if(cfg.blurb) host.appendChild(el('p','caption', cfg.blurb));
+  bar.appendChild(bSyn); bar.appendChild(bSyn5); bar.appendChild(bBr); bar.appendChild(bChk); bar.appendChild(bRst);
+  host.appendChild(stage); host.appendChild(tally); host.appendChild(bar); host.appendChild(msg);
+  paint();
+}
+
+/* --- m1s2 · build a glycogen particle --- */
+makeBuilder('act-build', 'build', {
+  blurb: 'Each click of glycogen synthase adds one residue to every nonreducing end at once — ' +
+         'that is what it means for many enzyme molecules to work in parallel. Add two branches, ' +
+         'then check.',
+  tally: function(m, ends){
+    return ['Residues: ' + totalResidues(m),
+            'Branches: ' + m.branches.length,
+            'Nonreducing ends: ' + ends,
+            'Enzymes that can work at once: ' + ends];
+  },
+  doneText: 'Two branches, and the number of simultaneous worksites has tripled. That is the whole argument for branching.'
+});
+
+/* --- m1s3 · liver or muscle? --- */
+actSort('act-tissue', 'tissue', [
+  {text:'Maintains blood glucose for other tissues',                         ans:'Liver'},
+  {text:'Contains glucose-6-phosphatase',                                    ans:'Liver'},
+  {text:'Responds to glucagon',                                              ans:'Liver'},
+  {text:'Phosphorylase is inhibited when glucose binds it',                  ans:'Liver'},
+  {text:'Uses its own glycogen to make ATP for itself',                      ans:'Skeletal muscle'},
+  {text:'Phosphorylase responds strongly to a rise in AMP',                  ans:'Skeletal muscle'},
+  {text:'Phosphorylase kinase is activated by contraction-associated Ca&sup2;&#8314;', ans:'Skeletal muscle'},
+  {text:'Responds to epinephrine',                                           ans:'Both tissues'}
+], ['Liver','Skeletal muscle','Both tissues'],
+'Eight properties, three buckets. The last one catches people out.');
+
+/* --- m2s1 · phosphorylase, run until it stalls --- */
+(function(){
+  var host = document.getElementById('act-phos'); if(!host) return;
+  var fresh = {main:20, branches:[{at:6,len:9},{at:10,len:7}], g1p:0};
+  var m = state.activities['phos'] ? JSON.parse(JSON.stringify(state.activities['phos'].m)) : JSON.parse(JSON.stringify(fresh));
+  var answered = done('phos');
+
+  var stage = el('div','stage'), tally = el('div'), msg = el('div','caption');
+  var quiz = el('div');
+  var bar = controlsRow();
+  var b1 = el('button','btn','Run phosphorylase &mdash; one cleavage');
+  var bAll = el('button','btn ghost','Run until it stalls');
+  var bRst = el('button','btn ghost','Reset the particle');
+
+  function maxAt(){ var a = 0; m.branches.forEach(function(b){ if(b.len>0 && b.at>a) a = b.at; }); return a; }
+  function target(){
+    var b = null;
+    m.branches.forEach(function(x){ if(x.len > 4 && (!b || x.len > b.len)) b = x; });
+    if(b) return b;
+    if(m.main > maxAt() + 5) return 'main';
+    return null;
+  }
+  function step(){
+    var t = target(); if(!t) return false;
+    if(t === 'main') m.main -= 1; else t.len -= 1;
+    m.g1p += 1; return true;
+  }
+  function paint(){
+    stage.innerHTML = drawGlycogen(m, 'A glycogen particle being degraded by phosphorylase');
+    tally.innerHTML = '';
+    tally.appendChild(tallyBar(['Glucose-1-phosphate released: ' + m.g1p,
+                                'Free glucose released: 0',
+                                'Residues remaining: ' + totalResidues(m)]));
+    var stalled = !target();
+    b1.disabled = stalled; bAll.disabled = stalled;
+    msg.textContent = stalled
+      ? 'Phosphorylase has stopped. Four residues are still sitting above each branch point, and it will not go further.'
+      : 'Phosphorylase is cleaving residues from the nonreducing ends.';
+    quiz.innerHTML = '';
+    if(stalled){
+      var card = el('div','case-card');
+      card.appendChild(el('h4', null, 'Why did glycogen phosphorylase stop?'));
+      var box = el('div','choices'), fb = el('div','feedback');
+      var opts = [
+        {t:'The branch point crowds its active site, so it cannot reach residues that close to an &#945;1&#8594;6 linkage', ok:true},
+        {t:'Inorganic phosphate has been used up in the immediate area', ok:false},
+        {t:'The remaining residues are joined by &#946;1&#8594;4 bonds it cannot cleave', ok:false}
+      ];
+      shuffle(opts).forEach(function(o, i){
+        var b = el('button','choice','<span class="mark">' + LETTERS[i] + '</span>' + o.t);
+        if(answered && o.ok) b.classList.add('right');
+        if(answered) b.disabled = true;
+        b.onclick = function(){
+          if(o.ok){
+            answered = true;
+            box.querySelectorAll('.choice').forEach(function(x){x.disabled = true;});
+            b.classList.add('right');
+            fb.className = 'feedback show';
+            fb.innerHTML = '<strong>Correct.</strong>The stall is steric, not chemical. What is left behind — ' +
+              'a particle with four-residue stubs above each branch point — is called a limit dextrin, ' +
+              'and it is exactly the substrate the debranching enzyme handles in the next section.';
+            saveAct('phos', {m:m});
+          }else{
+            b.classList.add('wrong'); b.disabled = true;
+            fb.className = 'feedback show miss';
+            fb.innerHTML = '<strong>Not quite — try again.</strong>Look at where the enzyme stopped rather than at what it ran out of.';
+          }
+        };
+        box.appendChild(b);
+      });
+      if(answered){
+        fb.className = 'feedback show';
+        fb.innerHTML = '<strong>Correct.</strong>The stall is steric, not chemical. The four-residue stubs left above each branch point form a limit dextrin — the debranching enzyme\'s substrate.';
+      }
+      card.appendChild(box); card.appendChild(fb);
+      quiz.appendChild(card);
+    }
+  }
+  b1.onclick   = function(){ step(); paint(); };
+  bAll.onclick = function(){ var guard = 0; while(step() && guard++ < 200){} paint(); };
+  bRst.onclick = function(){ m = JSON.parse(JSON.stringify(fresh)); answered = false; clearAct('phos'); paint(); };
+
+  bar.appendChild(b1); bar.appendChild(bAll); bar.appendChild(bRst);
+  host.appendChild(stage); host.appendChild(tally); host.appendChild(bar);
+  host.appendChild(msg); host.appendChild(quiz);
+  paint();
+})();
+
+/* --- m2s2 · the debranching enzyme, two activities in order --- */
+(function(){
+  var host = document.getElementById('act-debranch'); if(!host) return;
+  var fresh = {main:15, branches:[{at:6,len:4},{at:10,len:4}], g1p:13, glc:0, resumed:false};
+  var m = state.activities['debranch'] ? JSON.parse(JSON.stringify(state.activities['debranch'])) : JSON.parse(JSON.stringify(fresh));
+
+  var stage = el('div','stage'), tally = el('div'), msg = el('div','caption');
+  var bar = controlsRow();
+  var bT = el('button','btn','1 &middot; Transferase &mdash; move three residues');
+  var bG = el('button','btn','2 &middot; &#945;1&#8594;6 glucosidase &mdash; cleave the branch point');
+  var bP = el('button','btn ghost','Resume phosphorylase');
+  var bR = el('button','btn ghost','Reset');
+
+  function stubbed(){ var r=null; m.branches.forEach(function(b){ if(b.len===4 && !r) r=b; }); return r; }
+  function single(){ var r=null; m.branches.forEach(function(b){ if(b.len===1 && !r) r=b; }); return r; }
+  function cleared(){ return m.branches.every(function(b){ return b.len === 0; }); }
+
+  function paint(){
+    stage.innerHTML = drawGlycogen(m, 'A limit dextrin being processed by the debranching enzyme');
+    tally.innerHTML = '';
+    tally.appendChild(tallyBar(['Glucose-1-phosphate (phosphorylase): ' + m.g1p,
+                                'Free glucose (&#945;1&#8594;6 glucosidase): ' + m.glc,
+                                'Branch points remaining: ' + m.branches.filter(function(b){return b.len>0;}).length]));
+    bT.disabled = !stubbed(); bG.disabled = !single();
+    bP.disabled = !(cleared() && !m.resumed);
+    if(cleared() && m.resumed){
+      msg.textContent = 'The particle has been run down to the glycogenin primer. Notice the ratio: most residues ' +
+        'left as glucose-1-phosphate, and exactly one free glucose per branch point.';
+    }else if(cleared()){
+      msg.textContent = 'Both branch points are gone. Phosphorylase can now run the chain down without obstruction.';
+    }else if(single()){
+      msg.textContent = 'One residue is left at the branch point, held by an &#945;1&#8594;6 bond. Phosphorylase cannot touch it.';
+    }else{
+      msg.textContent = 'Four residues sit above each branch point. Start with the transferase.';
+    }
+  }
+  bT.onclick = function(){ var b = stubbed(); m.main += 3; b.len = 1; paint(); };
+  bG.onclick = function(){ var b = single(); b.len = 0; m.glc += 1;
+    if(cleared()) saveAct('debranch', m); paint(); };
+  bP.onclick = function(){ m.g1p += (m.main - 4); m.main = 4; m.resumed = true; saveAct('debranch', m); paint(); };
+  bR.onclick = function(){ m = JSON.parse(JSON.stringify(fresh)); clearAct('debranch'); paint(); };
+
+  host.appendChild(el('p','caption','The particle below is where phosphorylase left off. The two buttons ' +
+    'enable themselves only when their substrate is actually present — if one is greyed out, ask yourself why.'));
+  bar.appendChild(bT); bar.appendChild(bG); bar.appendChild(bP); bar.appendChild(bR);
+  host.appendChild(stage); host.appendChild(tally); host.appendChild(bar); host.appendChild(msg);
+  paint();
+})();
+
+/* --- m2s3 · the metabolic fork --- */
+actPanel('act-fork', 'fork', [
+  { group:'Hepatocyte, 14 hours into a fast',
+    prompt:'Glycogen has been degraded to glucose-6-phosphate. Where does it go?',
+    options:['Glucose-6-phosphatase removes the phosphate and free glucose leaves for the bloodstream',
+             'Phosphoglucose isomerase sends it into glycolysis for hepatic ATP',
+             'It is exported as glucose-6-phosphate and dephosphorylated in the kidney',
+             'UDP-glucose pyrophosphorylase returns it to glycogen'],
+    answer:0,
+    explain:'A fasting liver is degrading glycogen on behalf of the rest of the body, and the exit door is glucose-6-phosphatase. Removing the phosphate gives a neutral molecule that can cross the membrane.' },
+  { group:'Myocyte during a hard interval',
+    prompt:'The same glucose-6-phosphate, in muscle. Where does it go?',
+    options:['Phosphoglucose isomerase converts it to fructose-6-phosphate and it enters glycolysis',
+             'Glucose-6-phosphatase removes the phosphate and it leaves for the bloodstream',
+             'It is exported to the liver for dephosphorylation',
+             'It is returned to glycogen by glycogen synthase'],
+    answer:0,
+    explain:'Muscle has no glucose-6-phosphatase, so the phosphate stays on and the molecule is committed to glycolysis and ATP for the contracting muscle itself.' },
+  { group:'The deciding factor',
+    prompt:'One enzyme decides which branch of the fork a cell can take. Which one?',
+    options:['Glucose-6-phosphatase','Phosphoglucomutase','Glycogen phosphorylase','Hexokinase'],
+    answer:0,
+    explain:'Everything upstream is identical in both tissues. Owning glucose-6-phosphatase is what makes a cell an exporter rather than a consumer — which is also why its loss produces Von Gierke disease.' }
+], 'Three decisions. Work from what the tissue owns, not from what it wants.');
+
+/* --- m3s1 · activating glucose --- */
+actSeq('act-udp', 'udp', [
+  'Glucose-6-phosphate',
+  'Phosphoglucomutase moves the phosphate to carbon 1',
+  'Glucose-1-phosphate',
+  'UDP-glucose pyrophosphorylase attacks UTP',
+  'UDP-glucose, plus pyrophosphate',
+  'Pyrophosphate is hydrolyzed, pulling the reaction forward'
+], 'Click the steps in order, starting from glucose-6-phosphate.');
+
+/* --- m3s2 · who starts the molecule? --- */
+(function(){
+  var host = document.getElementById('act-primer'); if(!host) return;
+  var stage = el('div','stage'), msg = el('div','caption'), quiz = el('div');
+  var solved = done('primer'), tried = solved;
+
+  function paintStage(withPrimer){
+    if(withPrimer){
+      stage.innerHTML = drawGlycogen({main:8, branches:[]}, 'Glycogenin carrying an eight-residue primer');
+    }else{
+      stage.innerHTML = '<svg viewBox="0 0 620 180" role="img" aria-label="Glycogen synthase and UDP-glucose ' +
+        'with no chain to build on."><rect x="180" y="40" width="260" height="46" rx="12" fill="var(--green-soft)" ' +
+        'stroke="var(--green-line)"/><text x="310" y="69" text-anchor="middle" font-size="13" font-weight="700" ' +
+        'fill="#8F3A12">glycogen synthase &middot; active</text><text x="310" y="112" text-anchor="middle" ' +
+        'font-size="12" fill="var(--ink-mid)">UDP-glucose: abundant</text><text x="310" y="142" text-anchor="middle" ' +
+        'font-size="12" fill="var(--ink-soft)">existing glucose chain: none</text></svg>';
+    }
+  }
+  var bar = controlsRow();
+  var bStart = el('button','btn','START SYNTHESIS');
+  var bReset = el('button','btn ghost','Reset');
+  bStart.onclick = function(){
+    tried = true;
+    msg.textContent = 'Nothing happens. Glycogen synthase extends an existing chain — it cannot create one. ' +
+                      'It needs at least four residues to grip.';
+    showQuiz();
+  };
+  bReset.onclick = function(){ solved = false; tried = false; clearAct('primer');
+    msg.textContent = 'You have active glycogen synthase and plenty of UDP-glucose. Press start.';
+    quiz.innerHTML = ''; paintStage(false); };
+
+  function showQuiz(){
+    quiz.innerHTML = '';
+    var card = el('div','case-card');
+    card.appendChild(el('h4', null, 'Which protein solves the problem?'));
+    var box = el('div','choices'), fb = el('div','feedback');
+    var opts = [
+      {t:'Glycogenin, which glycosylates one of its own tyrosine residues', ok:true},
+      {t:'Branching enzyme, which creates the first &#945;1&#8594;6 linkage', ok:false},
+      {t:'Phosphoglucomutase, which supplies glucose-1-phosphate', ok:false},
+      {t:'UDP-glucose pyrophosphorylase, which supplies more UDP-glucose', ok:false}
+    ];
+    shuffle(opts).forEach(function(o, i){
+      var b = el('button','choice','<span class="mark">' + LETTERS[i] + '</span>' + o.t);
+      if(solved){ b.disabled = true; if(o.ok) b.classList.add('right'); }
+      b.onclick = function(){
+        if(o.ok){
+          solved = true;
+          box.querySelectorAll('.choice').forEach(function(x){x.disabled = true;});
+          b.classList.add('right');
+          fb.className = 'feedback show';
+          fb.innerHTML = '<strong>Correct.</strong>Glycogenin is enzyme and substrate at once. It attaches ' +
+            'roughly eight glucose units to a tyrosine of its own, and that primer is what synthase takes over. ' +
+            'It then stays buried at the core of the finished particle for the rest of that particle\'s life.';
+          paintStage(true);
+          msg.textContent = 'The primer has formed. Glycogen synthase now has something to extend.';
+          saveAct('primer', 1);
+        }else{
+          b.classList.add('wrong'); b.disabled = true;
+          fb.className = 'feedback show miss';
+          fb.innerHTML = '<strong>Not quite — try again.</strong>The missing ingredient is a chain, not a substrate or a branch.';
+        }
+      };
+      box.appendChild(b);
+    });
+    if(solved){
+      fb.className = 'feedback show';
+      fb.innerHTML = '<strong>Correct.</strong>Glycogenin autoglycosylates a tyrosine with about eight glucose units, then hands the particle to synthase and remains at the core.';
+    }
+    card.appendChild(box); card.appendChild(fb);
+    quiz.appendChild(card);
+  }
+
+  msg.textContent = 'You have active glycogen synthase and plenty of UDP-glucose. Press start.';
+  bar.appendChild(bStart); bar.appendChild(bReset);
+  host.appendChild(stage); host.appendChild(bar); host.appendChild(msg); host.appendChild(quiz);
+  paintStage(solved); if(solved || tried) showQuiz();
+  if(solved) msg.textContent = 'The primer has formed. Glycogen synthase now has something to extend.';
+})();
+
+/* --- m3s3 · extending and branching --- */
+makeBuilder('act-synth', 'synth', {
+  blurb: 'Two enzymes, two very different contributions. Watch the two "glucose added" counters ' +
+         'as you work — one of them never moves.',
+  tally: function(m, ends){
+    return ['Glucose added by synthase: ' + m.bySynthase,
+            'Glucose added by branching enzyme: ' + m.byBranching,
+            'Nonreducing ends: ' + ends,
+            'Total residues: ' + totalResidues(m)];
+  },
+  doneText: 'Branching enzyme added no glucose at all — it only rearranged it. What it added was worksites, ' +
+            'and that is what makes synthase fast.'
+});
+
+/* --- m4s1 · the cascade, in order --- */
+actSeq('act-cascade', 'cascade', [
+  'Glucagon binds its G protein-coupled receptor',
+  'Adenylate cyclase is activated',
+  'cAMP rises',
+  'Protein kinase A is activated',
+  'PKA phosphorylates phosphorylase kinase',
+  'Phosphorylase kinase phosphorylates glycogen phosphorylase',
+  'Glycogen breakdown increases'
+], 'Seven steps. Each tier amplifies the one above it.');
+
+/* --- m4s2 · phosphorylation detective --- */
+actPanel('act-detective', 'detective', [
+  { group:'Suspect 1 — glycogen phosphorylase',
+    prompt:'PKA is active. Through phosphorylase kinase, a phosphate is added to glycogen phosphorylase. What happens to the enzyme?',
+    options:['It becomes more active, and glycogen breakdown rises',
+             'It becomes less active, and glycogen breakdown falls',
+             'Its activity is unchanged, but it relocates to the lysosome',
+             'It is marked for degradation and its activity disappears over hours'],
+    answer:0,
+    explain:'Phosphorylase a — the phosphorylated form — favors the active R state. For this enzyme, the phosphate is an on-switch.' },
+  { group:'Suspect 2 — glycogen synthase',
+    prompt:'The same active PKA adds a phosphate to glycogen synthase. What happens to that enzyme?',
+    options:['It becomes less active, and glycogen synthesis falls',
+             'It becomes more active, and glycogen synthesis rises',
+             'Its activity is unchanged, since the phosphate sits away from the active site',
+             'It is converted into glycogen phosphorylase'],
+    answer:0,
+    explain:'Same kinase, same phosphate, opposite result. For synthase the phosphate is an off-switch — which is exactly what the cell wants, since it is trying to break glycogen down, not build it.' },
+  { group:'The verdict',
+    prompt:'One kinase, one signal, two opposite outcomes. Which principle does this establish?',
+    options:['The consequence of adding a phosphate depends on which protein receives it',
+             'Kinases activate catabolic enzymes and inactivate anabolic ones as a general rule',
+             'Enzymes with more phosphorylation sites respond more strongly than those with fewer',
+             'A phosphate activates an enzyme when a kinase adds it and inactivates it when a phosphatase removes it'],
+    answer:0,
+    explain:'This is the transferable point, and it reaches well beyond glycogen. A phosphate is a covalent tag; whether it switches an enzyme on or off is a property of that enzyme. Carry this into every other regulated pathway you meet.' }
+], 'Predict before you click. The habit this activity breaks is a costly one on an exam.');
+
+/* --- m4s3 · isoforms and allostery --- */
+actSort('act-iso', 'iso', [
+  {text:'AMP binds muscle phosphorylase b',                          ans:'Toward R &mdash; more active'},
+  {text:'ATP binds muscle phosphorylase b',                          ans:'Toward T &mdash; less active'},
+  {text:'Glucose-6-phosphate binds muscle phosphorylase b',          ans:'Toward T &mdash; less active'},
+  {text:'Glucose binds hepatic phosphorylase a',                     ans:'Toward T &mdash; less active'},
+  {text:'Phosphorylase kinase phosphorylates the enzyme',            ans:'Toward R &mdash; more active'},
+  {text:'Protein phosphatase 1 removes the phosphate',               ans:'Toward T &mdash; less active'},
+  {text:'Ca&sup2;&#8314; is released as the muscle contracts',       ans:'Toward R &mdash; more active'}
+], ['Toward R &mdash; more active','Toward T &mdash; less active'],
+'Covalent state and conformational state are separate things. Effectors move a molecule between R and T without changing whether it is a or b.');
+
+/* --- m4s4 · the control room --- */
+(function(){
+  var host = document.getElementById('act-control'); if(!host) return;
+
+  var SCEN = [
+    { id:'fed', name:'Fed &mdash; liver',
+      signals:['Blood glucose &uarr;','Insulin &uarr;','Glucagon &darr;','cAMP &darr;','PP1 active'],
+      lysis:'down', genesis:'up',
+      why:'Insulin inactivates glycogen synthase kinase and activates PP1. Synthase loses its inhibitory ' +
+          'phosphate and switches on; phosphorylase loses its activating phosphate and quiets down. ' +
+          'Glucose itself also binds hepatic phosphorylase a and shifts it toward T.' },
+    { id:'fast', name:'Overnight fast &mdash; liver',
+      signals:['Blood glucose &darr;','Glucagon &uarr;','cAMP &uarr;','PKA active','G6-phosphatase available'],
+      lysis:'up', genesis:'down',
+      why:'Glucagon runs the cAMP cascade. PKA activates phosphorylase kinase and simultaneously ' +
+          'phosphorylates glycogen synthase off. Because the liver owns glucose-6-phosphatase, the glucose ' +
+          'released actually leaves the cell and defends blood glucose.' },
+    { id:'rest', name:'Resting skeletal muscle',
+      signals:['ATP &uarr;','AMP &darr;','Ca&sup2;&#8314; low','Glucagon: no receptor','Phosphorylase b, T state'],
+      lysis:'down', genesis:'up',
+      why:'A resting muscle is energy-replete, so ATP and glucose-6-phosphate hold phosphorylase b in the ' +
+          'T state. Nothing is asking it to mobilize glycogen, and if insulin is present it is rebuilding ' +
+          'stores instead. Note that glucagon never enters the picture here at all.' },
+    { id:'exercise', name:'Exercising skeletal muscle',
+      signals:['AMP &uarr;','ATP &darr;','Ca&sup2;&#8314; &uarr;','Epinephrine &uarr;','Phosphorylase b &rarr; R state'],
+      lysis:'up', genesis:'down',
+      why:'Three inputs converge on the same enzyme. AMP reports the fall in energy charge, the calcium ' +
+          'released to trigger contraction also activates phosphorylase kinase, and circulating epinephrine ' +
+          'runs the cAMP cascade. The glucose-6-phosphate produced cannot leave — it goes to glycolysis.' },
+    { id:'epi', name:'Epinephrine surge &mdash; both tissues',
+      signals:['Epinephrine &uarr;','cAMP &uarr; in both','PKA active in both','Liver: exports glucose','Muscle: burns it'],
+      lysis:'up', genesis:'down',
+      why:'The signal and the cascade are identical in the two tissues; the difference is entirely ' +
+          'downstream. Only the liver owns glucose-6-phosphatase, so only the liver can release the product ' +
+          'into the blood. The muscle keeps the phosphate on and oxidizes the carbon itself.' }
+  ];
+
+  var solved = state.activities['control'] ? state.activities['control'].slice() : [];
+  var cur = 0;
+  var picker = controlsRow(), panel = el('div'), progress = el('div','caption');
+
+  function draw(){
+    picker.innerHTML = '';
+    SCEN.forEach(function(s, i){
+      var b = el('button','btn ghost', s.name);
+      if(i === cur) b.classList.add('on');
+      if(solved.indexOf(s.id) > -1) b.innerHTML = s.name + ' &#10003;';
+      b.onclick = function(){ cur = i; draw(); };
+      picker.appendChild(b);
+    });
+
+    var s = SCEN[cur];
+    panel.innerHTML = '';
+    var read = el('div','readout');
+    s.signals.forEach(function(sig){
+      read.innerHTML += '<div><div class="k">signal</div><div class="v" style="font-size:.92rem">' + sig + '</div></div>';
+    });
+    panel.appendChild(read);
+
+    var isSolved = solved.indexOf(s.id) > -1;
+    var picks = {};
+    var q = el('div','case-card');
+    q.appendChild(el('h4', null, 'Predict both pathways before you reveal'));
+
+    ['lysis','genesis'].forEach(function(k){
+      var row = el('div','sort-row');
+      row.appendChild(el('div','sort-text', k === 'lysis'
+        ? 'Glycogenolysis in this condition:' : 'Glycogenesis in this condition:'));
+      var opts = el('div','sort-opts');
+      ['up','down'].forEach(function(v){
+        var b = el('button','opt', v === 'up' ? 'increases &uarr;' : 'decreases &darr;');
+        if(isSolved){
+          b.disabled = true;
+          if(s[k] === v) b.classList.add('sel');
+        }
+        b.onclick = function(){
+          picks[k] = v;
+          opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+          b.classList.add('sel');
+        };
+        opts.appendChild(b);
+      });
+      row.appendChild(opts); q.appendChild(row);
+    });
+
+    var fb = el('div','feedback');
+    var bar2 = controlsRow();
+    var reveal = el('button','btn','Reveal the dashboard');
+    reveal.disabled = isSolved;
+    reveal.onclick = function(){
+      if(!picks.lysis || !picks.genesis){
+        fb.className = 'feedback show miss';
+        fb.innerHTML = '<strong>Predict both first.</strong>The prediction is the part that does the learning.';
+        return;
+      }
+      var right = (picks.lysis === s.lysis) && (picks.genesis === s.genesis);
+      fb.className = 'feedback show' + (right ? '' : ' miss');
+      fb.innerHTML = '<strong>' + (right ? 'Both predictions correct.' :
+        'Glycogenolysis ' + (s.lysis === 'up' ? 'increases' : 'decreases') +
+        ', glycogenesis ' + (s.genesis === 'up' ? 'increases' : 'decreases') + '.') + '</strong>' + s.why;
+      if(solved.indexOf(s.id) === -1) solved.push(s.id);
+      if(solved.length === SCEN.length) saveAct('control', solved);
+      progress.textContent = solved.length + ' of ' + SCEN.length + ' conditions worked through.';
+      reveal.disabled = true;
+    };
+    if(isSolved){
+      fb.className = 'feedback show';
+      fb.innerHTML = '<strong>Glycogenolysis ' + (s.lysis === 'up' ? 'increases' : 'decreases') +
+        ', glycogenesis ' + (s.genesis === 'up' ? 'increases' : 'decreases') + '.</strong>' + s.why;
+    }
+    q.appendChild(fb);
+    bar2.appendChild(reveal);
+    q.appendChild(bar2);
+    panel.appendChild(q);
+    progress.textContent = solved.length + ' of ' + SCEN.length + ' conditions worked through.';
+  }
+
+  var resetBar = controlsRow();
+  var rb = el('button','btn ghost','Reset all five conditions');
+  rb.onclick = function(){ solved = []; clearAct('control'); draw(); };
+  resetBar.appendChild(rb);
+
+  host.appendChild(picker); host.appendChild(panel);
+  host.appendChild(progress); host.appendChild(resetBar);
+  draw();
+})();
+
+/* --- m5s1 · reasoning from the patient --- */
+actPanel('act-cases', 'cases', [
+  { group:'Patient A — 6-month-old, poor growth, seizures when a feed is missed',
+    prompt:'Findings: severe fasting hypoglycemia, lactic acidosis, marked hepatomegaly. Which tissue is failing at its normal glycogen job?',
+    options:['The liver, which is failing to release glucose into the blood',
+             'Skeletal muscle, which is failing to fuel contraction',
+             'The lysosomes of cardiac muscle',
+             'The intestine, which is failing to absorb carbohydrate'],
+    answer:0,
+    explain:'Hypoglycemia specifically between feeds points at hepatic glucose output; hepatomegaly says substrate is piling up inside the liver. Tissue first — the enzyme comes later.' },
+  { group:'Patient A, continued',
+    prompt:'The liver can degrade its glycogen normally but the glucose never reaches the blood. Which step is blocked?',
+    options:['Hydrolysis of glucose-6-phosphate to free glucose',
+             'Cleavage of &#945;1&#8594;4 bonds by phosphorylase',
+             'Transfer of three residues by the debranching enzyme',
+             'Conversion of glucose-1-phosphate to glucose-6-phosphate'],
+    answer:0,
+    explain:'The final exit step. Without glucose-6-phosphatase, everything upstream works and nothing gets out — Von Gierke disease, type I.' },
+  { group:'Patient B — 24-year-old, cramps in the first minutes of hard cycling',
+    prompt:'Fasting blood glucose is normal and there is no hepatomegaly. Where is the defect?',
+    options:['In skeletal muscle glycogen mobilization',
+             'In hepatic glucose export',
+             'In lysosomal glycogen degradation',
+             'In hepatic glycogen branching'],
+    answer:0,
+    explain:'Normal fasting glucose exonerates the liver entirely. Symptoms confined to the opening minutes of hard exercise — when muscle leans hardest on its own glycogen — localize the problem to muscle. This is McArdle disease, type V.' },
+  { group:'Patient C — 4-month-old, hypotonia and an enlarged heart',
+    prompt:'Blood glucose is normal, but biopsy shows glycogen inside membrane-bound vacuoles in cardiac and skeletal muscle. Which compartment is affected?',
+    options:['The lysosome','The cytosol','The mitochondrial matrix','The endoplasmic reticulum lumen'],
+    answer:0,
+    explain:'Normal blood glucose means the cytosolic pathway is intact. Glycogen trapped in vacuoles across several tissues points to the separate lysosomal degradation route — Pompe disease, type II.' },
+  { group:'Patient D — 3-year-old, hepatomegaly plus muscle weakness',
+    prompt:'Structural analysis shows glycogen with abnormally short outer branches. Which step is impaired?',
+    options:['Removal of the branch point during degradation',
+             'Formation of the branch point during synthesis',
+             'Hydrolysis of glucose-6-phosphate in the liver',
+             'Initiation of the primer by glycogenin'],
+    answer:0,
+    explain:'Short outer branches are a degradation signature: phosphorylase trimmed each branch to about four residues and stalled, with nothing to clear the branch point. Both liver and muscle are involved, which fits debranching enzyme — Cori disease, type III.' }
+], 'Five prompts across four patients. Work presentation → tissue → pathway → enzyme, in that order.');
+
+/* --- m5s2 · the disease matrix --- */
+actSort('act-matrix', 'matrix', [
+  {text:'<strong>Von Gierke (I)</strong> &mdash; severe fasting hypoglycemia and massive hepatomegaly; glycogen increased but normal in structure',
+   ans:'Glucose-6-phosphatase'},
+  {text:'<strong>Pompe (II)</strong> &mdash; cardiorespiratory failure in infancy; glycogen inside vacuoles across many tissues; blood glucose normal',
+   ans:'Lysosomal &#945;1&#8594;4 glucosidase'},
+  {text:'<strong>Cori (III)</strong> &mdash; hepatomegaly with muscle involvement, milder than type I; short outer branches',
+   ans:'Debranching enzyme'},
+  {text:'<strong>Andersen (IV)</strong> &mdash; progressive cirrhosis and early liver failure; long, sparsely branched chains',
+   ans:'Branching enzyme'},
+  {text:'<strong>McArdle (V)</strong> &mdash; exercise cramps and early fatigue; fasting blood glucose normal',
+   ans:'Muscle glycogen phosphorylase'}
+], ['Glucose-6-phosphatase','Lysosomal &#945;1&#8594;4 glucosidase','Debranching enzyme',
+    'Branching enzyme','Muscle glycogen phosphorylase'],
+'Five disorders, five defective enzymes. Read the glycogen structure clue when the clinical picture alone is ambiguous.');
+
+
+/* ---------- PART E · the pathway map ------------------------
+   Ungraded. Redraws itself from module completion, so pieces
+   appear as the student earns them. paintMap() is called once
+   after engine.js loads and again after any click, because
+   engine.js has no callback for "progress changed" — see the
+   short block at the very bottom of this file. */
+function paintMap(){
+  var host = document.getElementById('act-map'); if(!host) return;
+  if(typeof moduleComplete !== 'function') return;
+
+  var got = {};
+  MODULES.forEach(function(m){ got[m.id] = moduleComplete(m); });
+  function cls(id){ return got[id] ? '' : ' class="dim"'; }
+
+  var s = '<svg viewBox="0 0 640 330" role="img" aria-label="A glycogen metabolism map that fills in as modules are completed.">';
+  /* always visible: the two poles */
+  s += '<rect x="30" y="140" width="130" height="50" rx="12" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>';
+  s += '<text x="95" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#8F3A12">GLYCOGEN</text>';
+  s += '<rect x="470" y="140" width="140" height="50" rx="12" fill="var(--green-soft)" stroke="var(--green)" stroke-width="2"/>';
+  s += '<text x="540" y="170" text-anchor="middle" font-size="13" font-weight="700" fill="#8F3A12">GLUCOSE</text>';
+
+  /* Module 1: structure annotation */
+  s += '<g' + cls('m1') + '><text x="95" y="122" text-anchor="middle" font-size="10" fill="var(--ink-soft)">&#945;1&#8594;4 chains, &#945;1&#8594;6 branches</text>';
+  s += '<text x="95" y="208" text-anchor="middle" font-size="10" fill="var(--ink-soft)">many nonreducing ends = speed</text></g>';
+
+  /* Module 2: degradation arm along the top */
+  s += '<g' + cls('m2') + '>';
+  s += '<path d="M160 152 C 240 96, 400 96, 470 152" fill="none" stroke="var(--green)" stroke-width="2.5"/>';
+  s += '<polygon points="470,152 461,146 460,155" fill="var(--green)"/>';
+  s += '<rect x="238" y="86" width="76" height="30" rx="8" fill="#fff" stroke="var(--line)"/>';
+  s += '<text x="276" y="106" text-anchor="middle" font-size="11" font-weight="600">G1P</text>';
+  s += '<rect x="330" y="86" width="76" height="30" rx="8" fill="#fff" stroke="var(--line)"/>';
+  s += '<text x="368" y="106" text-anchor="middle" font-size="11" font-weight="600">G6P</text>';
+  s += '<text x="200" y="78" font-size="9.5" fill="var(--ink-soft)">phosphorylase + debranching</text>';
+  s += '<text x="414" y="78" font-size="9.5" fill="var(--ink-soft)">liver: G6-phosphatase</text>';
+  s += '<text x="414" y="132" font-size="9.5" fill="var(--ink-soft)">muscle: glycolysis &rarr; ATP</text>';
+  s += '</g>';
+
+  /* Module 3: synthesis arm along the bottom */
+  s += '<g' + cls('m3') + '>';
+  s += '<path d="M470 182 C 400 240, 240 240, 160 182" fill="none" stroke="var(--green)" stroke-width="2.5"/>';
+  s += '<polygon points="160,182 169,188 170,179" fill="var(--green)"/>';
+  s += '<rect x="286" y="216" width="112" height="30" rx="8" fill="var(--green-soft)" stroke="var(--green-line)"/>';
+  s += '<text x="342" y="236" text-anchor="middle" font-size="11" font-weight="600" fill="#8F3A12">UDP-glucose</text>';
+  s += '<text x="414" y="210" font-size="9.5" fill="var(--ink-soft)">mutase, then + UTP</text>';
+  s += '<text x="176" y="210" font-size="9.5" fill="var(--ink-soft)">glycogenin &rarr; synthase &rarr; branching</text>';
+  s += '</g>';
+
+  /* Module 4: regulatory arrows */
+  s += '<g' + cls('m4') + '>';
+  s += '<rect x="238" y="272" width="168" height="46" rx="10" fill="#fff" stroke="var(--green)" stroke-width="1.5"/>';
+  s += '<text x="322" y="290" text-anchor="middle" font-size="10.5" font-weight="700" fill="#8F3A12">PKA &mdash; one switch, both arms</text>';
+  s += '<text x="322" y="306" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">breakdown ON &middot; synthesis OFF</text>';
+  s += '<text x="30" y="296" font-size="9.5" fill="var(--ink-soft)">muscle: AMP, Ca&sup2;&#8314;</text>';
+  s += '<text x="30" y="311" font-size="9.5" fill="var(--ink-soft)">liver: glucagon, glucose</text>';
+  s += '<text x="470" y="296" font-size="9.5" fill="var(--ink-soft)">insulin &rarr; PP1 &rarr; synthesis</text>';
+  s += '<text x="470" y="311" font-size="9.5" fill="var(--ink-soft)">PDE ends the cAMP signal</text>';
+  s += '</g>';
+
+  /* Module 5: where the breaks happen */
+  s += '<g' + cls('m5') + '>';
+  s += '<circle cx="368" cy="70" r="9" fill="var(--rose-soft)" stroke="var(--rose)"/><text x="368" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="var(--rose)">I</text>';
+  s += '<circle cx="276" cy="70" r="9" fill="var(--rose-soft)" stroke="var(--rose)"/><text x="276" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="var(--rose)">III</text>';
+  s += '<circle cx="200" cy="122" r="9" fill="var(--rose-soft)" stroke="var(--rose)"/><text x="200" y="126" text-anchor="middle" font-size="9" font-weight="700" fill="var(--rose)">V</text>';
+  s += '<circle cx="200" cy="252" r="9" fill="var(--rose-soft)" stroke="var(--rose)"/><text x="200" y="256" text-anchor="middle" font-size="9" font-weight="700" fill="var(--rose)">IV</text>';
+  s += '<circle cx="540" cy="118" r="9" fill="var(--rose-soft)" stroke="var(--rose)"/><text x="540" y="122" text-anchor="middle" font-size="9" font-weight="700" fill="var(--rose)">II</text>';
+  s += '</g>';
+  s += '</svg>';
+
+  var labels = [
+    {id:'m1', text:'Module 1 &mdash; structure: what glycogen is and why it is branched'},
+    {id:'m2', text:'Module 2 &mdash; the degradation arm, and the fork at glucose-6-phosphate'},
+    {id:'m3', text:'Module 3 &mdash; the synthesis arm, running through UDP-glucose'},
+    {id:'m4', text:'Module 4 &mdash; the regulatory layer over both arms'},
+    {id:'m5', text:'Module 5 &mdash; where each disorder cuts the map'}
+  ];
+  var list = '<div class="lock-list" style="margin-top:18px">';
+  labels.forEach(function(l){
+    list += '<li' + (got[l.id] ? ' class="done"' : '') + '><span class="lock-dot' +
+            (got[l.id] ? ' done' : '') + '"></span>' + l.text + '</li>';
+  });
+  list += '</div>';
+
+  host.innerHTML = '<div class="stage">' + s + '</div>' + list;
+}
+</script>
+
+<!-- 6. engine.js LAST: it builds the nav from MODULES, wires every
+     checkpoint from CHECKPOINTS, renders every quiz from POOL, and
+     then shows the first page. -->
+<script src="shared/engine.js"></script>
+
+<script>
+/* The pathway map is the one piece of this page that has to react
+   to progress made elsewhere, and engine.js offers no "progress
+   changed" callback. Repainting after every click is cheap (one
+   innerHTML write) and keeps the map honest without touching any
+   shared file. This block sits after engine.js because paintMap()
+   calls moduleComplete(), which engine.js defines. */
+paintMap();
+document.addEventListener('click', function(){ setTimeout(paintMap, 0); });
+</script>
+
+</body>
+</html>

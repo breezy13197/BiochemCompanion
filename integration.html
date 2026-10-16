@@ -1,0 +1,2474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Metabolic Integration & Organ Specialization · PHA3134 Companion</title>
+<link rel="stylesheet" href="shared/styles.css">
+<style>
+/* ============================================================
+   THEME: olive / moss. Overrides the shared --green* family only.
+   Token names stay --green* per companion-architecture.md §7.
+   ============================================================ */
+:root{
+  --green:#5F7A1A; --green-bright:#7E9C2C; --green-soft:#EEF3DF; --green-line:#CDDBA5;
+  --olive-ink:#44580F;
+  /* flow colors on the integration map, borrowed from existing tokens */
+  --f-glucose:#5F7A1A; --f-fat:#B57614; --f-amino:#6B4FD8; --f-lactate:#D4536B;
+  --f-ketone:#2E7DA8; --f-hormone:#4A5C68; --f-waste:#7E8F9B;
+}
+body{
+  background:
+    radial-gradient(900px 420px at 88% -8%, #E8F0F4 0%, rgba(232,240,244,0) 62%),
+    radial-gradient(760px 380px at 4% -4%, #EEF3DF 0%, rgba(238,243,223,0) 60%),
+    var(--page);
+  background-attachment:fixed;
+}
+/* literal #1C7554 "green ink" rules in shared/styles.css, retinted */
+.mod-head.current .mod-badge,.mod-badge.done,.mod-head.current,.sub button.current,
+.ring-num,.pill,.opt.sel,.home-num.done,.home-status.done,.s-strong,.apply .tag,
+.dnd-pill,.dnd-ghost,.btn.ghost.on{color:var(--olive-ink)}
+.ring-cap{color:#5B6B3A}
+.btn:hover{background:#4E6614}
+.apply .tag{background:#DCE8BE}
+/* engine.js writes #2FA97A inline for "Strong" bars; retint only those */
+.bd-fill[style*="2FA97A"]{background:var(--green)!important}
+.score-hero{background:linear-gradient(135deg,#7E9C2C,#4E6614)}
+.fc-front{background:linear-gradient(140deg,#F2F6E6,#E6F0F4)}
+.choice:hover:not(:disabled){background:#FBFCF6}
+
+/* ---------- shared pieces for this topic's activities ---------- */
+.lab{background:#fff;border:1.5px solid var(--green-line);border-radius:var(--r-md);padding:22px;margin:24px 0}
+.lab > h3{margin-top:0;display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:1.05rem}
+.lab .tag{background:var(--green-soft);color:var(--olive-ink)}
+.lab-lead{color:var(--ink-mid);font-size:.94rem}
+.step{border-top:1px dashed var(--line);padding-top:16px;margin-top:16px}
+.step:first-of-type{border-top:0;padding-top:0;margin-top:6px}
+.step-h{font-weight:650;font-size:.9rem;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.step-n{width:22px;height:22px;border-radius:7px;background:var(--green-soft);color:var(--olive-ink);
+  display:grid;place-items:center;font-size:.72rem;font-weight:700;flex:0 0 22px}
+.step.locked{opacity:.45;pointer-events:none}
+.explain{display:none;background:var(--green-soft);border-radius:var(--r-sm);padding:14px 16px;margin-top:12px;font-size:.94rem}
+.explain.show{display:block}
+.explain p:last-child{margin-bottom:0}
+.verdict{font-weight:650;margin-bottom:4px}
+.opts-row{display:flex;gap:8px;flex-wrap:wrap}
+.opt.big{padding:9px 16px;font-size:.88rem}
+.slider-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px 22px;margin:8px 0}
+.slider-grid label{font-size:.82rem;color:var(--ink-mid);display:flex;justify-content:space-between;gap:8px}
+.slider-grid label b{color:var(--ink);font-weight:650}
+.preset-row{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 2px}
+.stackbar{display:flex;height:34px;border-radius:9px;overflow:hidden;background:#EEF2F4;margin:12px 0 6px}
+.stackbar span{display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-weight:650;
+  white-space:nowrap;overflow:hidden;transition:width .25s}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.78rem;color:var(--ink-mid);margin:6px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.note-sm{font-size:.8rem;color:var(--ink-soft);margin-top:8px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.two-col{grid-template-columns:1fr}}
+
+/* ---------- the integration map (signature element) ---------- */
+.map-wrap{background:linear-gradient(180deg,#FBFCF7,#F6F9FA);border:1px solid var(--line);border-radius:var(--r-md);padding:12px;margin:18px 0}
+.map-wrap svg{width:100%;height:auto;display:block}
+.node rect{fill:#fff;stroke:#D5DEE3;stroke-width:1.5}
+.node text{font-size:13px;font-weight:650;fill:var(--ink);text-anchor:middle;dominant-baseline:middle;pointer-events:none}
+.node .role{font-size:9.5px;font-weight:500;fill:var(--ink-soft)}
+.node.lit rect{stroke:var(--green);stroke-width:2}
+.node.clickable{cursor:pointer}
+.node.clickable:hover rect,.node.picked rect{fill:var(--green-soft);stroke:var(--green)}
+.flow .line{fill:none;stroke-width:3;stroke-linecap:round}
+.flow .hit{fill:none;stroke:transparent;stroke-width:18}
+.flow text{font-size:10.5px;font-weight:600;text-anchor:middle;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+.flow.off{display:none}
+.flow.ghost .line{stroke:#C3CDD3!important;stroke-dasharray:5 6}
+.flow.ghost text{fill:#9AA8B1!important}
+.flow.ghost marker path,.flow.ghost .head{fill:#C3CDD3!important}
+.flow.on .line{stroke-dasharray:9 7;animation:flowdash 1.1s linear infinite}
+.flow.fixed .line{stroke-dasharray:none;opacity:.55}
+.flow.toggle{cursor:pointer}
+.flow.toggle:hover .line{stroke-width:5}
+.flow.right .line{filter:drop-shadow(0 0 3px rgba(95,122,26,.55))}
+.flow.wrongOn .line{stroke:var(--rose)!important;stroke-dasharray:3 5}
+.flow.missed .head,.flow.wrongOn .head{fill:var(--rose)!important}
+.flow.missed .line{stroke:var(--rose)!important;opacity:.9;stroke-dasharray:2 6;animation:none}
+.flow.fresh{animation:freshin 1.6s ease-out 1}
+@keyframes flowdash{to{stroke-dashoffset:-16}}
+@keyframes freshin{0%{opacity:0}40%{opacity:1}60%{opacity:.5}100%{opacity:1}}
+.map-status{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 4px}
+.map-count{font-size:1.9rem;font-weight:700;color:var(--olive-ink);line-height:1}
+.map-count small{font-size:.85rem;color:var(--ink-soft);font-weight:600}
+.unlock-list{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px;max-width:none}
+.unlock-list li{display:flex;gap:10px;align-items:center;font-size:.88rem;margin:0}
+.unlock-list .sw{width:22px;height:4px;border-radius:2px;flex:0 0 22px}
+.unlock-list a{color:var(--green);font-weight:600;cursor:pointer;text-decoration:underline}
+.unlock-list li.done{color:var(--ink-soft)}
+
+/* ---------- simulator ---------- */
+.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:8px 0 18px;position:relative}
+.timeline:before{content:"";position:absolute;left:12%;right:12%;top:17px;height:3px;background:var(--line);border-radius:2px}
+.tl-stop{position:relative;background:none;border:0;padding:0 4px;display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink-mid)}
+.tl-dot{width:36px;height:36px;border-radius:50%;background:#fff;border:2.5px solid var(--line);display:grid;place-items:center;
+  font-size:.8rem;font-weight:700;color:var(--ink-soft);position:relative;z-index:1}
+.tl-stop.cur .tl-dot{border-color:var(--green);color:var(--olive-ink);background:var(--green-soft)}
+.tl-stop.checked .tl-dot{background:var(--green);border-color:var(--green);color:#fff}
+.tl-label{font-size:.82rem;font-weight:650}
+.tl-sub{font-size:.72rem;color:var(--ink-soft);margin-top:-4px}
+.qgrid{display:grid;gap:0}
+.qrow{display:grid;grid-template-columns:160px 1fr;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.qrow:last-child{border-bottom:0}
+.qrow .qlab{font-weight:650;font-size:.9rem}
+@media (max-width:640px){.qrow{grid-template-columns:1fr}}
+
+/* ---------- tables with inline toggles ---------- */
+.grid-tbl td,.grid-tbl th{vertical-align:middle}
+.grid-tbl td.cell{text-align:center}
+.grid-tbl .opt{padding:5px 11px;min-width:40px}
+.cellmark{display:block;font-size:.7rem;margin-top:3px;min-height:1em}
+.tbl-scroll{overflow-x:auto}
+
+/* ---------- hormone control panel ---------- */
+.hbtns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.hbtns .opt{font-size:.84rem}
+.hmeta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;font-size:.88rem;color:var(--ink-mid)}
+.hclass{border-radius:999px;padding:3px 10px;font-size:.74rem;font-weight:700}
+.hclass.ana{background:var(--green-soft);color:var(--olive-ink)}
+.hclass.cat{background:var(--amber-soft);color:var(--amber)}
+.hclass.mix{background:var(--blue-soft);color:var(--blue)}
+.organ-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.organ{border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;background:#FAFCFD;transition:border-color .2s,background .2s}
+.organ h4{margin:0 0 6px;font-size:.88rem}
+.organ ul{list-style:none;padding:0;margin:0;font-size:.84rem}
+.organ li{margin:0 0 4px;display:flex;gap:6px;align-items:flex-start}
+.organ.active{border-color:var(--green-line);background:#fff}
+.organ.quiet{opacity:.55}
+.arr{font-weight:800;font-size:1rem;line-height:1.3;flex:0 0 auto;width:16px;text-align:center}
+.arr.up{color:var(--olive-ink)} .arr.down{color:var(--rose)} .arr.eq{color:var(--ink-soft)}
+
+/* ---------- scenario cards ---------- */
+.scen{border:1px solid var(--line);border-radius:var(--r-md);padding:14px 16px;margin-bottom:12px;background:#FAFCFD}
+.scen h4{margin:0 0 8px;font-size:.95rem}
+.scen .sub-l{font-size:.76rem;color:var(--ink-soft);margin:8px 0 5px;font-weight:650}
+
+/* ---------- sequencing ---------- */
+.seq{list-style:none;padding:0;margin:10px 0;display:grid;gap:8px;max-width:none}
+.seq li{display:flex;align-items:center;gap:10px;background:#FAFCFD;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:9px 10px;margin:0}
+.seq li .pos{width:26px;height:26px;border-radius:8px;background:#EEF3F5;display:grid;place-items:center;font-weight:700;font-size:.8rem;color:var(--ink-mid);flex:0 0 26px}
+.seq li .txt{flex:1;font-size:.9rem}
+.seq li .mv{border:1px solid var(--line);background:#fff;border-radius:7px;width:32px;height:30px;color:var(--ink-mid);font-size:.8rem}
+.seq li .mv:disabled{opacity:.3}
+.seq li.ok{border-color:var(--green);background:var(--green-soft)}
+.seq li.no{border-color:var(--rose);background:var(--rose-soft)}
+
+/* ---------- charts ---------- */
+.chart text{font-size:11px;fill:var(--ink-soft)}
+.chart .axis{stroke:#C9D3D9;stroke-width:1}
+.chart .grid{stroke:#EDF1F3;stroke-width:1}
+.readout .k,.readout .v{background:none;border:0;padding:0;min-width:0;border-radius:0}
+.readout .v small{font-size:.72rem;color:var(--ink-soft);font-weight:500}
+.chain{display:grid;gap:8px;margin:14px 0}
+.chain-row{display:grid;grid-template-columns:210px 1fr 90px;gap:12px;align-items:center;font-size:.86rem}
+.chain-row .bar{height:12px;background:#EEF2F4;border-radius:99px;overflow:hidden}
+.chain-row .bar i{display:block;height:100%;border-radius:99px;transition:width .25s}
+.chain-row .val{font-weight:650;text-align:right}
+.chain-arrow{font-size:.75rem;color:var(--ink-soft);padding-left:12px}
+@media (max-width:640px){.chain-row{grid-template-columns:1fr 70px}.chain-row .bar{grid-column:1 / -1}}
+
+/* ---------- organ explorer (module 4) ---------- */
+.organ-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0}
+.otile{border:1.5px solid var(--line);background:#fff;border-radius:var(--r-sm);padding:10px;text-align:left}
+.otile b{display:block;font-size:.9rem}
+.otile span{font-size:.74rem;color:var(--ink-soft)}
+.otile.on{border-color:var(--green);background:var(--green-soft)}
+.odetail{border-left:4px solid var(--green);background:#FAFCFD;border-radius:var(--r-sm);padding:14px 18px}
+.odetail dl{display:grid;grid-template-columns:120px 1fr;gap:6px 14px;margin:8px 0 0;font-size:.88rem}
+.odetail dt{color:var(--ink-soft);font-weight:650}
+.odetail dd{margin:0}
+@media (max-width:560px){.odetail dl{grid-template-columns:1fr}}
+.map-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.76rem;color:var(--ink-mid);margin-top:8px}
+.map-legend i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:5px;vertical-align:3px}
+.state-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+/* shared/styles.css keeps align-self:flex-start on the sidebar in the
+   stacked (mobile) layout, so a long module title makes the sidebar
+   wider than the phone screen. Stretch it instead. Page-local fix; the
+   same change in shared/styles.css would fix every companion. */
+@media (max-width:900px){.sidebar{align-self:stretch;min-width:0}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a class="back-to-hub" href="hub.html"><span class="arrow">&#8592;</span> Study hub</a>
+    <div class="brand">
+      <div class="brand-mark">Mi</div>
+      <div><div class="brand-title">Metabolic Integration</div><div class="brand-sub">PHA3134 Biochemistry · Organ specialization</div></div>
+    </div>
+    <nav id="nav"></nav>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#CDDBA5" stroke-width="5"/>
+        <circle id="ringFill" cx="22" cy="22" r="18" fill="none" stroke="#5F7A1A" stroke-width="5"
+                stroke-linecap="round" stroke-dasharray="113" stroke-dashoffset="113"
+                transform="rotate(-90 22 22)"/>
+      </svg>
+      <div><div class="ring-num" id="ringPct">0%</div>
+      <div class="ring-cap">of the companion<br>complete</div></div>
+    </div>
+    <button class="reset" id="resetBtn">Clear my saved progress</button>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div><h1 id="topTitle">Welcome</h1><div class="meta" id="topMeta">Metabolic Integration &amp; Organ Specialization · companion to the PHA3134 lecture</div></div>
+      <div class="pill" id="topPill">Not started</div>
+    </div>
+
+<!-- =========================================================
+     START HERE
+     ========================================================= -->
+<section class="section" data-key="welcome">
+  <div class="card">
+    <div class="eyebrow">Start here</div>
+    <h2>Your body, before the connections</h2>
+    <p>The lecture taught fuels, feeding states, hormones, and organs one at a time. The real skill is seeing them as one system: what the liver exports at hour 12 depends on what adipose releases, which depends on insulin, which depends on what you ate. This map starts almost empty. Each section you complete draws in the flows it taught you.</p>
+    <div class="map-status">
+      <div class="map-count" id="mapCount">0<small> / 16 connections</small></div>
+      <div class="caption" style="margin:0" id="mapHint">Complete sections to draw the network. Hover or tap a line to see what it carries.</div>
+    </div>
+    <div class="map-wrap"><svg id="welcomeMap" viewBox="0 0 760 540" role="img" aria-label="Integration map of intestine, pancreas, liver, brain, red blood cells, kidney, adipose, skeletal muscle, and heart, with fuel flows that appear as sections are completed"></svg>
+      <div class="map-legend" id="welcomeLegend"></div>
+    </div>
+    <h3>Connections still to draw</h3>
+    <ul class="unlock-list" id="unlockList"></ul>
+  </div>
+  <div class="card">
+    <h3>How this companion works</h3>
+    <p>The lecture supplies the content. This companion is for the practice that is hard to fit into a live session: predicting before you look, manipulating variables, and assembling the pieces yourself.</p>
+    <div class="keypoints">
+      <h4>In every section</h4>
+      <ul>
+        <li><strong>An interactive activity</strong> — a simulator, sort, sequence, or prediction task. Submitting it once counts; it’s practice, not a grade.</li>
+        <li><strong>Checkpoint questions</strong> that you can retry until correct.</li>
+        <li><strong>A module quiz</strong> at the end of each module. If you miss a concept area, the results screen builds a targeted round on exactly those areas.</li>
+      </ul>
+    </div>
+    <p>Finish the four modules and the integration challenge to unlock the 25-question mastery exam, which offers the same targeted follow-up round.</p>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================================================
+     MODULE 1
+     ========================================================= -->
+<section class="section" data-key="m1home">
+  <div class="card">
+    <div class="eyebrow">Module 1</div>
+    <h2>Energy economy &amp; fuel storage</h2>
+    <p>Three questions organize this module: what fuels are available, how efficiently each can be stored, and what determines how much energy the body spends. The deeper lesson is why the body stores fuels so differently.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m1s1"><span class="home-num">1</span><span class="home-body"><span class="home-title">What fuels are available?</span><span class="home-desc">Energy yield per gram, and the shared route every fuel takes.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m1s2"><span class="home-num">2</span><span class="home-body"><span class="home-title">Build the fuel warehouse</span><span class="home-desc">Store the same energy as glycogen or triglyceride and compare the tissue mass.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m1s3"><span class="home-num">3</span><span class="home-body"><span class="home-title">Fuel storage sort</span><span class="home-desc">Dedicated store, mobilizable tissue, or fuel in transit?</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m1s4"><span class="home-num">4</span><span class="home-body"><span class="home-title">The DEE mixer</span><span class="home-desc">Adjust BMR, activity, and thermogenesis and watch daily expenditure respond.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m1quiz"><span class="home-num">&#10003;</span><span class="home-body"><span class="home-title">Module 1 quiz</span><span class="home-desc">Eight questions, with a targeted round on anything you miss.</span></span><span class="home-status">Not started</span></button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s1">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 1</div>
+    <h2>What fuels are available?</h2>
+    <p>The typical diet supplies energy as carbohydrate, fat, protein, and sometimes alcohol. On a food label, a “Calorie” is actually a kilocalorie (kcal): the energy needed to raise 1 liter of water by 1 °C.</p>
+    <table>
+      <thead><tr><th>Fuel</th><th>kcal per gram</th><th>What it becomes on its way to the citric acid cycle</th></tr></thead>
+      <tbody>
+        <tr><td>Carbohydrate</td><td>4</td><td>Glucose → pyruvate → acetyl-CoA</td></tr>
+        <tr><td>Protein</td><td>4</td><td>Amino acids → pyruvate, acetyl-CoA, or cycle intermediates</td></tr>
+        <tr><td>Fat</td><td>9</td><td>Fatty acids → acetyl-CoA by β-oxidation</td></tr>
+        <tr><td>Alcohol</td><td>7</td><td>Ethanol → acetate → acetyl-CoA</td></tr>
+      </tbody>
+    </table>
+    <div class="figure">
+      <svg viewBox="0 0 680 230" role="img" aria-label="Palmitate, acetoacetate, glucose, alanine, and ethanol all converge on acetyl-CoA, which enters the citric acid cycle and feeds NADH and FADH2 to oxidative phosphorylation">
+        <defs><marker id="ah1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7E8F9B"/></marker></defs>
+        <g font-size="12" font-weight="600" text-anchor="middle">
+          <rect x="10" y="10" width="118" height="40" rx="10" fill="#FFF4E0" stroke="#E7C98E"/><text x="69" y="28" fill="#1D2B33">Fatty acid</text><text x="69" y="42" font-size="10" font-weight="500" fill="#7E8F9B">palmitate</text>
+          <rect x="146" y="10" width="118" height="40" rx="10" fill="#E6F2F8" stroke="#A9CFE3"/><text x="205" y="28" fill="#1D2B33">Ketone body</text><text x="205" y="42" font-size="10" font-weight="500" fill="#7E8F9B">acetoacetate</text>
+          <rect x="282" y="10" width="118" height="40" rx="10" fill="#EEF3DF" stroke="#CDDBA5"/><text x="341" y="28" fill="#1D2B33">Sugar</text><text x="341" y="42" font-size="10" font-weight="500" fill="#7E8F9B">glucose</text>
+          <rect x="418" y="10" width="118" height="40" rx="10" fill="#EFEBFC" stroke="#C9BCF3"/><text x="477" y="28" fill="#1D2B33">Amino acid</text><text x="477" y="42" font-size="10" font-weight="500" fill="#7E8F9B">alanine</text>
+          <rect x="554" y="10" width="118" height="40" rx="10" fill="#FDECEF" stroke="#EDB7C2"/><text x="613" y="28" fill="#1D2B33">Alcohol</text><text x="613" y="42" font-size="10" font-weight="500" fill="#7E8F9B">ethanol</text>
+          <rect x="355" y="78" width="112" height="28" rx="8" fill="#fff" stroke="#D5DEE3"/><text x="411" y="96" font-size="11" fill="#4A5C68">pyruvate</text>
+          <rect x="250" y="130" width="180" height="40" rx="12" fill="#5F7A1A"/><text x="340" y="155" fill="#fff" font-size="14">Acetyl-CoA</text>
+          <text x="340" y="200" font-size="11" fill="#4A5C68">citric acid cycle → NADH, FADH₂ → oxidative phosphorylation</text>
+        </g>
+        <g stroke="#7E8F9B" stroke-width="1.6" fill="none" marker-end="url(#ah1)">
+          <path d="M69 52 C 80 110, 200 130, 262 142"/>
+          <path d="M205 52 C 215 100, 260 118, 285 128"/>
+          <path d="M350 52 L 395 76"/>
+          <path d="M470 52 L 430 76"/>
+          <path d="M405 108 L 360 128"/>
+          <path d="M613 52 C 600 110, 480 138, 432 146"/>
+          <path d="M340 172 L 340 186"/>
+        </g>
+      </svg>
+      <p class="caption">Redrawn from the lecture’s acetyl-CoA slide. Because every fuel funnels through acetyl-CoA and the citric acid cycle, a handful of hormones can steer the whole economy at once.</p>
+    </div>
+
+    <div class="lab" id="kcalLab">
+      <h3><span class="tag">Predict · interact · explain</span> Which snack carries more energy?</h3>
+      <div class="step" data-step="1">
+        <div class="step-h"><span class="step-n">1</span>Predict</div>
+        <p style="margin-bottom:8px">Snack A is 40 g of pure fat. Snack B is 90 g of pure carbohydrate, more than twice the weight. Which provides more energy?</p>
+        <div class="opts-row" id="kcalPred"></div>
+      </div>
+      <div class="step locked" data-step="2">
+        <div class="step-h"><span class="step-n">2</span>Interact: build a meal and read the energy</div>
+        <div class="preset-row" id="kcalPresets"></div>
+        <div class="slider-grid" id="kcalSliders"></div>
+        <div class="stackbar" id="kcalBar" aria-hidden="true"></div>
+        <div class="legend"><span><i style="background:var(--f-glucose)"></i>Carbohydrate</span><span><i style="background:var(--f-amino)"></i>Protein</span><span><i style="background:var(--f-fat)"></i>Fat</span><span><i style="background:var(--f-lactate)"></i>Alcohol</span></div>
+        <div class="readout"><div><div class="k">Total mass</div><div class="v" id="kcalMass">0 g</div></div><div><div class="k">Total energy</div><div class="v" id="kcalTotal">0 kcal</div></div><div><div class="k">Energy per gram of meal</div><div class="v" id="kcalDensity">–</div></div></div>
+      </div>
+      <div class="step locked" data-step="3">
+        <div class="step-h"><span class="step-n">3</span>Explain</div>
+        <div class="controls" style="margin-top:0"><button class="btn" id="kcalExplainBtn">Compare with my prediction</button><button class="btn ghost" id="kcalReset">Try again</button></div>
+        <div class="explain" id="kcalExplain"></div>
+      </div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c1a"><p>A patient follows a 2,000-Calorie meal plan. Expressed in the units used in biochemistry, how much energy is that?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c1b"><p>A beverage contains 14 g of ethanol and no other macronutrients. Approximately how much energy does it provide?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+    <div class="box apply">
+      <h3><span class="tag">Apply it</span></h3>
+      <div class="cp-item" data-check="c1c"><p>Which molecule is the common entry point where fatty acids, ketone bodies, and glucose-derived pyruvate converge before the citric acid cycle?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s2">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 2</div>
+    <h2>Build the fuel warehouse</h2>
+    <p>Only fat and carbohydrate have dedicated storage forms. Most stored energy sits in adipose triglyceride, and the reason is packaging. Triglyceride is hydrophobic, so adipose tissue is only about 15% water. Glycogen is hydrophilic and holds roughly 4 g of water for every gram of glycogen, on top of yielding less than half the energy per gram.</p>
+    <table>
+      <thead><tr><th>Stored fuel (70 kg adult)</th><th>Amount</th><th>Share of stored calories</th></tr></thead>
+      <tbody>
+        <tr><td>Adipose triglyceride</td><td>15 kg</td><td>~85%</td></tr>
+        <tr><td>Protein (mostly muscle)</td><td>6 kg</td><td>~14%</td></tr>
+        <tr><td>Muscle glycogen</td><td>0.15 kg</td><td>~0.4%</td></tr>
+        <tr><td>Liver glycogen</td><td>0.08 kg</td><td>~0.2%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="lab" id="whLab">
+      <h3><span class="tag">Predict · interact · explain</span> Store the same energy two ways</h3>
+      <div class="step">
+        <div class="step-h"><span class="step-n">1</span>Predict</div>
+        <p style="margin-bottom:8px">If the ~135,000 kcal held in adipose were stored as glycogen instead, how many times heavier would the storage tissue be?</p>
+        <div class="opts-row" id="whPred"></div>
+      </div>
+      <div class="step locked">
+        <div class="step-h"><span class="step-n">2</span>Interact: choose how much energy to store</div>
+        <div class="slider-grid" style="grid-template-columns:1fr"><label for="whSlider">Energy to store <b id="whKcal">135,000 kcal</b></label>
+          <input type="range" id="whSlider" min="10000" max="150000" step="5000" value="135000"></div>
+        <svg id="whSvg" viewBox="0 0 640 190" role="img" aria-label="Bar comparison of tissue mass needed to store the chosen energy as adipose triglyceride versus hydrated glycogen, with a 70 kg body mass reference line"></svg>
+        <div class="legend"><span><i style="background:var(--f-fat)"></i>Triglyceride</span><span><i style="background:var(--f-glucose)"></i>Glycogen</span><span><i style="background:#A9CFE3"></i>Water stored with it</span></div>
+        <div class="readout"><div><div class="k">As adipose tissue</div><div class="v" id="whAd">–</div></div><div><div class="k">As hydrated glycogen</div><div class="v" id="whGly">–</div></div><div><div class="k">Glycogen ÷ adipose</div><div class="v" id="whRatio">–</div></div></div>
+      </div>
+      <div class="step locked">
+        <div class="step-h"><span class="step-n">3</span>Explain</div>
+        <div class="controls" style="margin-top:0"><button class="btn" id="whExplainBtn">Compare with my prediction</button><button class="btn ghost" id="whReset">Try again</button></div>
+        <div class="explain" id="whExplain"></div>
+      </div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c2a"><p>Why is glycogen an inefficient long-term energy store compared with triglyceride?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c2b"><p>Adipose tissue is about 15% water. Approximately how much adipose tissue holds 15 kg of triglyceride?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+    <div class="box apply">
+      <h3><span class="tag">Integration prompt</span></h3>
+      <div class="cp-item" data-check="c2c"><p>From an evolutionary standpoint, why would storing most energy as glycogen be impractical for humans?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s3">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 3</div>
+    <h2>Fuel storage sort</h2>
+    <p>Not every fuel molecule in the body is “stored” in the same sense. Some sit in dedicated reserves built for withdrawal. Some are working tissue that can be broken down in an emergency, at a cost. And some are simply fuel in transit between the tissue that releases it and the tissue that burns it.</p>
+    <div class="two-col">
+      <div class="keypoints"><h4>Dedicated storage</h4><p style="font-size:.9rem">Built to be filled and emptied: glycogen in liver and muscle, triglyceride in adipose.</p></div>
+      <div class="keypoints"><h4>Functional tissue that can be mobilized</h4><p style="font-size:.9rem">Protein. There is no protein reserve, so every gram burned is a gram of enzyme, transporter, or muscle fiber lost.</p></div>
+    </div>
+    <div class="lab">
+      <h3><span class="tag">Sort</span> Classify each fuel pool</h3>
+      <p class="lab-lead">Pick a category for every row, then check.</p>
+      <div id="storageSort"></div>
+      <div class="controls"><button class="btn" id="storageCheck">Check my sort</button><button class="btn ghost" id="storageReset">Try again</button><span class="caption" id="storageScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c3a"><p>Liver glycogen totals about 0.08 kg. At 4 kcal/g, roughly how much energy does it hold?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c3b"><p>A patient loses 5 kg of skeletal muscle during a long ICU stay with poor nutrition. Which storage concept best explains why this loss is harmful beyond the energy it represents?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1s4">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Section 4</div>
+    <h2>The DEE mixer</h2>
+    <p>Daily energy expenditure (DEE) has three parts. <strong>Basal metabolic rate</strong> is the cost of staying alive at rest: running organs, maintaining electrochemical gradients, and keeping pathways turning. <strong>Physical activity</strong> is ATP spent on muscle contraction. <strong>Diet-induced thermogenesis</strong> is the cost of digesting, absorbing, distributing, and storing food, about 10% of the total.</p>
+    <div class="lab">
+      <h3><span class="tag">Mixer</span> Build a day of energy expenditure</h3>
+      <div class="slider-grid">
+        <div><label for="deeBmr">Baseline BMR <b id="deeBmrV"></b></label><input type="range" id="deeBmr" min="1000" max="2200" step="50" value="1500"></div>
+        <div><label for="deePa">Physical activity <b id="deePaV"></b></label><input type="range" id="deePa" min="0" max="1500" step="50" value="500"></div>
+        <div><label for="deeDit">Thermogenesis, % of DEE <b id="deeDitV"></b></label><input type="range" id="deeDit" min="5" max="15" step="1" value="10"></div>
+      </div>
+      <p class="step-h" style="margin:14px 0 6px">Conditions that change BMR</p>
+      <div class="chiprow" id="deeMods"></div>
+      <div class="stackbar" id="deeBar" aria-hidden="true"></div>
+      <div class="legend"><span><i style="background:var(--f-glucose)"></i>BMR</span><span><i style="background:var(--f-fat)"></i>Physical activity</span><span><i style="background:var(--f-ketone)"></i>Diet-induced thermogenesis</span></div>
+      <div class="readout"><div><div class="k">Adjusted BMR</div><div class="v" id="deeAdj">–</div></div><div><div class="k">Thermogenesis</div><div class="v" id="deeDitK">–</div></div><div><div class="k">Total DEE</div><div class="v" id="deeTot">–</div></div></div>
+      <p class="note-sm">Modifier sizes are illustrative, chosen to show direction and rough scale rather than clinical values.</p>
+
+      <div class="step" style="margin-top:20px">
+        <div class="step-h"><span class="step-n">?</span>Now predict: how does each situation change BMR?</div>
+        <div id="deeSort"></div>
+        <div class="controls"><button class="btn" id="deeCheck">Check my predictions</button><button class="btn ghost" id="deeReset">Try again</button><span class="caption" id="deeScore" style="margin:0"></span></div>
+      </div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c4a"><p>Two people have identical body weight, but one has much more lean mass. Which component of daily energy expenditure differs most between them?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c4b"><p>A person’s total daily energy expenditure is 2,500 kcal. Roughly how much is spent digesting, absorbing, and storing food?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m1quiz">
+  <div class="card">
+    <div class="eyebrow">Module 1 · Mastery check</div>
+    <h2>Module 1 quiz</h2>
+    <p>Eight questions drawn from a larger bank. Any concept area you miss gets its own targeted practice round afterward.</p>
+    <div class="quiz-body" data-quiz="m1"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================================================
+     MODULE 2
+     ========================================================= -->
+<section class="section" data-key="m2home">
+  <div class="card">
+    <div class="eyebrow">Module 2</div>
+    <h2>The metabolic state simulator</h2>
+    <p>Instead of memorizing fed, postabsorptive, and starvation states as three lists, follow one person through time after a meal. The same six questions apply at every stage: blood glucose, the insulin/glucagon ratio, and what the liver, adipose, muscle, and brain are doing.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m2s1"><span class="home-num">1</span><span class="home-body"><span class="home-title">After a meal</span><span class="home-desc">Route glucose, triglyceride, and amino acids to where they go first.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m2s2"><span class="home-num">2</span><span class="home-body"><span class="home-title">The overnight fast</span><span class="home-desc">Carbon tracker: follow lactate, glycerol, and alanine into new glucose.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m2s3"><span class="home-num">3</span><span class="home-body"><span class="home-title">Prolonged starvation</span><span class="home-desc">Scrub through days of fasting, then solve why urea production falls.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m2s4"><span class="home-num">4</span><span class="home-body"><span class="home-title">Run the simulator</span><span class="home-desc">Six questions, four timepoints, one integrated model.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m2quiz"><span class="home-num">&#10003;</span><span class="home-body"><span class="home-title">Module 2 quiz</span><span class="home-desc">Eight questions, with a targeted round on anything you miss.</span></span><span class="home-status">Not started</span></button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s1">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 1 · 0–4 hours</div>
+    <h2>After a meal: the fed state</h2>
+    <p>Each macronutrient takes a different road out of the intestine, and the road decides which organ sees it first.</p>
+    <div class="two-col">
+      <div class="keypoints"><h4>Glucose and amino acids</h4><p style="font-size:.9rem">Absorbed into the hepatic portal vein and delivered to the liver first. Glucose then reaches the pancreas and raises insulin, which drives uptake into muscle, adipose, and liver and storage as glycogen. Amino acids build proteins; surplus is oxidized or, without carbohydrate, used for glucose.</p></div>
+      <div class="keypoints"><h4>Triglyceride</h4><p style="font-size:.9rem">Packaged with protein, phospholipid, and cholesterol into chylomicrons that enter the lymph and bypass the liver. Lipoprotein lipase (LPL) on capillary walls releases fatty acids to adipose and muscle, and insulin promotes their storage in adipose.</p></div>
+    </div>
+    <div class="map-wrap"><svg id="fedMap" viewBox="0 0 760 540" role="img" aria-label="Fed state flows: portal glucose and amino acids to liver, chylomicron triglyceride to adipose, insulin from pancreas, VLDL from liver to adipose, glucose from liver to brain and red blood cells"></svg>
+      <div class="map-legend fedLegend"></div></div>
+
+    <div class="lab">
+      <h3><span class="tag">Route the meal</span> Which road does each step use?</h3>
+      <p class="lab-lead">Choose the transport route or enzyme for each description, then check.</p>
+      <div id="routingSort"></div>
+      <div class="controls"><button class="btn" id="routingCheck">Check my routes</button><button class="btn ghost" id="routingReset">Try again</button><span class="caption" id="routingScore" style="margin:0"></span></div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c5a"><p>After a pasta meal, how does the insulin/glucagon ratio change to drive glucose uptake into muscle and adipose?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c5b"><p>A patient with obstructed intestinal lymphatics eats a mixed meal. Delivery of which nutrient to adipose tissue is most impaired?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c5c"><p>Lipoprotein lipase on adipose capillary walls acts on which particle to release dietary fatty acids after a meal?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s2">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 2 · ~12 hours</div>
+    <h2>The overnight fast</h2>
+    <p>Twelve hours after eating, insulin is low and glucagon is high. The liver now maintains blood glucose, first by breaking down glycogen and then, increasingly, by gluconeogenesis from three carbon sources: <strong>glycerol</strong> from triglyceride, <strong>lactate</strong> from glycolysis, and <strong>amino acids</strong>, predominantly from muscle. Ketone body production begins but is not yet a major fuel, and urea production rises as amino acids are metabolized.</p>
+    <div class="figure">
+      <svg viewBox="0 0 640 230" class="chart" role="img" aria-label="Bar chart of daily urinary nitrogen excretion: about 2.5 grams on 700 grams per day IV glucose, about 4 on 150 grams per day IV glucose, about 15 at 12 hours of fasting, about 12 at 3 days, and about 4.5 at 5 to 6 weeks" id="ureaBars"></svg>
+      <p class="caption">Redrawn from the lecture’s nitrogen excretion chart (approximate values). Urea climbs early in a fast, then falls. Hold on to that puzzle; Section 3 solves it.</p>
+    </div>
+
+    <div class="lab">
+      <h3><span class="tag">Carbon tracker</span> Where does each carbon go?</h3>
+      <p class="lab-lead">Pick a substrate. Predict where its carbon enters the liver’s glucose-making pathway, then watch the trip. Trace all three.</p>
+      <div class="opts-row" id="trackBtns"></div>
+      <div id="trackStage" style="margin-top:14px"></div>
+      <div class="map-wrap"><svg id="trackMap" viewBox="0 0 760 540" role="img" aria-label="Map showing the path of the selected carbon source to the liver and out as glucose"></svg></div>
+      <ol id="trackSteps" style="font-size:.9rem"></ol>
+      <div class="controls"><span class="caption" id="trackScore" style="margin:0"></span><button class="btn ghost" id="trackReset">Start the tracker over</button></div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c6a"><p>Liver glycogen is partly depleted twelve hours after the last meal. Which process supplies a growing share of blood glucose as the fast continues?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c6b"><p>Adipose lipolysis releases both glycerol and fatty acids. Why can glycerol provide carbon for new glucose while fatty acids cannot?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c6c"><p>Urinary nitrogen rises about twelve hours into a fast. Use of which substrate accounts for this rise?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s3">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 3 · days to weeks</div>
+    <h2>Prolonged starvation</h2>
+    <p>As a fast stretches into days, the brain increasingly uses ketone bodies and total glucose requirements fall, so hepatic glucose output levels off. Red blood cells still need glucose, but their lactate is recycled. Fatty acid oxidation feeds ketone body synthesis, and citric acid cycle flux drops because acetyl-CoA is diverted to ketone bodies and oxaloacetate to glucose.</p>
+
+    <div class="lab">
+      <h3><span class="tag">Explore</span> Scrub through the first week</h3>
+      <div class="slider-grid" style="grid-template-columns:1fr"><label for="starveDay">Days of starvation <b id="starveDayV">0</b></label><input type="range" id="starveDay" min="0" max="8" step="0.25" value="0"></div>
+      <svg id="starveChart" class="chart" viewBox="0 0 640 260" role="img" aria-label="Plasma glucose falls from about 5.6 to 3.5 millimolar, ketone bodies rise from near zero to about 5 millimolar, and fatty acids rise to about 1.2 millimolar over 8 days of starvation"></svg>
+      <div class="readout"><div><div class="k">Glucose</div><div class="v" id="svGlu">–</div></div><div><div class="k">Ketone bodies</div><div class="v" id="svKet">–</div></div><div><div class="k">Fatty acids</div><div class="v" id="svFa">–</div></div></div>
+      <p class="note-sm" id="starveNote"></p>
+      <table style="margin-top:14px">
+        <thead><tr><th>Fuel exchange (grams per 24 h)</th><th>Day 3</th><th>Day 40</th></tr></thead>
+        <tbody>
+          <tr><td>Brain glucose use</td><td>100</td><td>40</td></tr>
+          <tr><td>Brain ketone body use</td><td>50</td><td>100</td></tr>
+          <tr><td>Adipose lipolysis</td><td>180</td><td>180</td></tr>
+          <tr><td>Muscle protein degradation</td><td>75</td><td>20</td></tr>
+          <tr><td>Liver glucose output</td><td>150</td><td>80</td></tr>
+          <tr><td>Liver ketone body output</td><td>150</td><td>150</td></tr>
+        </tbody>
+      </table>
+      <p class="note-sm">Curves and table redrawn from the lecture’s “Fuel metabolism in starvation” slide.</p>
+    </div>
+
+    <div class="lab" id="ureaLab">
+      <h3><span class="tag">Predict · interact · explain</span> Why does urea production fall?</h3>
+      <div class="step">
+        <div class="step-h"><span class="step-n">1</span>Predict</div>
+        <p style="margin-bottom:8px">Urea output is high on day 3 of a fast and much lower by week 6. What is the best explanation?</p>
+        <div class="opts-row" id="ureaPred" style="flex-direction:column;align-items:flex-start"></div>
+      </div>
+      <div class="step locked">
+        <div class="step-h"><span class="step-n">2</span>Interact: turn up the brain’s ketone use</div>
+        <div class="slider-grid" style="grid-template-columns:1fr"><label for="ureaSlider">Ketone bodies used by the brain <b id="ureaSliderV"></b></label><input type="range" id="ureaSlider" min="20" max="100" step="5" value="30"></div>
+        <div class="chain" id="ureaChain"></div>
+        <p class="note-sm">Anchored to the lecture table’s day 3 and day 40 values; points between are interpolated.</p>
+      </div>
+      <div class="step locked">
+        <div class="step-h"><span class="step-n">3</span>Explain</div>
+        <div class="controls" style="margin-top:0"><button class="btn" id="ureaExplainBtn">Compare with my prediction</button><button class="btn ghost" id="ureaReset">Try again</button></div>
+        <div class="explain" id="ureaExplain"></div>
+      </div>
+    </div>
+
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c7a"><p>By day 40 of a fast, which fuel supplies most of the brain’s energy?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c7b"><p>Red blood cells still need glucose during prolonged starvation. What keeps this demand sustainable?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c7c"><p>Citric acid cycle flux in the liver falls during starvation. Which pair of diversions explains this?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2s4">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Section 4</div>
+    <h2>Run the simulator</h2>
+    <p>Move through time after a meal. At each timepoint, answer the same six questions, then check the stage to see the flows that are running. Repeating the questions is the point: the pattern is the model.</p>
+    <div class="lab" id="simLab">
+      <div class="timeline" id="simTimeline"></div>
+      <h3 id="simTitle" style="margin:0 0 4px"></h3>
+      <p class="lab-lead" id="simLead"></p>
+      <div class="qgrid" id="simQs"></div>
+      <div class="controls"><button class="btn" id="simCheck">Check this stage</button><button class="btn ghost" id="simNext">Next timepoint</button><span class="caption" id="simScore" style="margin:0"></span></div>
+      <div class="explain" id="simExplain"></div>
+      <div class="map-wrap hidden" id="simMapWrap"><svg id="simMap" viewBox="0 0 760 540" role="img" aria-label="Map of the fuel flows running at the selected timepoint"></svg><div class="map-legend simLegend"></div></div>
+      <div class="controls"><span class="caption" id="simOverall" style="margin:0"></span><button class="btn ghost" id="simReset">Reset all four stages</button></div>
+    </div>
+    <div class="box apply">
+      <h3><span class="tag">Apply it</span></h3>
+      <div class="cp-item" data-check="c8a"><p>Which pattern best describes a person 36 hours into a water-only fast?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m2quiz">
+  <div class="card">
+    <div class="eyebrow">Module 2 · Mastery check</div>
+    <h2>Module 2 quiz</h2>
+    <p>Eight questions drawn from a larger bank. Any concept area you miss gets its own targeted practice round afterward.</p>
+    <div class="quiz-body" data-quiz="m2"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================================================
+     MODULE 3
+     ========================================================= -->
+<section class="section" data-key="m3home">
+  <div class="card">
+    <div class="eyebrow">Module 3</div>
+    <h2>Hormones as a regulatory network</h2>
+    <p>Memorizing seven hormones one at a time tends to fall apart the moment two of them act together. This module asks a different question: given a signal, what should every tissue do? And given a situation, which signals should rise or fall?</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m3s1"><span class="home-num">1</span><span class="home-body"><span class="home-title">Insulin &amp; glucagon</span><span class="home-desc">Fill in the arrow grid for the two hormones that set the fed/fasted switch.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m3s2"><span class="home-num">2</span><span class="home-body"><span class="home-title">Hormone control panel</span><span class="home-desc">Select a hormone, watch its effects appear across tissues, then match effects to signals.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m3s3"><span class="home-num">3</span><span class="home-body"><span class="home-title">Reverse it: predict the signals</span><span class="home-desc">Start from a situation and pick the hormone pattern and fuel response.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m3s4"><span class="home-num">4</span><span class="home-body"><span class="home-title">Incretins &amp; pharmacotherapy</span><span class="home-desc">Oral versus IV glucose, and the drugs built on GLP-1, GIP, and GLP-2.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m3quiz"><span class="home-num">&#10003;</span><span class="home-body"><span class="home-title">Module 3 quiz</span><span class="home-desc">Eight questions, with a targeted round on anything you miss.</span></span><span class="home-status">Not started</span></button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s1">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 1</div>
+    <h2>Insulin &amp; glucagon: the master switch</h2>
+    <p><strong>Insulin</strong> is released when blood glucose rises after a meal. It is anabolic: it tells liver and muscle to take up glucose and amino acids and adipose to take up fatty acids and glucose, then build glycogen, protein, and triglyceride. In the liver it also stimulates fatty acid and VLDL synthesis while inhibiting gluconeogenesis and glycogen breakdown; in adipose it inhibits triglyceride hydrolysis.</p>
+    <p><strong>Glucagon</strong> is released when glucose falls between meals. It mobilizes fuel in the liver, stimulating glycogen breakdown and gluconeogenesis while inhibiting glycogen synthesis and the conversion of glucose to fatty acids. Skeletal muscle has no glucagon receptors, so muscle does not respond to it directly.</p>
+    <div class="lab">
+      <h3><span class="tag">Arrow grid</span> Predict each hormone’s effect</h3>
+      <p class="lab-lead">For every process, choose ↑ (stimulates), ↓ (inhibits), or — (little or no direct effect). Values follow the lecture’s hormone table.</p>
+      <div class="tbl-scroll"><table class="grid-tbl" id="arrowTbl"><thead><tr><th>Process</th><th style="text-align:center">Insulin</th><th style="text-align:center">Glucagon</th></tr></thead><tbody></tbody></table></div>
+      <div class="controls"><button class="btn" id="arrowCheck">Check my grid</button><button class="btn ghost" id="arrowReset">Try again</button><span class="caption" id="arrowScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c9a"><p>A person with type 1 diabetes misses an insulin dose. Which hepatic process increases inappropriately?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c9b"><p>Glucagon rises between meals, yet skeletal muscle glycogen is not mobilized in response. Which feature best explains this?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s2">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 2</div>
+    <h2>Hormone control panel</h2>
+    <p>Beyond insulin and glucagon, four more signals reshape fuel use. <strong>Growth hormone</strong> works directly and through IGF-I and mainly increases fatty acid availability. <strong>Catecholamines</strong> mobilize fuel and push the pancreas toward glucagon. <strong>Glucocorticoids</strong> raise glucose by driving gluconeogenesis and limiting peripheral uptake. <strong>Thyroid hormones</strong> raise BMR and oxygen use and sensitize tissues to catecholamines.</p>
+    <div class="lab">
+      <h3><span class="tag">Explore</span> Pick a hormone and watch the tissues respond</h3>
+      <div class="hbtns" id="hBtns"></div>
+      <div class="hmeta" id="hMeta"></div>
+      <div class="organ-grid" id="hOrgans"></div>
+    </div>
+    <div class="lab">
+      <h3><span class="tag">Match</span> Which hormone produces each effect?</h3>
+      <div id="hMatch"></div>
+      <div class="controls"><button class="btn" id="hMatchCheck">Check my matches</button><button class="btn ghost" id="hMatchReset">Try again</button><span class="caption" id="hMatchScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c10a"><p>Cortisol raises blood glucose by driving gluconeogenesis from broken-down peripheral molecules, and it also increases hepatic glycogen. How is its overall action best classified?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c10b"><p>Growth hormone increases fatty acid release from adipose. How does this indirectly lower glucose uptake by muscle?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c10c"><p>A patient with untreated hyperthyroidism has tachycardia. Which mechanism links thyroid hormone to this finding?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s3">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 3</div>
+    <h2>Reverse it: predict the signals</h2>
+    <p>On an exam, and at a bedside, you rarely get told which hormone changed. You get a situation. Work backward: what does the body need right now, and which signals would deliver it?</p>
+    <div class="lab">
+      <h3><span class="tag">Scenarios</span> Pick the signal pattern and the fuel response</h3>
+      <div id="scenList"></div>
+      <div class="controls"><button class="btn" id="scenCheck">Check my scenarios</button><button class="btn ghost" id="scenReset">Try again</button><span class="caption" id="scenScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c11a"><p>A patient on long-term high-dose glucocorticoid therapy develops hyperglycemia. Which pair of effects contributes most?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c11b"><p>During intense exercise, catecholamines alter pancreatic hormone release. Which change results?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3s4">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Section 4 · Pharmacotherapy connection</div>
+    <h2>Incretins &amp; the drugs built on them</h2>
+    <p>Some metabolic hormones come from outside the classic endocrine glands. The small intestine releases <strong>GLP-1</strong> and <strong>GIP</strong>, the incretins, which amplify insulin secretion after a meal. It also releases <strong>GLP-2</strong>, which is intestinotrophic: it increases mucosal proliferation and gut barrier function. GLP-1 and GLP-2 come from proglucagon, the same precursor as glucagon; the intestine and pancreas simply process it differently.</p>
+    <div class="lab" id="incLab">
+      <h3><span class="tag">Predict · interact · explain</span> Oral versus IV glucose</h3>
+      <div class="step">
+        <div class="step-h"><span class="step-n">1</span>Predict</div>
+        <p style="margin-bottom:8px">One volunteer drinks glucose. Another receives an IV glucose infusion adjusted so blood glucose follows the same curve. Which shows the larger insulin response?</p>
+        <div class="opts-row" id="incPred"></div>
+      </div>
+      <div class="step locked">
+        <div class="step-h"><span class="step-n">2</span>Interact: switch the route</div>
+        <div class="opts-row" id="incRoute"></div>
+        <svg id="incChart" class="chart" viewBox="0 0 640 250" role="img" aria-label="Chart comparing blood glucose, insulin, and incretin release after oral versus intravenous glucose"></svg>
+        <div class="readout"><div><div class="k">GLP-1 released</div><div class="v" id="incGlp">–</div></div><div><div class="k">GIP released</div><div class="v" id="incGip">–</div></div><div><div class="k">Peak insulin (relative)</div><div class="v" id="incIns">–</div></div></div>
+        <p class="note-sm">Illustrative curves showing the direction of the incretin effect.</p>
+      </div>
+      <div class="step locked">
+        <div class="step-h"><span class="step-n">3</span>Explain</div>
+        <div class="controls" style="margin-top:0"><button class="btn" id="incExplainBtn">Compare with my prediction</button></div>
+        <div class="explain" id="incExplain"></div>
+      </div>
+    </div>
+    <div class="lab">
+      <h3><span class="tag">Drug match</span> Connect each drug to its target</h3>
+      <div id="drugSort"></div>
+      <div class="controls"><button class="btn" id="drugCheck">Check my matches</button><button class="btn ghost" id="drugReset">Try again</button><span class="caption" id="drugScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c12a"><p>Teduglutide is prescribed for short bowel syndrome rather than type 2 diabetes. Which property of its target hormone explains this?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c12b"><p>GLP-1 and glucagon both come from proglucagon. What determines which peptide a cell releases?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c12c"><p>A hospitalized patient receives all nutrition as IV glucose. Compared with eating, which incretin-related change is expected?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m3quiz">
+  <div class="card">
+    <div class="eyebrow">Module 3 · Mastery check</div>
+    <h2>Module 3 quiz</h2>
+    <p>Eight questions drawn from a larger bank. Any concept area you miss gets its own targeted practice round afterward.</p>
+    <div class="quiz-body" data-quiz="m3"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================================================
+     MODULE 4
+     ========================================================= -->
+<section class="section" data-key="m4home">
+  <div class="card">
+    <div class="eyebrow">Module 4</div>
+    <h2>The metabolic division of labor</h2>
+    <p>Different organs solve different metabolic problems. The liver directs traffic, adipose warehouses, muscle meets demand that swings from rest to sprint, the heart never stops, the brain is picky, and red blood cells have no choice at all. Seeing why each organ burns what it burns is what makes fasting physiology predictable.</p>
+    <div class="home-list">
+      <button class="home-item" data-goto="m4s1"><span class="home-num">1</span><span class="home-body"><span class="home-title">Who burns what?</span><span class="home-desc">Explore each organ’s fuel role, then fill in which tissues run which pathways.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m4s2"><span class="home-num">2</span><span class="home-body"><span class="home-title">The liver: traffic controller</span><span class="home-desc">First-pass metabolism, nitrogen disposal, and the liver’s biosynthetic output.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m4s3"><span class="home-num">3</span><span class="home-body"><span class="home-title">Muscle energy timeline</span><span class="home-desc">Slide from a 1-second lift to a 3-hour ride and watch the fuel mix shift.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m4s4"><span class="home-num">4</span><span class="home-body"><span class="home-title">Creatine to creatinine</span><span class="home-desc">Build the pathway from amino acids to an eGFR, then see where it misleads.</span></span><span class="home-status">Not started</span></button>
+      <button class="home-item" data-goto="m4quiz"><span class="home-num">&#10003;</span><span class="home-body"><span class="home-title">Module 4 quiz</span><span class="home-desc">Eight questions, with a targeted round on anything you miss.</span></span><span class="home-status">Not started</span></button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s1">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Section 1</div>
+    <h2>Who burns what?</h2>
+    <p>Select an organ to see its job in the fuel economy. Pay particular attention to the ketone body paradox: the liver makes ketone bodies but cannot use them, the brain eventually can, and red blood cells never can.</p>
+    <div class="organ-tiles" id="oTiles"></div>
+    <div class="odetail" id="oDetail"></div>
+    <div class="lab">
+      <h3><span class="tag">Fill the table</span> Which tissues run each pathway?</h3>
+      <p class="lab-lead">Tap each cell to cycle between <strong>Yes</strong> and <strong>No</strong>. Count any use, even minimal, as Yes. Based on the lecture’s organ fuel reference table.</p>
+      <div class="tbl-scroll"><table class="grid-tbl" id="whoTbl"></table></div>
+      <div class="controls"><button class="btn" id="whoCheck">Check my table</button><button class="btn ghost" id="whoReset">Try again</button><span class="caption" id="whoScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c13a"><p>Which arrangement best describes the liver’s relationship with ketone bodies during fasting?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c13b"><p>Why do red blood cells produce lactate from glucose even when fully oxygenated?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c13c"><p>Heart muscle derives roughly 60–70% of its fuel from which source?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s2">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Section 2</div>
+    <h2>The liver: metabolic traffic controller</h2>
+    <p>Most nutrients absorbed from the gut pass through the liver before reaching the rest of the body, because the hepatic portal vein drains the GI tissues straight to it. Long-chain fatty acids are the exception, bypassing it through the lymph. That position makes the liver the first to see every meal, and every swallowed drug.</p>
+    <div class="two-col">
+      <div class="keypoints"><h4>What the liver manages</h4><ul style="font-size:.9rem">
+        <li>Blood glucose: glycogen storage when high, glycogenolysis and gluconeogenesis when low</li>
+        <li>Lipid synthesis and export of triglyceride and cholesterol</li>
+        <li>Amino acid metabolism and the urea cycle</li>
+        <li>Ketone body production when fatty acid oxidation is high</li>
+        <li>Fructose and galactose metabolism</li>
+        <li>Xenobiotic inactivation, most notably by cytochrome P450 enzymes</li></ul></div>
+      <div class="box clinical" style="margin:0"><h3><span class="tag">Clinical connection</span></h3>
+        <p style="font-size:.92rem">The liver accounts for roughly 20% of total oxygen use. It can oxidize essentially every major fuel except ketone bodies. For pharmacy, its position on the portal vein explains first-pass metabolism: an oral dose may be substantially metabolized by CYP450 enzymes before it ever reaches systemic circulation.</p></div>
+    </div>
+    <div class="lab">
+      <h3><span class="tag">Drag and drop</span> The liver’s biosynthetic hub</h3>
+      <p class="lab-lead">Drag each product onto its precursors, or tap a product and then tap a slot. Check when every slot is filled.</p>
+      <div class="dnd-board" id="liverBoard"></div>
+      <div class="dnd-tray" id="liverTray"></div>
+      <div class="controls"><button class="btn" id="liverCheck">Check my matches</button><button class="btn ghost" id="liverReset">Try again</button><span class="caption" id="liverScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c14a"><p>An oral drug is extensively metabolized before it reaches systemic circulation. Which anatomical feature explains this?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c14b"><p>A patient with advanced liver failure has elevated blood ammonia. Which hepatic function has failed?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c14c"><p>Fructose from a large soft drink is metabolized primarily in which organ?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s3">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Section 3</div>
+    <h2>Muscle energy timeline</h2>
+    <p>Cardiac muscle is a continuous oxidative consumer, running mainly on fatty acids (about 60–70%) with lactate and glucose. Skeletal muscle is a variable-demand consumer: ATP is the immediate energy source, phosphocreatine rapidly regenerates it, glycolysis takes over as seconds become minutes, and fatty acids dominate as exercise lengthens.</p>
+    <div class="lab">
+      <h3><span class="tag">Explore</span> How long does the effort last?</h3>
+      <div class="slider-grid" style="grid-template-columns:1fr"><label for="musT">Duration of the hardest effort you could sustain <b id="musTV"></b></label><input type="range" id="musT" min="0" max="100" step="1" value="10"></div>
+      <div class="stackbar" id="musBar" aria-hidden="true" style="height:40px"></div>
+      <div class="legend"><span><i style="background:#1D2B33"></i>Stored ATP</span><span><i style="background:var(--f-amino)"></i>Phosphocreatine</span><span><i style="background:var(--f-lactate)"></i>Glycogen → lactate</span><span><i style="background:var(--f-glucose)"></i>Aerobic glucose/glycogen</span><span><i style="background:var(--f-fat)"></i>Fatty acids</span></div>
+      <div class="readout"><div><div class="k">Main ATP source</div><div class="v" id="musMain">–</div></div><div><div class="k">Lactate production</div><div class="v" id="musLac">–</div></div></div>
+      <p class="note-sm" id="musNote"></p>
+      <p class="note-sm">Illustrative model. Anchors from the lecture: stored ATP ~1.2 s, phosphocreatine ~9 s, longer exercise → more fatty acid reliance.</p>
+    </div>
+    <div class="lab">
+      <h3><span class="tag">Sequence</span> Put the dominant ATP sources in order</h3>
+      <p class="lab-lead">Arrange from the first source used at the start of a maximal sprint to the dominant source late in a long endurance event.</p>
+      <ol class="seq" id="musSeq"></ol>
+      <div class="controls"><button class="btn" id="musSeqCheck">Check my order</button><button class="btn ghost" id="musSeqReset">Shuffle and try again</button><span class="caption" id="musSeqScore" style="margin:0"></span></div>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c15a"><p>A weightlifter performs one maximal lift lasting about 5 seconds. Which reserve regenerates most of the ATP used?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c15b"><p>During a 400-meter sprint, blood lactate rises sharply. Which explanation fits best?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c15c"><p>As a marathon continues past 2 hours, muscle relies increasingly on which fuel?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4s4">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Section 4 · Clinical connection</div>
+    <h2>Creatine to creatinine</h2>
+    <p>Creatine synthesis begins in the kidney and finishes in the liver, using glycine, arginine, and methionine (as the methyl donor SAM). Muscle takes up creatine, and creatine kinase phosphorylates it to phosphocreatine, a more efficient way to store high-energy phosphate than ATP itself. Creatine and phosphocreatine then cyclize spontaneously into creatinine at a steady rate, and the kidney excretes it. That steady input is why serum creatinine is used to estimate glomerular filtration rate (GFR).</p>
+    <div class="figure">
+      <svg viewBox="0 0 660 150" role="img" aria-label="Creatine plus ATP is phosphorylated by creatine kinase to phosphocreatine plus ADP; phosphocreatine and creatine cyclize nonenzymatically to creatinine, which is excreted in urine">
+        <defs><marker id="ah4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#7E8F9B"/></marker></defs>
+        <g font-weight="600" text-anchor="middle" font-size="13">
+          <rect x="10" y="50" width="120" height="46" rx="12" fill="#EFEBFC" stroke="#C9BCF3"/><text x="70" y="78" fill="#1D2B33">Creatine</text>
+          <rect x="250" y="50" width="150" height="46" rx="12" fill="#EEF3DF" stroke="#CDDBA5"/><text x="325" y="78" fill="#1D2B33">Phosphocreatine</text>
+          <rect x="520" y="50" width="130" height="46" rx="12" fill="#F1F5F7" stroke="#D5DEE3"/><text x="585" y="78" fill="#1D2B33">Creatinine</text>
+          <text x="190" y="36" font-size="11" fill="#4A5C68">ATP → ADP</text>
+          <text x="190" y="118" font-size="11" fill="#5F7A1A">creatine kinase</text>
+          <text x="460" y="36" font-size="11" fill="#4A5C68">spontaneous</text>
+          <text x="460" y="118" font-size="11" fill="#7E8F9B">cyclization</text>
+          <text x="585" y="130" font-size="11" fill="#7E8F9B">filtered → urine</text>
+        </g>
+        <g stroke="#7E8F9B" stroke-width="1.8" fill="none" marker-end="url(#ah4)">
+          <path d="M134 66 L 244 66"/><path d="M244 82 L 134 82"/><path d="M404 73 L 514 73"/>
+        </g>
+      </svg>
+      <p class="caption">Redrawn from the lecture’s phosphocreatine and creatinine slides. Creatine kinase runs both ways: charging phosphocreatine at rest, regenerating ATP during sudden demand.</p>
+    </div>
+    <div class="lab">
+      <h3><span class="tag">Sequence</span> From amino acids to an eGFR</h3>
+      <ol class="seq" id="crSeq"></ol>
+      <div class="controls"><button class="btn" id="crSeqCheck">Check my order</button><button class="btn ghost" id="crSeqReset">Shuffle and try again</button><span class="caption" id="crSeqScore" style="margin:0"></span></div>
+    </div>
+    <div class="lab">
+      <h3><span class="tag">Explore</span> When serum creatinine misleads</h3>
+      <p class="lab-lead">Serum creatinine reflects both how much creatinine is made and how well the kidney clears it. A creatinine-based estimate assumes average muscle mass. Change the patient and watch the estimate drift from the true GFR.</p>
+      <div class="slider-grid">
+        <div><label for="crGfr">True GFR <b id="crGfrV"></b></label><input type="range" id="crGfr" min="15" max="120" step="5" value="60"></div>
+      </div>
+      <div class="opts-row" id="crMass" style="margin:6px 0"></div>
+      <div class="readout"><div><div class="k">Serum creatinine</div><div class="v" id="crScr">–</div></div><div><div class="k">GFR the estimate assumes</div><div class="v" id="crEst">–</div></div><div><div class="k">Estimate vs truth</div><div class="v" id="crDiff">–</div></div></div>
+      <p class="note-sm" id="crNote"></p>
+      <p class="note-sm">Simplified steady-state model for illustration; real eGFR equations also use age and sex.</p>
+    </div>
+    <div class="box predict">
+      <h3><span class="tag">Can you predict it?</span></h3>
+      <div class="cp-item" data-check="c16a"><p>A frail 85-year-old with very low muscle mass has a “normal” serum creatinine. Why might a creatinine-based estimate overestimate her kidney function?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c16b"><p>Which property of creatinine formation makes it useful as a marker of GFR?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<section class="section" data-key="m4quiz">
+  <div class="card">
+    <div class="eyebrow">Module 4 · Mastery check</div>
+    <h2>Module 4 quiz</h2>
+    <p>Eight questions drawn from a larger bank. Any concept area you miss gets its own targeted practice round afterward.</p>
+    <div class="quiz-body" data-quiz="m4"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit quiz</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================================================
+     INTEGRATION CHALLENGE
+     ========================================================= -->
+<section class="section" data-key="rebuild">
+  <div class="card">
+    <div class="eyebrow">Integration challenge</div>
+    <h2>Rebuild the network</h2>
+    <p>You have drawn these connections one section at a time. Now reconstruct them yourself. For each state, tap the flows that are running to turn them on, choose where the liver’s glucose is coming from, and check. Solid grey lines run in every state and are already drawn.</p>
+    <div class="lab">
+      <div class="state-tabs" id="rbTabs"></div>
+      <p class="lab-lead" id="rbLead"></p>
+      <div class="map-wrap"><svg id="rbMap" viewBox="0 0 760 540" role="img" aria-label="Interactive map: tap flows to mark them as running in the selected metabolic state"></svg><div class="map-legend rbLegend"></div></div>
+      <p class="step-h" style="margin:12px 0 6px">Where is the liver’s exported glucose coming from?</p>
+      <div class="opts-row" id="rbSource"></div>
+      <div class="controls"><button class="btn" id="rbCheck">Check this state</button><button class="btn ghost" id="rbClear">Clear this state</button><span class="caption" id="rbScore" style="margin:0"></span></div>
+      <div class="explain" id="rbExplain"></div>
+      <div class="controls"><span class="caption" id="rbOverall" style="margin:0"></span><button class="btn ghost" id="rbResetAll">Reset all three states</button></div>
+    </div>
+    <div class="box apply">
+      <h3><span class="tag">Apply it</span></h3>
+      <div class="cp-item" data-check="c17a"><p>Which exchange keeps red blood cell glucose use sustainable during a prolonged fast?</p><div class="choices"></div><div class="feedback"></div></div>
+      <div class="cp-item" data-check="c17b"><p>A patient is on day 5 of a hunger strike. Which organ produces ketone bodies, and which tissues are major consumers?</p><div class="choices"></div><div class="feedback"></div></div>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================================================
+     FLASHCARDS (markup copied verbatim from architecture §7)
+     ========================================================= -->
+<section class="section" data-key="flashcards">
+  <div class="card">
+    <div class="eyebrow">Retrieval practice</div>
+    <h2>Flashcards</h2>
+    <p>Say the answer out loud before you flip. Retrieval is what makes it stick.</p>
+    <div class="fc-stage">
+      <div class="fc" id="fcCard" tabindex="0" role="button" aria-label="Flashcard. Press Enter to flip.">
+        <div class="fc-face fc-front"><div>
+          <div class="fc-term" id="fcFront"></div>
+          <div class="fc-hint">click, tap, or press Enter to flip</div>
+        </div></div>
+        <div class="fc-face fc-back"><div class="fc-def" id="fcBack"></div></div>
+      </div>
+    </div>
+    <div class="fc-bar">
+      <button class="btn ghost" id="fcPrev">Previous</button>
+      <span class="fc-count" id="fcCount"></span>
+      <button class="btn ghost" id="fcNext">Next</button>
+    </div>
+  </div>
+  <div class="card pager"></div>
+</section>
+
+<!-- =========================================================
+     FINAL MASTERY EXAM
+     ========================================================= -->
+<section class="section" data-key="final">
+  <div class="card">
+    <div class="eyebrow">Final mastery exam</div>
+    <h2>25-question mastery exam</h2>
+    <p>Six foundational questions and nineteen application and integration questions, drawn fresh each attempt from all four modules. After grading, any concept area you miss can be practiced in a targeted round.</p>
+    <div class="quiz-body" data-quiz="final"></div>
+    <div class="controls" style="margin-top:22px">
+      <button class="btn q-submit">Submit exam</button>
+      <button class="btn ghost q-retake">Start over</button>
+      <span class="caption q-warn" style="margin:0"></span>
+    </div>
+  </div>
+  <div class="card hidden q-result"></div>
+  <div class="card pager"></div>
+</section>
+
+  </main>
+</div>
+
+<script src="banks/integration.js"></script>
+<script src="banks/integration.manifest.js"></script>
+<script src="shared/storage.js"></script>
+<script src="shared/helpers.js"></script>
+<script>
+/* ============================================================
+   CONTENT SCRIPT: Metabolic Integration & Organ Specialization
+   1. Structure derived from MANIFEST (verbatim block, §5)
+   2. Shared activity helpers (sort, sequence)
+   3. The integration map (nodes, flows, welcome page)
+   4. Module 1–4 activities, integration challenge
+   ============================================================ */
+
+// Presentation-only sidebar icon per module id.
+var BADGES = {start:'&#9656;', m1:'1', m2:'2', m3:'3', m4:'4', map:'&#8734;', flash:'&#10022;', final:'&#9733;'};
+
+var MODULES = MANIFEST.modules.map(function(m){
+  var mod = {id:m.id, badge:BADGES[m.id]||'&#8226;', title:m.title,
+             sections:m.sections.map(function(s){return {key:s.key,label:s.label};})};
+  if(m.unlockAfter) mod.unlockAfter = m.unlockAfter;
+  return mod;
+});
+
+var FLOW = []; MODULES.forEach(function(m){ m.sections.forEach(function(s){ FLOW.push(s); }); });
+
+var UNGRADED = [];
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(!s.checks && !s.activity && !s.quiz) UNGRADED.push(s.key);
+});});
+
+var SECTION_REQ = {}, QUIZ_KEY_FOR_SECTION = {};
+MANIFEST.modules.forEach(function(m){ m.sections.forEach(function(s){
+  if(s.checks || s.activity){
+    SECTION_REQ[s.key] = {checks:s.checks||[]};
+    if(s.activity) SECTION_REQ[s.key].activity = s.activity;
+  }
+  if(s.quiz) QUIZ_KEY_FOR_SECTION[s.key] = s.quiz;
+});});
+
+var AREA_SECTION = MANIFEST.areaSection;
+
+var MODULE_QUIZ_SIZE = 8;
+var FINAL_EXAM_MIX = {concept:6, application:12, integration:7};
+
+/* ============================================================
+   2. SHARED ACTIVITY HELPERS
+   Every activity follows §8: save on Check, clear on Try again.
+   paintNav() is defined later by engine.js; it is only called from
+   click handlers, which run after engine.js has loaded.
+   ============================================================ */
+function $(id){ return document.getElementById(id); }
+function saveAct(name, data){ state.activities[name] = data; saveState(); if(typeof paintNav==='function') paintNav(); }
+function clearAct(name){ state.activities[name] = null; saveState(); if(typeof paintNav==='function') paintNav(); }
+function savedAct(name){ return state.activities[name] || null; }
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function fmt(n){ return Math.round(n).toLocaleString('en-US'); }
+
+/* Sort / match rows. rows: [{text, answer, options?, head?, why?}] */
+function makeSort(cfg){
+  var host = $(cfg.host), picks = [], orders = [];
+  function render(){
+    host.innerHTML = ''; picks = cfg.rows.map(function(){ return null; });
+    cfg.rows.forEach(function(r, i){
+      if(r.head) host.appendChild(el('h4', null, r.head)).style.margin = (i ? '18px' : '4px') + ' 0 2px';
+      var row = el('div', 'sort-row');
+      row.appendChild(el('div', 'sort-text', r.text));
+      var opts = el('div', 'sort-opts');
+      var list = r.options || cfg.options;
+      if(!orders[i]) orders[i] = cfg.keepOrder ? list.slice() : shuffle(list);
+      orders[i].forEach(function(o){
+        var b = el('button', 'opt', o); b.type = 'button'; b.dataset.val = o;
+        b.onclick = function(){
+          picks[i] = o;
+          opts.querySelectorAll('.opt').forEach(function(x){ x.classList.remove('sel'); });
+          b.classList.add('sel');
+        };
+        opts.appendChild(b);
+      });
+      row.appendChild(opts);
+      host.appendChild(row);
+      if(r.why){ var w = el('div', 'caption hidden', r.why); w.style.margin = '0 0 6px'; w.dataset.why = i; host.appendChild(w); }
+    });
+    $(cfg.score).textContent = '';
+  }
+  function grade(){
+    var right = 0;
+    var rowEls = host.querySelectorAll('.sort-row');
+    cfg.rows.forEach(function(r, i){
+      var ok = picks[i] === r.answer; if(ok) right++;
+      rowEls[i].querySelectorAll('.opt').forEach(function(b){
+        b.disabled = true;
+        b.classList.toggle('sel', b.dataset.val === picks[i]);
+        if(b.dataset.val === picks[i] && !ok) b.classList.add('bad');
+        if(b.dataset.val === r.answer && !ok) b.classList.add('reveal');
+      });
+      var w = host.querySelector('[data-why="'+i+'"]'); if(w) w.classList.remove('hidden');
+    });
+    $(cfg.score).textContent = right + ' of ' + cfg.rows.length + ' correct' +
+      (right === cfg.rows.length ? '. Nicely done.' : '. Correct answers are outlined.');
+    return right;
+  }
+  $(cfg.check).onclick = function(){
+    if(picks.some(function(p){ return p === null; })){ $(cfg.score).textContent = 'Choose an answer for every row first.'; return; }
+    grade();
+    var data = {picks: picks.slice()};
+    if(cfg.extra) Object.assign(data, cfg.extra());
+    saveAct(cfg.act, data);
+    if(cfg.onCheck) cfg.onCheck();
+  };
+  $(cfg.reset).onclick = function(){ orders = []; clearAct(cfg.act); render(); };
+  render();
+  var s = savedAct(cfg.act);
+  if(s && s.picks){ picks = s.picks.slice(); grade(); }
+}
+
+/* Ordering activity with up/down buttons (keyboard and touch friendly). */
+function makeSequence(cfg){
+  var list = $(cfg.host), order = [], locked = false;
+  function freshOrder(){
+    var o; do { o = shuffle(cfg.items); } while(o.join('|') === cfg.items.join('|'));
+    return o;
+  }
+  function render(){
+    list.innerHTML = '';
+    order.forEach(function(item, i){
+      var li = el('li');
+      li.appendChild(el('span', 'pos', String(i+1)));
+      li.appendChild(el('span', 'txt', item));
+      var up = el('button', 'mv', '&#9650;'), dn = el('button', 'mv', '&#9660;');
+      up.type = dn.type = 'button';
+      up.setAttribute('aria-label', 'Move “' + item + '” up'); dn.setAttribute('aria-label', 'Move “' + item + '” down');
+      up.disabled = locked || i === 0; dn.disabled = locked || i === order.length - 1;
+      up.onclick = function(){ swap(i, i-1, i-1); }; dn.onclick = function(){ swap(i, i+1, i+1); };
+      li.appendChild(up); li.appendChild(dn);
+      list.appendChild(li);
+    });
+  }
+  function swap(a, b, focusIdx){
+    var t = order[a]; order[a] = order[b]; order[b] = t; render();
+    var btns = list.children[focusIdx].querySelectorAll('.mv');
+    (btns[a > b ? 0 : 1].disabled ? btns[a > b ? 1 : 0] : btns[a > b ? 0 : 1]).focus();
+  }
+  function grade(){
+    locked = true; render();
+    var right = 0;
+    order.forEach(function(item, i){
+      var ok = cfg.items[i] === item; if(ok) right++;
+      list.children[i].classList.add(ok ? 'ok' : 'no');
+    });
+    $(cfg.score).innerHTML = right + ' of ' + order.length + ' in the right position.' +
+      (right === order.length ? ' That’s the full sequence.' : ' Correct order: ' + cfg.items.map(function(x, i){ return (i+1) + '. ' + x; }).join(' · '));
+  }
+  $(cfg.check).onclick = function(){ grade(); saveAct(cfg.act, {order: order.slice()}); };
+  $(cfg.reset).onclick = function(){ locked = false; order = freshOrder(); $(cfg.score).textContent = ''; clearAct(cfg.act); render(); };
+  var s = savedAct(cfg.act);
+  if(s && s.order){ order = s.order.slice(); grade(); } else { order = freshOrder(); render(); }
+}
+
+/* Predict buttons for predict → interact → explain labs. */
+function makePredict(hostId, options, onPick, column){
+  var host = $(hostId); host.innerHTML = '';
+  var btns = options.map(function(o){
+    var b = el('button', 'opt big', o); b.type = 'button'; b.dataset.val = o;
+    b.onclick = function(){ select(o); onPick(o); };
+    host.appendChild(b); return b;
+  });
+  function select(o){ btns.forEach(function(b){ b.classList.toggle('sel', b.dataset.val === o); }); }
+  return {
+    select: select,
+    lock: function(answer){
+      btns.forEach(function(b){
+        b.disabled = true;
+        if(b.classList.contains('sel') && b.dataset.val !== answer) b.classList.add('bad');
+        if(b.dataset.val === answer && !b.classList.contains('sel')) b.classList.add('reveal');
+      });
+    },
+    unlock: function(){ btns.forEach(function(b){ b.disabled = false; b.classList.remove('bad', 'reveal', 'sel'); }); }
+  };
+}
+function unlockSteps(labId, on){
+  document.querySelectorAll('#' + labId + ' .step').forEach(function(s, i){ if(i > 0) s.classList.toggle('locked', !on); });
+}
+
+/* ============================================================
+   3. THE INTEGRATION MAP
+   One geometry, reused by the welcome page, the fed-state figure,
+   the carbon tracker, the simulator, and the rebuild challenge.
+   ============================================================ */
+var NODES = {
+  brain    : {x:380, y:52,  label:'Brain',           role:'selective consumer'},
+  pancreas : {x:120, y:140, label:'Pancreas',        role:'signal source'},
+  rbc      : {x:640, y:140, label:'Red blood cells', role:'glycolysis only'},
+  intestine: {x:120, y:282, label:'Intestine',       role:'fuel entry'},
+  liver    : {x:380, y:252, label:'Liver',           role:'traffic controller'},
+  kidney   : {x:640, y:282, label:'Kidney',          role:'waste exit'},
+  adipose  : {x:120, y:436, label:'Adipose',         role:'energy warehouse'},
+  muscle   : {x:380, y:442, label:'Skeletal muscle', role:'variable demand'},
+  heart    : {x:640, y:436, label:'Heart',           role:'continuous oxidizer'}
+};
+var KIND = {
+  glucose:{color:'var(--f-glucose)', name:'Glucose'},
+  fat    :{color:'var(--f-fat)',     name:'Triglyceride, fatty acids, glycerol'},
+  amino  :{color:'var(--f-amino)',   name:'Amino acids'},
+  lactate:{color:'var(--f-lactate)', name:'Lactate'},
+  ketone :{color:'var(--f-ketone)',  name:'Ketone bodies'},
+  hormone:{color:'var(--f-hormone)', name:'Hormone signal'},
+  waste  :{color:'var(--f-waste)',   name:'Nitrogen & creatinine waste'}
+};
+/* states: which rebuild states the flow is running in. fixed: runs in every state. */
+var EDGES = [
+  {id:'portal',   from:'intestine', to:'liver',   label:'glucose + amino acids', kind:'glucose', bend:-18, unlock:'m2s1', states:['fed'], t:0.4},
+  {id:'chylo',    from:'intestine', to:'adipose', label:'chylomicron TAG',       kind:'fat',     bend:30,  unlock:'m1s2', states:['fed']},
+  {id:'insulin',  from:'pancreas',  to:'liver',   label:'insulin',               kind:'hormone', bend:-28, unlock:'m3s1', states:['fed']},
+  {id:'glucagon', from:'pancreas',  to:'liver',   label:'glucagon',              kind:'hormone', bend:28,  unlock:'m3s1', states:['fast','starve']},
+  {id:'vldl',     from:'liver',     to:'adipose', label:'VLDL',                  kind:'fat',     bend:28,  unlock:'m4s2', states:['fed']},
+  {id:'glyc',     from:'adipose',   to:'liver',   label:'glycerol',              kind:'fat',     bend:28,  unlock:'m2s2', states:['fast','starve'], t:0.45},
+  {id:'fa',       from:'adipose',   to:'muscle',  label:'fatty acids',           kind:'fat',     bend:-24, unlock:'m1s3', states:['fast','starve']},
+  {id:'faHeart',  from:'adipose',   to:'heart',   label:'fatty acids',           kind:'fat',     bend:118, unlock:'m4s1', states:['fast','starve']},
+  {id:'aa',       from:'muscle',    to:'liver',   label:'alanine',               kind:'amino',   bend:30,  unlock:'m2s2', states:['fast','starve']},
+  {id:'lac',      from:'rbc',       to:'liver',   label:'lactate',               kind:'lactate', bend:26,  unlock:'m2s2', fixed:true},
+  {id:'gluBrain', from:'liver',     to:'brain',   label:'glucose',               kind:'glucose', bend:-34, unlock:'m2s2', fixed:true},
+  {id:'gluRbc',   from:'liver',     to:'rbc',     label:'glucose',               kind:'glucose', bend:26,  unlock:'m4s1', fixed:true},
+  {id:'ketBrain', from:'liver',     to:'brain',   label:'ketone bodies',         kind:'ketone',  bend:34,  unlock:'m2s3', states:['starve']},
+  {id:'ketMus',   from:'liver',     to:'muscle',  label:'ketone bodies',         kind:'ketone',  bend:30,  unlock:'m4s1', states:['starve'], t:0.38},
+  {id:'urea',     from:'liver',     to:'kidney',  label:'urea',                  kind:'waste',   bend:-20, unlock:'m2s3', offChallenge:true},
+  {id:'creat',    from:'muscle',    to:'kidney',  label:'creatinine',            kind:'waste',   bend:24,  unlock:'m4s4', offChallenge:true, t:0.72}
+];
+var EDGE_BY_ID = {}; EDGES.forEach(function(e){ EDGE_BY_ID[e.id] = e; });
+var EDGE_LONG = {
+  portal:'Intestine → liver: glucose and amino acids in the portal vein', chylo:'Intestine → adipose: dietary triglyceride in chylomicrons',
+  insulin:'Pancreas → tissues: insulin', glucagon:'Pancreas → liver: glucagon', vldl:'Liver → adipose: VLDL triglyceride',
+  glyc:'Adipose → liver: glycerol for gluconeogenesis', fa:'Adipose → muscle: fatty acids', faHeart:'Adipose → heart: fatty acids',
+  aa:'Muscle → liver: alanine and other amino acids', lac:'Red blood cells → liver: lactate (Cori cycle)', gluBrain:'Liver → brain: glucose',
+  gluRbc:'Liver → red blood cells: glucose', ketBrain:'Liver → brain: ketone bodies', ketMus:'Liver → muscle: ketone bodies',
+  urea:'Liver → kidney: urea', creat:'Muscle → kidney: creatinine'
+};
+
+function makeMap(svg, cfg){
+  cfg = cfg || {};
+  var NS = 'http://www.w3.org/2000/svg';
+  function mk(tag, attrs){ var n = document.createElementNS(NS, tag); for(var k in attrs) n.setAttribute(k, attrs[k]); return n; }
+  svg.innerHTML = '';
+  var gE = mk('g', {}), gN = mk('g', {});
+  svg.appendChild(gE); svg.appendChild(gN);
+  var api = {edges:{}, nodes:{}, svg:svg};
+  function boundary(N, T){
+    var dx = T.x - N.x, dy = T.y - N.y, hw = 70, hh = 27;
+    var s = Math.min(hw / Math.max(Math.abs(dx), 1e-6), hh / Math.max(Math.abs(dy), 1e-6));
+    return {x:N.x + dx*s, y:N.y + dy*s};
+  }
+  EDGES.forEach(function(e){
+    var A = NODES[e.from], B = NODES[e.to];
+    var dx = B.x - A.x, dy = B.y - A.y, len = Math.sqrt(dx*dx + dy*dy);
+    var C = {x:(A.x+B.x)/2 + (-dy/len)*e.bend, y:(A.y+B.y)/2 + (dx/len)*e.bend};
+    var P0 = boundary(A, C), P2 = boundary(B, C);
+    var ux = P2.x - C.x, uy = P2.y - C.y, ul = Math.sqrt(ux*ux + uy*uy); ux /= ul; uy /= ul;
+    var E = {x:P2.x - ux*9, y:P2.y - uy*9};
+    var d = 'M' + P0.x.toFixed(1) + ' ' + P0.y.toFixed(1) + ' Q' + C.x.toFixed(1) + ' ' + C.y.toFixed(1) + ' ' + E.x.toFixed(1) + ' ' + E.y.toFixed(1);
+    var col = KIND[e.kind].color;
+    var g = mk('g', {'class':'flow off', 'data-edge':e.id});
+    var title = mk('title', {}); title.textContent = EDGE_LONG[e.id]; g.appendChild(title);
+    var hit = mk('path', {d:d, 'class':'hit'});
+    var line = mk('path', {d:d, 'class':'line'}); line.style.stroke = col;
+    var head = mk('polygon', {'class':'head', points:
+      P2.x.toFixed(1)+','+P2.y.toFixed(1)+' '+(P2.x-ux*11-uy*5.5).toFixed(1)+','+(P2.y-uy*11+ux*5.5).toFixed(1)+' '+(P2.x-ux*11+uy*5.5).toFixed(1)+','+(P2.y-uy*11-ux*5.5).toFixed(1)});
+    head.style.fill = col;
+    var t = e.t || 0.5, mt = 1 - t;
+    var lx = mt*mt*P0.x + 2*mt*t*C.x + t*t*P2.x, ly = mt*mt*P0.y + 2*mt*t*C.y + t*t*P2.y;
+    /* push the label to the outside of the bulge so paired flows don't collide */
+    var sg = e.bend < 0 ? -1 : 1, nx = (-dy/len)*sg, ny = (dx/len)*sg;
+    var anchor = nx > 0.45 ? 'start' : (nx < -0.45 ? 'end' : 'middle');
+    lx += nx*7; ly += ny*(anchor === 'middle' ? 11 : 4);
+    var txt = mk('text', {x:lx.toFixed(1), y:(ly + 4).toFixed(1)}); txt.textContent = e.label; txt.style.fill = col; txt.style.textAnchor = anchor;
+    g.appendChild(hit); g.appendChild(line); g.appendChild(head); g.appendChild(txt);
+    gE.appendChild(g);
+    api.edges[e.id] = {g:g, line:line};
+  });
+  Object.keys(NODES).forEach(function(k){
+    var n = NODES[k];
+    var g = mk('g', {'class':'node', 'data-node':k, transform:'translate(' + n.x + ',' + n.y + ')'});
+    g.appendChild(mk('rect', {x:-66, y:-23, width:132, height:46, rx:12}));
+    var t1 = mk('text', {x:0, y:-5}); t1.textContent = n.label;
+    var t2 = mk('text', {x:0, y:11, 'class':'role'}); t2.textContent = n.role;
+    g.appendChild(t1); g.appendChild(t2);
+    gN.appendChild(g); api.nodes[k] = g;
+  });
+  api.set = function(id, cls){ api.edges[id].g.setAttribute('class', 'flow ' + cls); };
+  api.showOnly = function(ids, cls){
+    EDGES.forEach(function(e){ api.set(e.id, ids.indexOf(e.id) > -1 ? (cls || 'on') : 'off'); });
+    api.light(ids);
+  };
+  api.light = function(ids){
+    Object.keys(api.nodes).forEach(function(k){
+      var on = ids.some(function(id){ var e = EDGE_BY_ID[id]; return e.from === k || e.to === k; });
+      api.nodes[k].setAttribute('class', 'node' + (on ? ' lit' : ''));
+    });
+  };
+  return api;
+}
+function legendFor(hostEl, ids){
+  var kinds = [];
+  ids.forEach(function(id){ var k = EDGE_BY_ID[id].kind; if(kinds.indexOf(k) < 0) kinds.push(k); });
+  hostEl.innerHTML = kinds.map(function(k){ return '<span><i style="background:' + KIND[k].color + '"></i>' + KIND[k].name + '</span>'; }).join('');
+}
+function sectionLabel(key){ var f = FLOW.filter(function(x){ return x.key === key; })[0]; return f ? f.label : key; }
+function goKey(key){ if(typeof goTo === 'function') goTo(FLOW.findIndex(function(f){ return f.key === key; })); }
+
+/* ---------- welcome page: the living map ---------- */
+var welcomeMap = makeMap($('welcomeMap'));
+var mapSeen = null;
+function refreshWelcome(){
+  if(typeof sectionComplete !== 'function') return;
+  var unlocked = EDGES.filter(function(e){ return sectionComplete(e.unlock); }).map(function(e){ return e.id; });
+  var first = (mapSeen === null); if(first) mapSeen = unlocked.slice();
+  EDGES.forEach(function(e){
+    var on = unlocked.indexOf(e.id) > -1;
+    var fresh = on && mapSeen.indexOf(e.id) < 0;
+    welcomeMap.set(e.id, on ? ('on' + (fresh ? ' fresh' : '')) : 'off');
+  });
+  mapSeen = unlocked.slice();
+  welcomeMap.light(unlocked);
+  $('mapCount').innerHTML = unlocked.length + '<small> / ' + EDGES.length + ' connections</small>';
+  legendFor($('welcomeLegend'), unlocked.length ? unlocked : []);
+  if(!unlocked.length) $('welcomeLegend').textContent = 'No flows yet. Your first line appears when you finish “Build the fuel warehouse.”';
+  var pending = {}, orderKeys = [];
+  EDGES.forEach(function(e){
+    if(unlocked.indexOf(e.id) > -1) return;
+    if(!pending[e.unlock]){ pending[e.unlock] = []; orderKeys.push(e.unlock); }
+    pending[e.unlock].push(e);
+  });
+  orderKeys.sort(function(a, b){
+    return FLOW.findIndex(function(f){ return f.key === a; }) - FLOW.findIndex(function(f){ return f.key === b; });
+  });
+  var ul = $('unlockList'); ul.innerHTML = '';
+  if(!orderKeys.length){
+    ul.innerHTML = '<li>Every connection is drawn. Now rebuild it from memory in the <a data-go="rebuild">integration challenge</a>.</li>';
+  }
+  orderKeys.forEach(function(key){
+    var li = el('li');
+    li.innerHTML = '<span class="sw" style="background:' + KIND[pending[key][0].kind].color + '"></span><span>Finish <a data-go="' + key + '">' +
+      sectionLabel(key) + '</a> to draw ' + pending[key].map(function(e){ return EDGE_LONG[e.id].replace(': ', ' (') + ')'; }).join('; ') + '.</span>';
+    ul.appendChild(li);
+  });
+  ul.querySelectorAll('[data-go]').forEach(function(a){ a.onclick = function(){ goKey(a.dataset.go); }; });
+}
+
+/* ============================================================
+   4. MODULE 1 ACTIVITIES
+   ============================================================ */
+
+/* ---- m1s1: which snack carries more energy? ---- */
+(function(){
+  var ANSWER = 'About the same';
+  var grams = {carb:0, protein:0, fat:0, alcohol:0};
+  var SPEC = [
+    {k:'carb', label:'Carbohydrate', max:150, kcal:4, color:'var(--f-glucose)'},
+    {k:'protein', label:'Protein', max:100, kcal:4, color:'var(--f-amino)'},
+    {k:'fat', label:'Fat', max:80, kcal:9, color:'var(--f-fat)'},
+    {k:'alcohol', label:'Alcohol', max:60, kcal:7, color:'var(--f-lactate)'}
+  ];
+  var sliders = {}, pred = null;
+  var sg = $('kcalSliders');
+  SPEC.forEach(function(s){
+    var wrap = el('div');
+    wrap.innerHTML = '<label for="kc_' + s.k + '">' + s.label + ' (' + s.kcal + ' kcal/g) <b id="kcv_' + s.k + '">0 g</b></label>';
+    var r = el('input'); r.type = 'range'; r.id = 'kc_' + s.k; r.min = 0; r.max = s.max; r.step = 1; r.value = 0;
+    r.oninput = function(){ grams[s.k] = +r.value; draw(); };
+    wrap.appendChild(r); sg.appendChild(wrap); sliders[s.k] = r;
+  });
+  var PRESETS = [
+    ['Snack A: 40 g fat', {carb:0, protein:0, fat:40, alcohol:0}],
+    ['Snack B: 90 g carbohydrate', {carb:90, protein:0, fat:0, alcohol:0}],
+    ['Mixed plate', {carb:60, protein:30, fat:20, alcohol:0}],
+    ['Two drinks: 28 g alcohol', {carb:0, protein:0, fat:0, alcohol:28}]
+  ];
+  PRESETS.forEach(function(p){
+    var b = el('button', 'opt', p[0]); b.type = 'button';
+    b.onclick = function(){ Object.keys(p[1]).forEach(function(k){ grams[k] = p[1][k]; sliders[k].value = p[1][k]; }); draw(); };
+    $('kcalPresets').appendChild(b);
+  });
+  function draw(){
+    var total = 0, mass = 0;
+    SPEC.forEach(function(s){ total += grams[s.k] * s.kcal; mass += grams[s.k]; $('kcv_' + s.k).textContent = grams[s.k] + ' g'; });
+    var scale = Math.max(800, total);
+    $('kcalBar').innerHTML = SPEC.map(function(s){
+      var kc = grams[s.k] * s.kcal, w = kc / scale * 100;
+      return '<span style="width:' + w + '%;background:' + s.color + '">' + (w > 9 ? fmt(kc) + ' kcal' : '') + '</span>';
+    }).join('');
+    $('kcalMass').textContent = mass + ' g';
+    $('kcalTotal').textContent = fmt(total) + ' kcal';
+    $('kcalDensity').textContent = mass ? (total / mass).toFixed(1) + ' kcal/g' : '–';
+  }
+  var P = makePredict('kcalPred', ['Snack A (40 g fat)', 'Snack B (90 g carbohydrate)', ANSWER], function(o){ pred = o; unlockSteps('kcalLab', true); });
+  function explain(){
+    var ok = pred === ANSWER;
+    P.lock(ANSWER);
+    var x = $('kcalExplain'); x.classList.add('show');
+    x.innerHTML = '<div class="verdict">' + (ok ? 'Your prediction holds.' : 'Not what you predicted, and that surprise is the lesson.') + '</div>' +
+      '<p>Both snacks deliver 360 kcal: 40 g × 9 kcal/g = 90 g × 4 kcal/g. Fat carries more than twice the energy per gram, so less than half the mass does the same job. Load both presets above to see identical bars.</p>' +
+      '<p>That density difference is exactly why the body keeps its bulk energy reserve as triglyceride, which the next section makes concrete.</p>';
+  }
+  $('kcalExplainBtn').onclick = function(){
+    if(!pred){ $('kcalExplain').classList.add('show'); $('kcalExplain').textContent = 'Make a prediction in step 1 first.'; return; }
+    explain(); saveAct('kcal', {pred:pred});
+  };
+  $('kcalReset').onclick = function(){ pred = null; P.unlock(); unlockSteps('kcalLab', false); $('kcalExplain').classList.remove('show'); clearAct('kcal'); };
+  draw();
+  var s = savedAct('kcal');
+  if(s){ pred = s.pred; P.select(pred); unlockSteps('kcalLab', true); explain(); }
+})();
+
+/* ---- m1s2: the fuel warehouse ---- */
+(function(){
+  var ANSWER = 'About 10×', pred = null;
+  var P = makePredict('whPred', ['About 2×', 'About 4×', ANSWER, 'About 20×'], function(o){ pred = o; unlockSteps('whLab', true); });
+  var slider = $('whSlider');
+  function draw(){
+    var kcal = +slider.value;
+    var tag = kcal / 9 / 1000, adipose = tag / 0.85, gly = kcal / 4 / 1000, glyTissue = gly * 5;
+    $('whKcal').textContent = fmt(kcal) + ' kcal';
+    $('whAd').textContent = adipose.toFixed(1) + ' kg';
+    $('whGly').textContent = glyTissue.toFixed(1) + ' kg';
+    $('whRatio').textContent = (glyTissue / adipose).toFixed(1) + '×';
+    var x0 = 150, W = 460, max = 200, sc = W / max;
+    function bar(y, label, dry, total, color){
+      return '<text x="' + (x0 - 10) + '" y="' + (y + 20) + '" text-anchor="end" font-size="12" font-weight="600" fill="#1D2B33">' + label + '</text>' +
+        '<rect x="' + x0 + '" y="' + y + '" width="' + (dry * sc).toFixed(1) + '" height="30" rx="4" fill="' + color + '"/>' +
+        '<rect x="' + (x0 + dry * sc).toFixed(1) + '" y="' + y + '" width="' + ((total - dry) * sc).toFixed(1) + '" height="30" rx="4" fill="#A9CFE3"/>' +
+        '<text x="' + (x0 + total * sc + 8).toFixed(1) + '" y="' + (y + 20) + '" font-size="12" font-weight="650" fill="#1D2B33">' + total.toFixed(1) + ' kg</text>';
+    }
+    var ref = x0 + 70 * sc;
+    $('whSvg').innerHTML =
+      '<line x1="' + x0 + '" y1="20" x2="' + x0 + '" y2="150" stroke="#C9D3D9"/>' +
+      bar(35, 'Adipose triglyceride', tag, adipose, '#B57614') +
+      bar(95, 'Hydrated glycogen', gly, glyTissue, '#5F7A1A') +
+      '<line x1="' + ref + '" y1="18" x2="' + ref + '" y2="150" stroke="#D4536B" stroke-dasharray="4 4"/>' +
+      '<text x="' + ref + '" y="172" text-anchor="middle" font-size="11" fill="#D4536B">70 kg: a whole adult</text>';
+  }
+  slider.oninput = draw;
+  function explain(){
+    P.lock(ANSWER);
+    var x = $('whExplain'); x.classList.add('show');
+    x.innerHTML = '<div class="verdict">' + (pred === ANSWER ? 'Right: close to tenfold.' : 'The answer is close to tenfold.') + '</div>' +
+      '<p>The ratio stays near 9.6× wherever you set the slider, because it comes from two fixed properties: energy yield (9 vs 4 kcal/g) and water content (adipose ~15% water vs ~4 g water per gram of glycogen). Storing a typical adult’s ~135,000 kcal as glycogen would take ~170 kg of tissue, more than twice the person’s whole body mass.</p>';
+  }
+  $('whExplainBtn').onclick = function(){
+    if(!pred){ $('whExplain').classList.add('show'); $('whExplain').textContent = 'Make a prediction in step 1 first.'; return; }
+    explain(); saveAct('warehouse', {pred:pred});
+  };
+  $('whReset').onclick = function(){ pred = null; P.unlock(); unlockSteps('whLab', false); $('whExplain').classList.remove('show'); clearAct('warehouse'); };
+  draw();
+  var s = savedAct('warehouse');
+  if(s){ pred = s.pred; P.select(pred); unlockSteps('whLab', true); explain(); }
+})();
+
+/* ---- m1s3: storage sort ---- */
+makeSort({
+  host:'storageSort', act:'storagesort', check:'storageCheck', reset:'storageReset', score:'storageScore', keepOrder:true,
+  options:['Dedicated storage', 'Functional tissue that can be mobilized', 'Circulating fuel'],
+  rows:[
+    {text:'Glycogen granules in hepatocytes', answer:'Dedicated storage'},
+    {text:'Contractile proteins in skeletal muscle', answer:'Functional tissue that can be mobilized', why:'Muscle protein supplies amino acids in a long fast, but only by dismantling working tissue.'},
+    {text:'Glucose dissolved in plasma', answer:'Circulating fuel'},
+    {text:'Triglyceride droplets in adipocytes', answer:'Dedicated storage'},
+    {text:'Fatty acids bound to albumin during a fast', answer:'Circulating fuel', why:'Released from adipose, on their way to muscle, heart, and liver.'},
+    {text:'Enzymes and plasma proteins made by the liver', answer:'Functional tissue that can be mobilized'},
+    {text:'Glycogen in skeletal muscle fibers', answer:'Dedicated storage', why:'A dedicated store, but muscle keeps its glucose for itself; it cannot release free glucose to blood.'},
+    {text:'Alanine carried in plasma from muscle to liver', answer:'Circulating fuel'},
+    {text:'Ketone bodies in plasma on day 5 of a fast', answer:'Circulating fuel'}
+  ]
+});
+
+/* ---- m1s4: DEE mixer ---- */
+(function(){
+  var MODS = [
+    {id:'hypo', label:'Hypothyroidism', f:0.8, excl:'hyper'},
+    {id:'hyper', label:'Hyperthyroidism', f:1.3, excl:'hypo'},
+    {id:'lean', label:'More lean mass', f:1.1},
+    {id:'preg', label:'Third trimester pregnancy', f:1.15},
+    {id:'cold', label:'Cold environment', f:1.07},
+    {id:'fever', label:'Fever of 39 °C', f:1.2}
+  ];
+  var on = {}, btns = {};
+  MODS.forEach(function(m){
+    var b = el('button', 'opt', m.label); b.type = 'button'; b.setAttribute('aria-pressed', 'false');
+    b.onclick = function(){
+      on[m.id] = !on[m.id];
+      if(on[m.id] && m.excl){ on[m.excl] = false; }
+      MODS.forEach(function(x){ btns[x.id].classList.toggle('sel', !!on[x.id]); btns[x.id].setAttribute('aria-pressed', on[x.id] ? 'true' : 'false'); });
+      draw();
+    };
+    btns[m.id] = b; $('deeMods').appendChild(b);
+  });
+  function draw(){
+    var bmr = +$('deeBmr').value, pa = +$('deePa').value, dit = +$('deeDit').value;
+    var f = 1; MODS.forEach(function(m){ if(on[m.id]) f *= m.f; });
+    var adj = bmr * f, total = (adj + pa) / (1 - dit / 100), ditK = total * dit / 100;
+    $('deeBmrV').textContent = fmt(bmr) + ' kcal'; $('deePaV').textContent = fmt(pa) + ' kcal'; $('deeDitV').textContent = dit + '%';
+    $('deeAdj').innerHTML = fmt(adj) + ' kcal' + (f !== 1 ? ' <small>(' + (f > 1 ? '+' : '') + Math.round((f - 1) * 100) + '%)</small>' : '');
+    $('deeDitK').textContent = fmt(ditK) + ' kcal';
+    $('deeTot').textContent = fmt(total) + ' kcal';
+    var sc = Math.max(4500, total);
+    $('deeBar').innerHTML =
+      '<span style="width:' + (adj / sc * 100) + '%;background:var(--f-glucose)">BMR</span>' +
+      '<span style="width:' + (pa / sc * 100) + '%;background:var(--f-fat)">' + (pa / sc > 0.08 ? 'Activity' : '') + '</span>' +
+      '<span style="width:' + (ditK / sc * 100) + '%;background:var(--f-ketone)">' + (ditK / sc > 0.06 ? 'DIT' : '') + '</span>';
+  }
+  ['deeBmr', 'deePa', 'deeDit'].forEach(function(id){ $(id).oninput = draw; });
+  draw();
+})();
+makeSort({
+  host:'deeSort', act:'dee', check:'deeCheck', reset:'deeReset', score:'deeScore', keepOrder:true,
+  options:['BMR rises', 'BMR falls', 'BMR unchanged'],
+  rows:[
+    {text:'Untreated hypothyroidism', answer:'BMR falls', why:'Less thyroid hormone lowers BMR and oxygen consumption: weight gain and cold intolerance.'},
+    {text:'Adding 5 kg of lean mass through resistance training', answer:'BMR rises', why:'Lean mass is metabolically active tissue and a listed determinant of BMR.'},
+    {text:'Third trimester of pregnancy', answer:'BMR rises'},
+    {text:'A fever of 39 °C', answer:'BMR rises', why:'Higher body temperature speeds reactions throughout the body.'},
+    {text:'Moving from a warm office to outdoor work in winter', answer:'BMR rises', why:'Low ambient temperature raises the cost of maintaining body temperature.'},
+    {text:'Swapping a daily 30-minute walk for time on the couch', answer:'BMR unchanged', why:'Daily energy expenditure falls, but through the physical activity term. BMR is measured at rest.'}
+  ]
+});
+
+/* ============================================================
+   5. MODULE 2 ACTIVITIES
+   ============================================================ */
+
+/* ---- m2s1: fed-state map + routing sort ---- */
+(function(){
+  var ids = ['portal', 'chylo', 'insulin', 'vldl', 'gluBrain', 'gluRbc'];
+  var m = makeMap($('fedMap')); m.showOnly(ids, 'on');
+  legendFor(document.querySelector('.fedLegend'), ids);
+})();
+makeSort({
+  host:'routingSort', act:'routing', check:'routingCheck', reset:'routingReset', score:'routingScore', keepOrder:true,
+  options:['Hepatic portal vein', 'Lymphatics (chylomicrons)', 'Lipoprotein lipase'],
+  rows:[
+    {text:'How glucose from a meal reaches the liver', answer:'Hepatic portal vein'},
+    {text:'How dietary triglyceride leaves the intestine', answer:'Lymphatics (chylomicrons)'},
+    {text:'How chylomicron fatty acids are released into adipose and muscle', answer:'Lipoprotein lipase'},
+    {text:'How absorbed amino acids reach the liver', answer:'Hepatic portal vein'},
+    {text:'The route that lets long-chain fats bypass the liver', answer:'Lymphatics (chylomicrons)'},
+    {text:'The capillary-wall step that lets insulin-stimulated adipose store dietary fat', answer:'Lipoprotein lipase'}
+  ]
+});
+
+/* ---- m2s2: urinary nitrogen bars ---- */
+(function(){
+  var data = [['IV glucose', '700 g/day', 2.5], ['IV glucose', '150 g/day', 4], ['12-hour', 'fast', 15], ['3-day', 'fast', 12], ['5–6 week', 'fast', 4.5]];
+  var x0 = 70, y0 = 180, H = 150, max = 16, bw = 60, gap = 48, s = '';
+  for(var v = 0; v <= 16; v += 4){
+    var y = y0 - v / max * H;
+    s += '<line class="grid" x1="' + x0 + '" x2="620" y1="' + y + '" y2="' + y + '"/><text x="' + (x0 - 8) + '" y="' + (y + 4) + '" text-anchor="end">' + v + '</text>';
+  }
+  data.forEach(function(d, i){
+    var x = x0 + 30 + i * (bw + gap), h = d[2] / max * H;
+    var fill = i < 2 ? '#C3CDD3' : 'var(--f-amino)';
+    s += '<rect x="' + x + '" y="' + (y0 - h) + '" width="' + bw + '" height="' + h + '" rx="5" style="fill:' + fill + '"/>' +
+      '<text x="' + (x + bw / 2) + '" y="' + (y0 - h - 6) + '" text-anchor="middle" style="fill:#1D2B33;font-weight:650">' + d[2] + '</text>' +
+      '<text x="' + (x + bw / 2) + '" y="' + (y0 + 16) + '" text-anchor="middle">' + d[0] + '</text>' +
+      '<text x="' + (x + bw / 2) + '" y="' + (y0 + 30) + '" text-anchor="middle">' + d[1] + '</text>';
+  });
+  s += '<line class="axis" x1="' + x0 + '" x2="620" y1="' + y0 + '" y2="' + y0 + '"/>' +
+    '<text x="16" y="105" transform="rotate(-90 16 105)" text-anchor="middle">Urinary nitrogen (g/day)</text>';
+  $('ureaBars').innerHTML = s;
+})();
+
+/* ---- m2s2: carbon tracker ---- */
+(function(){
+  var SUBS = {
+    lactate:{label:'Lactate', edge:'lac', entry:'Pyruvate',
+      wrong:{'Dihydroxyacetone phosphate':'That’s glycerol’s entry point. Lactate is one oxidation step away from a different three-carbon molecule.',
+             'Acetyl-CoA':'Acetyl-CoA can’t be turned back into pyruvate, so carbon entering there can’t become net glucose. Lactate enters earlier.'},
+      steps:['Red blood cells run glycolysis: glucose → pyruvate → lactate (no mitochondria to go further).',
+             'Lactate travels in blood to the liver.',
+             'Lactate dehydrogenase oxidizes lactate → <strong>pyruvate</strong>.',
+             'Pyruvate carboxylase makes oxaloacetate, which gluconeogenesis carries back up to glucose.',
+             'The liver exports new glucose, which returns to red blood cells and the brain. This loop is the Cori cycle.']},
+    glycerol:{label:'Glycerol', edge:'glyc', entry:'Dihydroxyacetone phosphate',
+      wrong:{'Pyruvate':'Glycerol enters above pyruvate, closer to glucose. Think about triose phosphates.',
+             'Acetyl-CoA':'Acetyl-CoA is where the fatty acids from the same triglyceride end up, and that’s why they can’t make glucose. Glycerol enters elsewhere.'},
+      steps:['Adipose lipolysis splits triglyceride → glycerol + 3 fatty acids.',
+             'Glycerol travels to the liver (adipose has little glycerol kinase to reuse it).',
+             'Glycerol kinase makes glycerol-3-phosphate, which is oxidized to <strong>dihydroxyacetone phosphate</strong>.',
+             'DHAP joins gluconeogenesis at the triose phosphate step and is built into glucose.',
+             'The liver exports the glucose. The fatty acids from the same molecule went to muscle, heart, and ketogenesis instead.']},
+    alanine:{label:'Alanine', edge:'aa', entry:'Pyruvate',
+      wrong:{'Dihydroxyacetone phosphate':'Alanine is an amino acid; removing its amino group leaves a different three-carbon molecule.',
+             'Acetyl-CoA':'If alanine’s carbon entered as acetyl-CoA it could not make net glucose, yet alanine is a major gluconeogenic substrate.'},
+      steps:['Muscle breaks down protein; amino groups are transferred to pyruvate, forming alanine.',
+             'Alanine travels in blood to the liver.',
+             'Alanine aminotransferase removes the amino group, leaving <strong>pyruvate</strong>.',
+             'The nitrogen goes to the urea cycle and leaves as urea, which is why urinary nitrogen rises at 12 hours.',
+             'Pyruvate becomes oxaloacetate and then glucose, which the liver exports (the glucose–alanine cycle).']}
+  };
+  var OPTS = ['Pyruvate', 'Dihydroxyacetone phosphate', 'Acetyl-CoA'];
+  var traced = {}, current = null;
+  var map = makeMap($('trackMap'));
+  var NS = 'http://www.w3.org/2000/svg', dot = document.createElementNS(NS, 'circle');
+  dot.setAttribute('r', 8); dot.setAttribute('fill', '#1D2B33'); dot.setAttribute('stroke', '#fff'); dot.setAttribute('stroke-width', 3);
+  function baseMap(){
+    map.showOnly(['lac', 'glyc', 'aa', 'gluBrain'], 'ghost');
+    if(dot.parentNode) dot.parentNode.removeChild(dot);
+  }
+  function animate(edgeId){
+    map.set(edgeId, 'on'); map.set('gluBrain', 'on');
+    map.light([edgeId, 'gluBrain']);
+    map.svg.appendChild(dot);
+    var legs = [map.edges[edgeId].line, map.edges.gluBrain.line];
+    if(REDUCED){ var L = legs[1].getTotalLength(), p = legs[1].getPointAtLength(L); dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); return; }
+    var leg = 0, start = null, token = {}; animate.token = token;
+    function frame(ts){
+      if(animate.token !== token) return;
+      if(start === null) start = ts;
+      var dur = leg === 0 ? 1500 : 1100, k = Math.min(1, (ts - start) / dur);
+      var path = legs[leg], L = path.getTotalLength(), p = path.getPointAtLength(L * k);
+      dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y);
+      if(k < 1) requestAnimationFrame(frame);
+      else if(leg === 0){ leg = 1; start = null; setTimeout(function(){ requestAnimationFrame(frame); }, 250); }
+    }
+    requestAnimationFrame(frame);
+  }
+  function showSteps(key){
+    $('trackSteps').innerHTML = SUBS[key].steps.map(function(s){ return '<li>' + s + '</li>'; }).join('');
+  }
+  function score(){
+    var n = Object.keys(traced).length;
+    $('trackScore').textContent = n + ' of 3 carbon sources traced' + (n === 3 ? '. All three carbons end up as glucose; none came from fatty acids.' : '.');
+    btns.forEach(function(b){ b.classList.toggle('sel', !!traced[b.dataset.val] || b.dataset.val === current); });
+  }
+  function choose(key){
+    current = key; baseMap(); $('trackSteps').innerHTML = '';
+    var st = $('trackStage'); st.innerHTML = '';
+    if(traced[key]){ st.innerHTML = '<p class="lab-lead"><strong>' + SUBS[key].label + '</strong> enters as ' + SUBS[key].entry.toLowerCase() + '. Replaying its trip.</p>'; animate(SUBS[key].edge); showSteps(key); score(); return; }
+    st.appendChild(el('p', null, '<strong>' + SUBS[key].label + ':</strong> where does its carbon enter the liver’s glucose-making pathway?'));
+    var row = el('div', 'opts-row'), fb = el('div', 'note-sm');
+    shuffle(OPTS).forEach(function(o){
+      var b = el('button', 'opt big', o); b.type = 'button';
+      b.onclick = function(){
+        if(o === SUBS[key].entry){
+          row.querySelectorAll('.opt').forEach(function(x){ x.disabled = true; x.classList.remove('bad', 'sel'); });
+          b.classList.add('sel');
+          fb.innerHTML = '<strong style="color:var(--olive-ink)">Correct.</strong> Watch the carbon travel.';
+          traced[key] = true; animate(SUBS[key].edge); showSteps(key); score();
+          if(Object.keys(traced).length === 3) saveAct('tracker', {traced:traced});
+        } else {
+          row.querySelectorAll('.opt').forEach(function(x){ x.classList.remove('sel', 'bad'); });
+          b.classList.add('sel', 'bad');
+          fb.textContent = SUBS[key].wrong[o] + ' Try again.';
+        }
+      };
+      row.appendChild(b);
+    });
+    st.appendChild(row); st.appendChild(fb);
+    score();
+  }
+  var btns = Object.keys(SUBS).map(function(k){
+    var b = el('button', 'opt big', 'Trace ' + SUBS[k].label.toLowerCase()); b.type = 'button'; b.dataset.val = k;
+    b.onclick = function(){ choose(k); };
+    $('trackBtns').appendChild(b); return b;
+  });
+  $('trackReset').onclick = function(){ traced = {}; current = null; animate.token = {}; baseMap(); $('trackStage').innerHTML = ''; $('trackSteps').innerHTML = ''; clearAct('tracker'); score(); };
+  baseMap();
+  var s = savedAct('tracker'); if(s && s.traced) traced = s.traced;
+  score();
+})();
+
+/* ---- m2s3: starvation curves ---- */
+(function(){
+  var DAYS = [0,1,2,3,4,5,6,7,8];
+  var GLU = [5.6,4.9,4.4,4.0,3.75,3.6,3.5,3.45,3.45];
+  var KET = [0.1,0.2,0.5,2.0,3.0,3.8,4.4,4.8,5.0];
+  var FA  = [0.3,0.5,0.8,1.0,1.15,1.2,1.25,1.2,1.2];
+  function at(arr, d){
+    var i = Math.min(7, Math.floor(d)), f = d - i, mu = (1 - Math.cos(f * Math.PI)) / 2;
+    return arr[i] * (1 - mu) + arr[i + 1] * mu;
+  }
+  var x0 = 50, x1 = 560, y0 = 220, y1 = 20;
+  function X(d){ return x0 + d / 8 * (x1 - x0); }
+  function Y(v){ return y0 - v / 6 * (y0 - y1); }
+  var s = '';
+  for(var v = 0; v <= 6; v++) s += '<line class="grid" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(v) + '" y2="' + Y(v) + '"/><text x="' + (x0 - 8) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+  for(var d = 0; d <= 8; d += 2) s += '<text x="' + X(d) + '" y="' + (y0 + 18) + '" text-anchor="middle">' + d + '</text>';
+  s += '<line class="axis" x1="' + x0 + '" x2="' + x1 + '" y1="' + y0 + '" y2="' + y0 + '"/><text x="' + ((x0 + x1) / 2) + '" y="' + (y0 + 36) + '" text-anchor="middle">Days of starvation</text>' +
+       '<text x="14" y="120" transform="rotate(-90 14 120)" text-anchor="middle">Plasma level (mM)</text>';
+  function line(arr, color, label){
+    var pts = []; for(var t = 0; t <= 8.001; t += 0.1) pts.push(X(t).toFixed(1) + ',' + Y(at(arr, t)).toFixed(1));
+    return '<polyline points="' + pts.join(' ') + '" fill="none" stroke-width="3" style="stroke:' + color + '"/>' +
+      '<text x="' + (x1 + 8) + '" y="' + (Y(arr[8]) + 4) + '" style="fill:' + color + ';font-weight:650">' + label + '</text>';
+  }
+  s += line(GLU, 'var(--f-glucose)', 'Glucose') + line(KET, 'var(--f-ketone)', 'Ketone bodies') + line(FA, 'var(--f-fat)', 'Fatty acids');
+  s += '<line id="svCursor" y1="' + y1 + '" y2="' + y0 + '" stroke="#1D2B33" stroke-dasharray="3 4"/>' +
+       '<circle id="svDg" r="5" style="fill:var(--f-glucose)" stroke="#fff" stroke-width="2"/><circle id="svDk" r="5" style="fill:var(--f-ketone)" stroke="#fff" stroke-width="2"/><circle id="svDf" r="5" style="fill:var(--f-fat)" stroke="#fff" stroke-width="2"/>';
+  $('starveChart').innerHTML = s;
+  function draw(){
+    var d = +$('starveDay').value, g = at(GLU, d), k = at(KET, d), f = at(FA, d);
+    $('starveDayV').textContent = d % 1 ? d.toFixed(2) : d;
+    ['svCursor'].forEach(function(id){ $(id).setAttribute('x1', X(d)); $(id).setAttribute('x2', X(d)); });
+    [['svDg', g], ['svDk', k], ['svDf', f]].forEach(function(p){ $(p[0]).setAttribute('cx', X(d)); $(p[0]).setAttribute('cy', Y(p[1])); });
+    $('svGlu').textContent = g.toFixed(1) + ' mM'; $('svKet').textContent = k.toFixed(1) + ' mM'; $('svFa').textContent = f.toFixed(1) + ' mM';
+    $('starveNote').textContent =
+      d < 1 ? 'Overnight-fast territory: liver glycogen plus early gluconeogenesis. Ketone bodies are barely detectable.' :
+      d < 3 ? 'Liver glycogen is spent. Gluconeogenesis and muscle protein breakdown are running near their peak; glucose is still drifting down.' :
+      d < 5 ? 'Ketone bodies are climbing steeply as hepatic fatty acid oxidation outpaces the citric acid cycle. The brain begins to switch.' :
+              'Ketone bodies now exceed glucose, and glucose has leveled off near 3.5 mM. The brain’s lower glucose need is what lets protein breakdown ease.';
+  }
+  $('starveDay').oninput = draw; draw();
+})();
+
+/* ---- m2s3: why does urea fall? ---- */
+(function(){
+  var OPTS = ['Muscle protein has been used up',
+              'Brain ketone use lowers the demand for glucose made from amino acids',
+              'The kidney stops excreting urea to conserve nitrogen',
+              'Glucagon inhibits the urea cycle enzymes'];
+  var ANSWER = OPTS[1], pred = null;
+  var P = makePredict('ureaPred', OPTS, function(o){ pred = o; unlockSteps('ureaLab', true); });
+  var ROWS = [
+    {k:'glu', label:'Brain glucose needed', unit:'g/day', max:160, color:'var(--f-glucose)'},
+    {k:'gng', label:'Glucose made from amino acids', unit:'g/day', max:80, color:'var(--f-amino)'},
+    {k:'pro', label:'Muscle protein broken down', unit:'g/day', max:120, color:'var(--f-amino)'},
+    {k:'n', label:'Urea nitrogen excreted', unit:'g/day', max:20, color:'var(--f-waste)'}
+  ];
+  var chain = $('ureaChain');
+  ROWS.forEach(function(r, i){
+    if(i) chain.appendChild(el('div', 'chain-arrow', '↓ which sets'));
+    chain.appendChild(el('div', 'chain-row', '<span>' + r.label + '</span><span class="bar"><i id="uc_' + r.k + '" style="background:' + r.color + '"></i></span><span class="val" id="ucv_' + r.k + '"></span>'));
+  });
+  function draw(){
+    var kb = +$('ureaSlider').value;
+    var vals = {glu: 160 - 1.2 * kb, pro: 130 - 1.1 * kb};
+    vals.gng = vals.pro * 0.57; vals.n = vals.pro * 0.16;
+    $('ureaSliderV').textContent = kb + ' g/day' + (kb === 50 ? ' (≈ day 3)' : kb === 100 ? ' (≈ day 40)' : '');
+    ROWS.forEach(function(r){
+      $('uc_' + r.k).style.width = Math.max(0, vals[r.k] / r.max * 100) + '%';
+      $('ucv_' + r.k).textContent = Math.round(vals[r.k]) + ' ' + r.unit;
+    });
+  }
+  $('ureaSlider').oninput = draw; draw();
+  function explain(){
+    P.lock(ANSWER);
+    var x = $('ureaExplain'); x.classList.add('show');
+    x.innerHTML = '<div class="verdict">' + (pred === ANSWER ? 'Exactly the causal chain.' : 'The chain runs through the brain, not the kidney or a depleted muscle.') + '</div>' +
+      '<p>As the brain burns more ketone bodies, it needs less glucose. Less glucose demand means less amino acid carbon is needed for gluconeogenesis, so muscle protein breakdown slows (75 → 20 g/day between day 3 and day 40). Fewer amino acids deaminated means less nitrogen for the urea cycle, so urea output falls.</p>' +
+      '<p>Muscle protein is far from exhausted, and the kidney keeps excreting what it is given. The drop in urea is a sign of adaptation that protects muscle, including respiratory muscle, during a long fast.</p>';
+  }
+  $('ureaExplainBtn').onclick = function(){
+    if(!pred){ $('ureaExplain').classList.add('show'); $('ureaExplain').textContent = 'Make a prediction in step 1 first.'; return; }
+    explain(); saveAct('urea', {pred:pred});
+  };
+  $('ureaReset').onclick = function(){ pred = null; P.unlock(); unlockSteps('ureaLab', false); $('ureaExplain').classList.remove('show'); clearAct('urea'); };
+  var s = savedAct('urea');
+  if(s){ pred = s.pred; P.select(pred); unlockSteps('ureaLab', true); explain(); }
+})();
+
+/* ---- m2s4: the metabolic state simulator ---- */
+var SIM_STAGES = [
+  {id:'fed', dot:'1', label:'0–4 h', sub:'after a meal', title:'0–4 hours: the fed state',
+   lead:'A mixed meal is being absorbed. Glucose, amino acids, and chylomicrons are pouring in.',
+   key:{glucose:'Increasing', ratio:'High', liver:'Storing glycogen and making lipid', adipose:'Lipogenesis: storing triglyceride',
+        muscle:'Taking up glucose and building glycogen', brain:'Glucose'},
+   edges:['portal','chylo','insulin','vldl','gluBrain','lac','gluRbc'],
+   explain:'Rising glucose raises insulin and suppresses glucagon. Insulin sends glucose into muscle and adipose and tells the liver to build glycogen and export surplus as VLDL triglyceride. Adipose stores chylomicron and VLDL fatty acids. The brain runs on glucose as it does whenever glucose is available.'},
+  {id:'fast', dot:'2', label:'~12 h', sub:'overnight fast', title:'About 12 hours: the postabsorptive state',
+   lead:'Breakfast hasn’t happened yet. The last meal was absorbed hours ago.',
+   key:{glucose:'Maintained', ratio:'Low', liver:'Exporting glucose from glycogen and gluconeogenesis', adipose:'Lipolysis: releasing fatty acids and glycerol',
+        muscle:'Oxidizing fatty acids, sparing glucose', brain:'Glucose'},
+   edges:['glucagon','glyc','fa','faHeart','aa','gluBrain','lac','gluRbc'],
+   explain:'Low insulin and high glucagon flip the liver to export mode: glycogenolysis first, then a growing share of gluconeogenesis from glycerol, lactate, and alanine. Adipose releases fatty acids so muscle and heart can burn them and leave glucose for the brain and red blood cells. Ketone production has started but is not yet a major fuel.'},
+  {id:'day2', dot:'3', label:'1–2 days', sub:'early starvation', title:'1–2 days: early starvation',
+   lead:'Liver glycogen is gone. Every gram of glucose now has to be made.',
+   key:{glucose:'Decreasing', ratio:'Low', liver:'Exporting glucose by gluconeogenesis, with rising ketone output', adipose:'Lipolysis: releasing fatty acids and glycerol',
+        muscle:'Releasing amino acids at a high rate', brain:'Glucose, with ketone use starting to rise'},
+   edges:['glucagon','glyc','fa','faHeart','aa','ketBrain','ketMus','gluBrain','lac','gluRbc','urea'],
+   explain:'With glycogen spent, the liver depends on gluconeogenesis, and muscle protein breakdown is near its peak to supply amino acids. Muscle is still burning fatty acids too, but its distinctive contribution now is alanine. Blood glucose drifts down, and rising hepatic fatty acid oxidation starts pushing out ketone bodies that the brain begins to use.'},
+  {id:'weeks', dot:'4', label:'Weeks', sub:'prolonged starvation', title:'Weeks: prolonged starvation',
+   lead:'The body has settled into a fuel-conserving steady state.',
+   key:{glucose:'Maintained', ratio:'Low', liver:'Exporting ketone bodies, with glucose output leveled off', adipose:'Lipolysis: releasing fatty acids and glycerol',
+        muscle:'Oxidizing fatty acids and ketones, with protein largely spared', brain:'Mostly ketone bodies'},
+   edges:['glucagon','glyc','fa','faHeart','aa','ketBrain','ketMus','gluBrain','lac','gluRbc'],
+   explain:'Ketone bodies now supply most of the brain’s energy, so whole-body glucose demand has fallen and hepatic glucose output levels off near 80 g/day. Blood glucose holds steady around 3.5 mM. Muscle protein breakdown drops to about 20 g/day, and urea output falls with it. Red blood cells still need glucose, but the Cori cycle recycles their lactate.'}
+];
+var SIM_QS = [
+  {id:'glucose', label:'Blood glucose', opts:['Increasing', 'Maintained', 'Decreasing']},
+  {id:'ratio', label:'Insulin/glucagon ratio', opts:['High', 'Low']},
+  {id:'liver', label:'Liver', opts:['Storing glycogen and making lipid', 'Exporting glucose from glycogen and gluconeogenesis', 'Exporting glucose by gluconeogenesis, with rising ketone output', 'Exporting ketone bodies, with glucose output leveled off']},
+  {id:'adipose', label:'Adipose', opts:['Lipogenesis: storing triglyceride', 'Lipolysis: releasing fatty acids and glycerol']},
+  {id:'muscle', label:'Skeletal muscle: most distinctive role', opts:['Taking up glucose and building glycogen', 'Oxidizing fatty acids, sparing glucose', 'Releasing amino acids at a high rate', 'Oxidizing fatty acids and ketones, with protein largely spared']},
+  {id:'brain', label:'Brain fuel', opts:['Glucose', 'Glucose, with ketone use starting to rise', 'Mostly ketone bodies']}
+];
+(function(){
+  var answers = {}, checked = {}, cur = 0;
+  SIM_STAGES.forEach(function(s){ answers[s.id] = {}; });
+  var map = makeMap($('simMap'));
+  var tl = $('simTimeline');
+  var stops = SIM_STAGES.map(function(s, i){
+    var b = el('button', 'tl-stop', '<span class="tl-dot">' + s.dot + '</span><span class="tl-label">' + s.label + '</span><span class="tl-sub">' + s.sub + '</span>');
+    b.type = 'button'; b.setAttribute('aria-label', 'Timepoint ' + s.label + ', ' + s.sub);
+    b.onclick = function(){ show(i); };
+    tl.appendChild(b); return b;
+  });
+  function show(i){
+    cur = i; var st = SIM_STAGES[i];
+    stops.forEach(function(b, j){ b.classList.toggle('cur', j === i); b.classList.toggle('checked', !!checked[SIM_STAGES[j].id]); });
+    $('simTitle').textContent = st.title; $('simLead').textContent = st.lead;
+    var host = $('simQs'); host.innerHTML = '';
+    SIM_QS.forEach(function(q){
+      var row = el('div', 'qrow'); row.appendChild(el('div', 'qlab', q.label));
+      var opts = el('div', 'opts-row');
+      q.opts.forEach(function(o){
+        var b = el('button', 'opt', o); b.type = 'button'; b.dataset.val = o;
+        if(answers[st.id][q.id] === o) b.classList.add('sel');
+        b.onclick = function(){ answers[st.id][q.id] = o; opts.querySelectorAll('.opt').forEach(function(x){ x.classList.toggle('sel', x === b); }); };
+        opts.appendChild(b);
+      });
+      row.appendChild(opts); host.appendChild(row);
+    });
+    $('simScore').textContent = ''; $('simExplain').classList.remove('show');
+    $('simMapWrap').classList.add('hidden');
+    $('simNext').style.visibility = i < SIM_STAGES.length - 1 ? '' : 'hidden';
+    if(checked[st.id]) grade(st);
+    overall();
+  }
+  function grade(st){
+    var right = 0;
+    $('simQs').querySelectorAll('.qrow').forEach(function(row, qi){
+      var q = SIM_QS[qi], pick = answers[st.id][q.id], key = st.key[q.id];
+      if(pick === key) right++;
+      row.querySelectorAll('.opt').forEach(function(b){
+        b.disabled = true;
+        if(b.dataset.val === pick && pick !== key) b.classList.add('bad');
+        if(b.dataset.val === key && pick !== key) b.classList.add('reveal');
+      });
+    });
+    $('simScore').textContent = right + ' of 6 correct at this timepoint.';
+    var x = $('simExplain'); x.classList.add('show'); x.innerHTML = '<p>' + st.explain + '</p>';
+    $('simMapWrap').classList.remove('hidden');
+    map.showOnly(st.edges, 'on');
+    legendFor(document.querySelector('.simLegend'), st.edges);
+  }
+  function overall(){
+    var n = SIM_STAGES.filter(function(s){ return checked[s.id]; }).length;
+    $('simOverall').textContent = n + ' of 4 timepoints checked' + (n === 4 ? '. Simulator complete.' : '.');
+  }
+  $('simCheck').onclick = function(){
+    var st = SIM_STAGES[cur];
+    if(checked[st.id]) return;
+    if(SIM_QS.some(function(q){ return !answers[st.id][q.id]; })){ $('simScore').textContent = 'Answer all six questions first.'; return; }
+    checked[st.id] = true; grade(st);
+    stops[cur].classList.add('checked'); overall();
+    if(SIM_STAGES.every(function(s){ return checked[s.id]; })) saveAct('simulator', {answers:answers});
+  };
+  $('simNext').onclick = function(){ if(cur < SIM_STAGES.length - 1){ show(cur + 1); $('simLab').scrollIntoView({behavior: REDUCED ? 'auto' : 'smooth', block:'start'}); } };
+  $('simReset').onclick = function(){
+    SIM_STAGES.forEach(function(s){ answers[s.id] = {}; checked[s.id] = false; });
+    clearAct('simulator'); show(0);
+  };
+  var s = savedAct('simulator');
+  if(s && s.answers){ answers = s.answers; SIM_STAGES.forEach(function(st){ checked[st.id] = true; }); }
+  show(0);
+})();
+
+/* ============================================================
+   6. MODULE 3 ACTIVITIES
+   ============================================================ */
+
+/* ---- m3s1: arrow grid ---- */
+(function(){
+  var ROWS = [
+    ['Muscle glucose uptake', '↑', '—'],
+    ['Liver glycogen synthesis', '↑', '↓'],
+    ['Liver glycogen breakdown', '↓', '↑'],
+    ['Gluconeogenesis', '↓', '↑'],
+    ['Adipose triglyceride synthesis', '↑', '—'],
+    ['Adipose lipolysis', '↓', '↑'],
+    ['Ketone body formation', '↓', '↑']
+  ];
+  var SYMS = ['↑', '↓', '—'], picks = [], tbody = document.querySelector('#arrowTbl tbody');
+  function render(){
+    tbody.innerHTML = ''; picks = ROWS.map(function(){ return [null, null]; });
+    ROWS.forEach(function(r, i){
+      var tr = el('tr'); tr.appendChild(el('td', null, r[0]));
+      [0, 1].forEach(function(c){
+        var td = el('td', 'cell'), row = el('div', 'opts-row'); row.style.justifyContent = 'center';
+        SYMS.forEach(function(sym){
+          var b = el('button', 'opt', sym); b.type = 'button'; b.dataset.val = sym;
+          b.setAttribute('aria-label', (c ? 'Glucagon' : 'Insulin') + ', ' + r[0] + ': ' + (sym === '↑' ? 'stimulates' : sym === '↓' ? 'inhibits' : 'no direct effect'));
+          b.onclick = function(){ picks[i][c] = sym; row.querySelectorAll('.opt').forEach(function(x){ x.classList.toggle('sel', x === b); }); };
+          row.appendChild(b);
+        });
+        td.appendChild(row); td.appendChild(el('span', 'cellmark')); tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    $('arrowScore').textContent = '';
+  }
+  function grade(){
+    var right = 0;
+    tbody.querySelectorAll('tr').forEach(function(tr, i){
+      tr.querySelectorAll('td.cell').forEach(function(td, c){
+        var key = ROWS[i][c + 1], pick = picks[i][c], ok = pick === key; if(ok) right++;
+        td.querySelectorAll('.opt').forEach(function(b){
+          b.disabled = true; b.classList.toggle('sel', b.dataset.val === pick);
+          if(b.dataset.val === pick && !ok) b.classList.add('bad');
+          if(b.dataset.val === key && !ok) b.classList.add('reveal');
+        });
+      });
+    });
+    $('arrowScore').textContent = right + ' of 14 cells correct. Lipolysis responds to glucagon mainly at large doses; epinephrine is the stronger lipolytic signal.';
+  }
+  $('arrowCheck').onclick = function(){
+    if(picks.some(function(p){ return p[0] === null || p[1] === null; })){ $('arrowScore').textContent = 'Fill every cell first.'; return; }
+    grade(); saveAct('arrowgrid', {picks:picks});
+  };
+  $('arrowReset').onclick = function(){ clearAct('arrowgrid'); render(); };
+  render();
+  var s = savedAct('arrowgrid'); if(s && s.picks){ picks = s.picks; grade(); }
+})();
+
+/* ---- m3s2: hormone control panel (explore) ---- */
+(function(){
+  var ORG = [['liver', 'Liver'], ['muscle', 'Skeletal muscle'], ['adipose', 'Adipose tissue'], ['pancreas', 'Pancreas'], ['gi', 'GI tract'], ['body', 'Whole body']];
+  var H = [
+    {name:'Insulin', cls:['ana', 'Anabolic'], trigger:'Released when blood glucose rises after a meal.',
+     fx:{liver:[['up', 'Glucose and amino acid uptake'], ['up', 'Glycogen, fatty acid/VLDL, and protein synthesis'], ['down', 'Gluconeogenesis'], ['down', 'Glycogen breakdown']],
+         muscle:[['up', 'Glucose and amino acid uptake'], ['up', 'Glycogen and protein synthesis']],
+         adipose:[['up', 'Glucose and fatty acid uptake'], ['up', 'Triglyceride synthesis'], ['down', 'Lipolysis']],
+         pancreas:[['eq', 'Secreted by β cells']]}},
+    {name:'Glucagon', cls:['cat', 'Catabolic'], trigger:'Released when blood glucose falls between meals.',
+     fx:{liver:[['up', 'Glycogen breakdown'], ['up', 'Gluconeogenesis'], ['up', 'Ketone body formation'], ['down', 'Glycogen synthesis'], ['down', 'Conversion of glucose to fatty acids']],
+         adipose:[['up', 'Lipolysis, at large doses']],
+         pancreas:[['eq', 'Secreted by α cells']]}},
+    {name:'Growth hormone', cls:['mix', 'Growth-promoting; fuel-mobilizing'], trigger:'Controlled mainly by other hormones; release is stimulated by low blood glucose.',
+     fx:{liver:[['up', 'IGF-I production'], ['up', 'Gluconeogenesis from glycerol'], ['up', 'Glycogen synthesis']],
+         muscle:[['up', 'Protein synthesis'], ['up', 'Fatty acid oxidation'], ['down', 'Glucose uptake (indirect)']],
+         adipose:[['down', 'Sensitivity to insulin’s lipogenic signal'], ['up', 'Fatty acid release']],
+         body:[['up', 'Growth, largely through IGF-I']]}},
+    {name:'Epinephrine & norepinephrine', cls:['cat', 'Catabolic'], trigger:'Released in acute stress and exercise; act through α and β receptors.',
+     fx:{liver:[['up', 'Glycogen breakdown'], ['up', 'Gluconeogenesis']],
+         muscle:[['up', 'Glycogen breakdown and glucose use']],
+         adipose:[['up', 'Lipolysis']],
+         pancreas:[['up', 'Glucagon release'], ['down', 'Insulin release']],
+         body:[['up', 'Perfusion pressure (norepinephrine, α₁)'], ['up', 'Cardiac output (epinephrine, β₁)']]}},
+    {name:'Cortisol', cls:['cat', 'Catabolic'], trigger:'Glucocorticoid released in stress; also anti-inflammatory.',
+     fx:{liver:[['up', 'Gluconeogenesis'], ['up', 'Glycogen storage']],
+         muscle:[['down', 'Glucose uptake'], ['up', 'Protein breakdown for gluconeogenic substrate']],
+         adipose:[['up', 'Lipolysis (permissive)']],
+         body:[['up', 'Blood glucose']]}},
+    {name:'Thyroid hormone (T₃/T₄)', cls:['cat', 'Raises energy expenditure'], trigger:'T₄ from the thyroid is converted to active T₃ in peripheral tissues.',
+     fx:{liver:[['up', 'Gluconeogenesis and glucose output']],
+         muscle:[['up', 'Glucose use'], ['up', 'Protein synthesis']],
+         adipose:[['up', 'Lipolysis (permissive)']],
+         body:[['up', 'Basal metabolic rate and O₂ consumption'], ['up', 'Sensitivity to catecholamines']]}},
+    {name:'GLP-1 & GIP (incretins)', cls:['ana', 'Promote insulin release'], trigger:'Released by the small intestine when nutrients arrive; IV glucose does not trigger them.',
+     fx:{pancreas:[['up', 'Glucose-dependent insulin secretion']],
+         gi:[['eq', 'Produced in the small intestine'], ['eq', 'GLP-2, a sibling peptide: ↑ mucosal growth']],
+         body:[['eq', 'Drug targets: semaglutide (GLP-1), tirzepatide (GLP-1/GIP)']]}}
+  ];
+  var ARR = {up:['↑', 'up'], down:['↓', 'down'], eq:['•', 'eq']}, btns = [];
+  H.forEach(function(h, i){
+    var b = el('button', 'opt', h.name); b.type = 'button'; b.onclick = function(){ pick(i); };
+    $('hBtns').appendChild(b); btns.push(b);
+  });
+  function pick(i){
+    var h = H[i];
+    btns.forEach(function(b, j){ b.classList.toggle('sel', j === i); b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+    $('hMeta').innerHTML = '<span class="hclass ' + h.cls[0] + '">' + h.cls[1] + '</span><span>' + h.trigger + '</span>';
+    $('hOrgans').innerHTML = ORG.map(function(o){
+      var list = h.fx[o[0]];
+      if(!list) return '<div class="organ quiet"><h4>' + o[1] + '</h4><ul><li><span class="arr eq">–</span>No major direct effect</li></ul></div>';
+      return '<div class="organ active"><h4>' + o[1] + '</h4><ul>' + list.map(function(x){
+        return '<li><span class="arr ' + ARR[x[0]][1] + '">' + ARR[x[0]][0] + '</span><span>' + x[1] + '</span></li>'; }).join('') + '</ul></div>';
+    }).join('');
+  }
+  pick(0);
+})();
+makeSort({
+  host:'hMatch', act:'hormonematch', check:'hMatchCheck', reset:'hMatchReset', score:'hMatchScore', keepOrder:true,
+  options:['Growth hormone', 'Catecholamines', 'Glucocorticoids', 'Thyroid hormone'],
+  rows:[
+    {text:'Decreases adipose sensitivity to insulin’s lipogenic signal', answer:'Growth hormone'},
+    {text:'Raises cardiac output through β₁ receptors', answer:'Catecholamines'},
+    {text:'Increases hepatic gluconeogenesis while decreasing muscle glucose uptake', answer:'Glucocorticoids'},
+    {text:'Increases basal metabolic rate and oxygen consumption', answer:'Thyroid hormone'},
+    {text:'Acts largely by stimulating IGF-I production', answer:'Growth hormone'},
+    {text:'Inhibits insulin release and stimulates glucagon release', answer:'Catecholamines'},
+    {text:'Increases tissue sensitivity to catecholamines', answer:'Thyroid hormone'},
+    {text:'Promotes peripheral breakdown of molecules that can become glucose', answer:'Glucocorticoids'}
+  ]
+});
+
+/* ---- m3s3: reverse scenarios ---- */
+(function(){
+  var SIG = ['↑ insulin, ↑ incretins, ↓ glucagon', '↓ insulin, ↑ glucagon', '↑ epinephrine/norepinephrine, ↓ insulin', '↑ glucocorticoid activity', '↑ T₃/T₄'];
+  var RESP = ['Glucose uptake and glycogen storage', 'Hepatic glycogenolysis and gluconeogenesis', 'Rapid mobilization of glycogen and fatty acids',
+              '↑ hepatic gluconeogenesis with ↓ peripheral glucose uptake', '↑ BMR and O₂ use, with amplified catecholamine effects'];
+  var SC = [
+    ['30 minutes after a carbohydrate-rich meal', 0, 0],
+    ['Waking up after an overnight fast', 1, 1],
+    ['Sprinting away from a loose dog', 2, 2],
+    ['Four months of high-dose prednisone therapy', 3, 3],
+    ['Untreated Graves disease (hyperthyroidism)', 4, 4]
+  ];
+  var rows = [];
+  SC.forEach(function(s){
+    rows.push({head:s[0], text:'Signal pattern', options:SIG, answer:SIG[s[1]]});
+    rows.push({text:'Fuel response', options:RESP, answer:RESP[s[2]]});
+  });
+  makeSort({host:'scenList', act:'scenarios', check:'scenCheck', reset:'scenReset', score:'scenScore', rows:rows});
+})();
+
+/* ---- m3s4: oral vs IV glucose + drug match ---- */
+var incPred = null;
+(function(){
+  var ANSWER = 'Oral glucose', route = 'Oral glucose';
+  var P = makePredict('incPred', [ANSWER, 'IV glucose', 'About the same'], function(o){ incPred = o; unlockSteps('incLab', true); });
+  var routeBtns = ['Oral glucose', 'IV glucose'].map(function(r){
+    var b = el('button', 'opt big', r); b.type = 'button'; b.onclick = function(){ route = r; draw(); };
+    $('incRoute').appendChild(b); return b;
+  });
+  var x0 = 55, x1 = 585, y0 = 210, y1 = 20;
+  function X(t){ return x0 + t / 120 * (x1 - x0); }
+  function gam(t, peak, tp){ return peak * (t / tp) * Math.exp(1 - t / tp); }
+  function glucose(t){ return 5 + gam(t, 3.2, 30); }
+  function insulin(t, oral){ return gam(t, oral ? 100 : 45, 35); }
+  function Yg(v){ return y0 - (v - 4) / 5 * (y0 - y1); }
+  function Yi(v){ return y0 - v / 110 * (y0 - y1); }
+  function poly(fn, Y){ var p = []; for(var t = 0; t <= 120; t += 2) p.push(X(t).toFixed(1) + ',' + Y(fn(t)).toFixed(1)); return p.join(' '); }
+  function draw(){
+    var oral = route === 'Oral glucose';
+    routeBtns.forEach(function(b){ b.classList.toggle('sel', b.textContent === route); });
+    var s = '';
+    for(var t = 0; t <= 120; t += 30) s += '<text x="' + X(t) + '" y="' + (y0 + 18) + '" text-anchor="middle">' + t + '</text><line class="grid" x1="' + X(t) + '" x2="' + X(t) + '" y1="' + y1 + '" y2="' + y0 + '"/>';
+    s += '<line class="axis" x1="' + x0 + '" x2="' + x1 + '" y1="' + y0 + '" y2="' + y0 + '"/><text x="' + ((x0 + x1) / 2) + '" y="' + (y0 + 36) + '" text-anchor="middle">Minutes after glucose</text>';
+    s += '<polyline fill="none" stroke-width="2" stroke-dasharray="4 5" style="stroke:var(--f-ketone);opacity:.35" points="' + poly(function(t){ return insulin(t, !oral); }, Yi) + '"/>';
+    s += '<polyline fill="none" stroke-width="3" style="stroke:var(--f-ketone)" points="' + poly(function(t){ return insulin(t, oral); }, Yi) + '"/>';
+    s += '<polyline fill="none" stroke-width="3" style="stroke:var(--f-glucose)" points="' + poly(glucose, Yg) + '"/>';
+    s += '<text x="' + (x1 - 4) + '" y="' + (Yg(glucose(120)) - 8) + '" text-anchor="end" style="fill:var(--f-glucose);font-weight:650">Blood glucose (same both routes)</text>';
+    s += '<text x="' + (X(35) + 8) + '" y="' + (Yi(insulin(35, oral)) - 8) + '" style="fill:var(--f-ketone);font-weight:650">Insulin, ' + route.toLowerCase() + '</text>';
+    s += '<text x="' + (X(35) + 8) + '" y="' + (Yi(insulin(35, !oral)) + 16) + '" style="fill:var(--f-ketone);opacity:.6">other route</text>';
+    $('incChart').innerHTML = s;
+    $('incGlp').textContent = oral ? 'Robust' : 'Minimal';
+    $('incGip').textContent = oral ? 'Robust' : 'Minimal';
+    $('incIns').textContent = oral ? '100' : '≈45';
+  }
+  draw();
+  function explain(){
+    P.lock(ANSWER);
+    var x = $('incExplain'); x.classList.add('show');
+    x.innerHTML = '<div class="verdict">' + (incPred === ANSWER ? 'Right: the gut adds its own signal.' : 'Oral glucose wins, even with identical blood glucose.') + '</div>' +
+      '<p>GLP-1 and GIP are released only when nutrients pass through the intestine. They amplify glucose-stimulated insulin secretion, so the same blood glucose curve produces a much larger insulin response when the glucose arrives orally. IV glucose skips the gut and the incretin signal with it.</p>' +
+      '<p>This is the physiology that semaglutide and tirzepatide exploit: they supply incretin receptor activation pharmacologically.</p>';
+  }
+  $('incExplainBtn').onclick = function(){
+    if(!incPred){ $('incExplain').classList.add('show'); $('incExplain').textContent = 'Make a prediction in step 1 first.'; return; }
+    explain();
+    var s = savedAct('incretin'); if(s){ s.pred = incPred; saveAct('incretin', s); }
+  };
+  var s = savedAct('incretin');
+  if(s && s.pred){ incPred = s.pred; P.select(incPred); unlockSteps('incLab', true); explain(); }
+})();
+makeSort({
+  host:'drugSort', act:'incretin', check:'drugCheck', reset:'drugReset', score:'drugScore', keepOrder:true,
+  options:['GLP-1 receptor agonist', 'Dual GLP-1/GIP receptor agonist', 'GLP-2 analog'],
+  extra:function(){ return incPred ? {pred:incPred} : {}; },
+  rows:[
+    {text:'Semaglutide', answer:'GLP-1 receptor agonist'},
+    {text:'Tirzepatide', answer:'Dual GLP-1/GIP receptor agonist'},
+    {text:'Teduglutide', answer:'GLP-2 analog'},
+    {text:'Treats short bowel syndrome by promoting mucosal growth', answer:'GLP-2 analog'},
+    {text:'Activates two incretin receptors with one molecule', answer:'Dual GLP-1/GIP receptor agonist'}
+  ]
+});
+
+/* ============================================================
+   7. MODULE 4 ACTIVITIES
+   ============================================================ */
+
+/* ---- m4s1: organ explorer ---- */
+(function(){
+  var O = [
+    {k:'liver', name:'Liver', nick:'Metabolic traffic controller',
+     role:'Stores and exports glucose, makes new glucose, runs the urea cycle, synthesizes and exports lipid, makes ketone bodies, handles fructose and galactose, and metabolizes xenobiotics.',
+     burns:'Essentially every major fuel: fatty acids, glucose, amino acids', exports:'Glucose, ketone bodies, VLDL triglyceride, urea', cannot:'Oxidize ketone bodies', note:'About 20% of total oxygen consumption.'},
+    {k:'adipose', name:'Adipose', nick:'Long-term energy warehouse',
+     role:'Stores triglyceride in the fed state; releases fatty acids and glycerol during fasting.',
+     burns:'Glucose and fatty acids at modest rates', exports:'Fatty acids (to muscle, heart, liver) and glycerol (to liver)', cannot:'Make glucose or ketone bodies', note:'Holds about 85% of stored calories.'},
+    {k:'muscle', name:'Skeletal muscle', nick:'Variable-demand consumer',
+     role:'Burns fatty acids at rest, relies on ATP, phosphocreatine, and glycogen during sudden intense work, and shifts back toward fatty acids as exercise lengthens.',
+     burns:'Fatty acids, glucose, its own glycogen, ketone bodies', exports:'Lactate and alanine to the liver', cannot:'Release free glucose from its glycogen, or perform gluconeogenesis', note:'Its protein is the body’s emergency amino acid source.'},
+    {k:'heart', name:'Heart', nick:'Continuous oxidative consumer',
+     role:'Contracts without rest, so it depends on steady oxidative metabolism and continuous fuel delivery.',
+     burns:'Fatty acids (~60–70%), lactate, glucose', exports:'Nothing of note', cannot:'Pause for glycolytic sprints the way skeletal muscle can', note:'Can take up lactate released by other tissues.'},
+    {k:'brain', name:'Brain', nick:'Selective consumer',
+     role:'Runs mainly on glucose; in prolonged starvation, ketone bodies supply most of its energy.',
+     burns:'Glucose; ketone bodies as starvation lengthens', exports:'Nothing of note', cannot:'Oxidize fatty acids meaningfully', note:'By day 40: ~100 g ketone bodies and ~40 g glucose per day.'},
+    {k:'rbc', name:'Red blood cells', nick:'Obligate glycolytic consumer',
+     role:'Convert glucose to lactate at every stage of feeding and fasting.',
+     burns:'Glucose, by glycolysis to lactate', exports:'Lactate, recycled to glucose by the liver (Cori cycle)', cannot:'Use fatty acids or ketone bodies; no mitochondria', note:'Their glucose need is why gluconeogenesis never stops completely.'}
+  ];
+  var tiles = O.map(function(o, i){
+    var b = el('button', 'otile', '<b>' + o.name + '</b><span>' + o.nick + '</span>'); b.type = 'button';
+    b.onclick = function(){ show(i); };
+    $('oTiles').appendChild(b); return b;
+  });
+  function show(i){
+    var o = O[i];
+    tiles.forEach(function(t, j){ t.classList.toggle('on', i === j); t.setAttribute('aria-pressed', i === j ? 'true' : 'false'); });
+    $('oDetail').innerHTML = '<h3 style="margin:0">' + o.name + ': ' + o.nick.toLowerCase() + '</h3><p style="margin:6px 0 0;font-size:.92rem">' + o.role + '</p>' +
+      '<dl><dt>Burns</dt><dd>' + o.burns + '</dd><dt>Exports</dt><dd>' + o.exports + '</dd><dt>Cannot</dt><dd>' + o.cannot + '</dd><dt>Worth knowing</dt><dd>' + o.note + '</dd></dl>';
+  }
+  show(0);
+})();
+
+/* ---- m4s1: who can run each pathway? ---- */
+(function(){
+  var TIS = ['Liver', 'Adipose', 'Muscle', 'Brain', 'RBC'];
+  var PROC = [
+    ['β-Oxidation of fatty acids', ['Yes', 'No', 'Yes', 'No', 'No']],
+    ['Ketone body formation', ['Yes', 'No', 'No', 'No', 'No']],
+    ['Ketone body utilization', ['No', 'Yes', 'Yes', 'Yes', 'No']],
+    ['Gluconeogenesis', ['Yes', 'No', 'No', 'No', 'No']]
+  ];
+  var tbl = $('whoTbl'), picks = [], locked = false;
+  function render(){
+    picks = PROC.map(function(){ return TIS.map(function(){ return null; }); }); locked = false;
+    tbl.innerHTML = '<thead><tr><th>Process</th>' + TIS.map(function(t){ return '<th style="text-align:center">' + t + '</th>'; }).join('') + '</tr></thead>';
+    var tb = el('tbody');
+    PROC.forEach(function(p, i){
+      var tr = el('tr'); tr.appendChild(el('td', null, p[0]));
+      TIS.forEach(function(t, j){
+        var td = el('td', 'cell'), b = el('button', 'opt', '?'); b.type = 'button';
+        b.setAttribute('aria-label', p[0] + ' in ' + t + ': not answered');
+        b.onclick = function(){
+          if(locked) return;
+          picks[i][j] = picks[i][j] === 'Yes' ? 'No' : 'Yes';
+          b.textContent = picks[i][j]; b.classList.add('sel');
+          b.setAttribute('aria-label', p[0] + ' in ' + t + ': ' + picks[i][j]);
+        };
+        td.appendChild(b); td.appendChild(el('span', 'cellmark')); tr.appendChild(td);
+      });
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb); $('whoScore').textContent = '';
+  }
+  function grade(){
+    locked = true; var right = 0;
+    tbl.querySelectorAll('tbody tr').forEach(function(tr, i){
+      tr.querySelectorAll('td.cell').forEach(function(td, j){
+        var b = td.querySelector('.opt'), key = PROC[i][1][j], ok = picks[i][j] === key; if(ok) right++;
+        b.textContent = picks[i][j]; b.classList.add('sel'); b.disabled = true;
+        if(!ok) b.classList.add('bad');
+        td.querySelector('.cellmark').textContent = ok ? '' : 'should be ' + key;
+        td.querySelector('.cellmark').style.color = 'var(--rose)';
+      });
+    });
+    $('whoScore').textContent = right + ' of 20 cells correct. Read across the ketone rows: the liver makes them, never burns them; red blood cells do neither.';
+  }
+  $('whoCheck').onclick = function(){
+    if(picks.some(function(r){ return r.some(function(x){ return x === null; }); })){ $('whoScore').textContent = 'Set every cell to Yes or No first.'; return; }
+    grade(); saveAct('whocan', {picks:picks});
+  };
+  $('whoReset').onclick = function(){ clearAct('whocan'); render(); };
+  render();
+  var s = savedAct('whocan'); if(s && s.picks){ picks = s.picks; grade(); }
+})();
+
+/* ---- m4s2: liver biosynthetic hub, drag and drop ---- */
+(function(){
+  var ROWS = [
+    {desc:'Arginine, glycine, and SAM', ans:'Creatine', fn:'Forms phosphocreatine in muscle; excreted as creatinine.'},
+    {desc:'Glutamate, cysteine, and glycine', ans:'Glutathione', fn:'Protects against free radical injury.'},
+    {desc:'Glycine, glutamine, aspartate, CO₂, tetrahydrofolate, and PRPP', ans:'Purines', fn:'Adenine and guanine nucleotides for DNA, RNA, ATP, GTP.'},
+    {desc:'Aspartate, glutamine, and CO₂', ans:'Pyrimidines', fn:'Uracil, thymine, and cytosine nucleotides.'},
+    {desc:'Glycine and succinyl-CoA', ans:'Heme', fn:'Incorporated into hemoglobin and cytochromes.'},
+    {desc:'Glycine, serine, histidine, and methionine', ans:'One-carbon donors (THF, SAM)', fn:'Methylation of choline, nucleotides, and xenobiotics.'}
+  ];
+  var board = $('liverBoard'), tray = $('liverTray'), slots = [], pills = {}, selected = null, locked = false;
+  function makePill(name){
+    var p = el('button', 'dnd-pill', name); p.type = 'button'; p.dataset.name = name;
+    p.addEventListener('pointerdown', function(e){ if(locked) return; startDrag(e, p); });
+    p.addEventListener('click', function(e){ if(e.detail === 0 && !locked) toggleSelect(p); });
+    return p;
+  }
+  function toggleSelect(p){
+    if(selected === p){ p.style.outline = ''; selected = null; return; }
+    if(selected) selected.style.outline = '';
+    selected = p; p.style.outline = '3px solid var(--green-bright)';
+  }
+  function place(p, slot){
+    if(slot){ var occ = slot.querySelector('.dnd-pill'); if(occ && occ !== p) tray.appendChild(occ); slot.appendChild(p); }
+    else tray.appendChild(p);
+    p.style.outline = ''; selected = null;
+  }
+  function startDrag(e, p){
+    var sx = e.clientX, sy = e.clientY, ghost = null, moved = false;
+    function move(ev){
+      if(!moved && Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 6){
+        moved = true; ghost = el('div', 'dnd-ghost', p.dataset.name); document.body.appendChild(ghost); p.classList.add('dragging');
+      }
+      if(ghost){ ghost.style.left = ev.clientX + 'px'; ghost.style.top = ev.clientY + 'px';
+        var under = document.elementFromPoint(ev.clientX, ev.clientY), s = under && under.closest('.dnd-slot');
+        slots.forEach(function(x){ x.classList.toggle('over', x === s); }); }
+    }
+    function up(ev){
+      document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up);
+      if(!moved){ toggleSelect(p); return; }
+      ghost.remove(); p.classList.remove('dragging'); slots.forEach(function(x){ x.classList.remove('over'); });
+      var under = document.elementFromPoint(ev.clientX, ev.clientY);
+      var s = under && under.closest('.dnd-slot'), t = under && under.closest('#liverTray');
+      if(s) place(p, s); else if(t) place(p, null);
+    }
+    document.addEventListener('pointermove', move); document.addEventListener('pointerup', up);
+  }
+  function render(){
+    board.innerHTML = ''; tray.innerHTML = ''; slots = []; locked = false; selected = null;
+    ROWS.forEach(function(r, i){
+      var row = el('div', 'dnd-row');
+      row.appendChild(el('div', 'dnd-desc', '<strong>Precursors:</strong> ' + r.desc + '<span class="caption hidden" style="display:block;margin:4px 0 0"></span>'));
+      var slot = el('div', 'dnd-slot'); slot.tabIndex = 0; slot.setAttribute('role', 'button');
+      slot.setAttribute('aria-label', 'Drop zone for: ' + r.desc + '. Select a product, then press Enter here.');
+      slot.dataset.row = i;
+      slot.onclick = function(e){ if(!locked && selected && !e.target.closest('.dnd-pill')) place(selected, slot); };
+      slot.onkeydown = function(e){ if((e.key === 'Enter' || e.key === ' ') && selected && !locked){ e.preventDefault(); place(selected, slot); } };
+      row.appendChild(slot); board.appendChild(row); slots.push(slot);
+    });
+    tray.onclick = function(e){ if(!locked && selected && e.target === tray) place(selected, null); };
+    shuffle(ROWS.map(function(r){ return r.ans; })).forEach(function(n){ var p = makePill(n); pills[n] = p; tray.appendChild(p); });
+    $('liverScore').textContent = '';
+  }
+  function grade(){
+    locked = true; var right = 0;
+    slots.forEach(function(s, i){
+      var p = s.querySelector('.dnd-pill'), ok = p && p.dataset.name === ROWS[i].ans; if(ok) right++;
+      s.parentNode.classList.add(ok ? 'correct' : 'incorrect');
+      var cap = s.parentNode.querySelector('.caption'); cap.classList.remove('hidden');
+      cap.textContent = (ok ? '' : 'Answer: ' + ROWS[i].ans + '. ') + ROWS[i].fn;
+      if(p) p.classList.add('locked');
+    });
+    $('liverScore').textContent = right + ' of 6 matched correctly.';
+  }
+  $('liverCheck').onclick = function(){
+    if(slots.some(function(s){ return !s.querySelector('.dnd-pill'); })){ $('liverScore').textContent = 'Fill every slot first.'; return; }
+    grade(); saveAct('livermatch', {placed: slots.map(function(s){ return s.querySelector('.dnd-pill').dataset.name; })});
+  };
+  $('liverReset').onclick = function(){ clearAct('livermatch'); render(); };
+  render();
+  var s = savedAct('livermatch');
+  if(s && s.placed){ s.placed.forEach(function(n, i){ if(pills[n]) slots[i].appendChild(pills[n]); }); grade(); }
+})();
+
+/* ---- m4s3: muscle energy timeline ---- */
+(function(){
+  var SRC = [
+    {k:'atp', name:'Stored ATP', color:'#1D2B33'},
+    {k:'pcr', name:'Phosphocreatine', color:'var(--f-amino)'},
+    {k:'gly', name:'Glycogen → lactate', color:'var(--f-lactate)'},
+    {k:'aer', name:'Aerobic glucose/glycogen', color:'var(--f-glucose)'},
+    {k:'fa', name:'Fatty acids', color:'var(--f-fat)'}
+  ];
+  function tFrom(v){ return 0.5 * Math.pow(10800 / 0.5, v / 100); }
+  function label(t){
+    if(t < 10) return t.toFixed(1) + ' seconds';
+    if(t < 60) return Math.round(t) + ' seconds';
+    if(t < 3600) return Math.round(t / 60) + ' minute' + (Math.round(t / 60) === 1 ? '' : 's');
+    var h = Math.floor(t / 3600), m = Math.round((t - h * 3600) / 60);
+    return h + ' h' + (m ? ' ' + m + ' min' : '');
+  }
+  function mix(t){
+    var w = {
+      atp: 3 * Math.exp(-t / 1.2),
+      pcr: 2.2 * (t / 6) * Math.exp(1 - t / 6),
+      gly: 2.4 * (t / 40) * Math.exp(1 - t / 40),
+      aer: 1.3 * Math.exp(-Math.pow(Math.log(t / 900), 2) / (2 * 1.69)),
+      fa: 1.4 / (1 + Math.exp(-(Math.log(t / 3600)) / 0.7))
+    };
+    var sum = 0; SRC.forEach(function(s){ sum += w[s.k]; });
+    SRC.forEach(function(s){ w[s.k] /= sum; });
+    return w;
+  }
+  var NOTES = {
+    atp:'The first second or so: myosin uses the ATP already in the cell, which lasts about 1.2 seconds at maximal effort.',
+    pcr:'Creatine kinase transfers phosphate from phosphocreatine to ADP, holding ATP steady for roughly 9 seconds.',
+    gly:'Glycolysis is racing ahead of oxidative phosphorylation, so pyruvate is reduced to lactate. Fatigue sets in quickly.',
+    aer:'Intensity has dropped to a level oxygen delivery can support; glucose and glycogen are oxidized completely.',
+    fa:'Long, lower-intensity work runs increasingly on blood-borne fatty acids, sparing dwindling glycogen.'
+  };
+  function draw(){
+    var t = tFrom(+$('musT').value), w = mix(t), main = SRC[0];
+    SRC.forEach(function(s){ if(w[s.k] > w[main.k]) main = s; });
+    $('musTV').textContent = label(t);
+    $('musBar').innerHTML = SRC.map(function(s){
+      var p = w[s.k] * 100; return '<span style="width:' + p + '%;background:' + s.color + '">' + (p > 12 ? Math.round(p) + '%' : '') + '</span>';
+    }).join('');
+    $('musMain').textContent = main.name;
+    $('musLac').textContent = w.gly > 0.35 ? 'High' : w.gly > 0.12 ? 'Moderate' : 'Low';
+    $('musNote').textContent = NOTES[main.k];
+  }
+  $('musT').oninput = draw; draw();
+})();
+makeSequence({host:'musSeq', act:'musclesequence', check:'musSeqCheck', reset:'musSeqReset', score:'musSeqScore',
+  items:['Stored ATP', 'Phosphocreatine', 'Glycogen → lactate (anaerobic glycolysis)', 'Aerobic oxidation of glycogen and glucose', 'Fatty acid oxidation']});
+
+/* ---- m4s4: creatine → creatinine ---- */
+makeSequence({host:'crSeq', act:'creatine', check:'crSeqCheck', reset:'crSeqReset', score:'crSeqScore',
+  items:['Kidney combines glycine and arginine',
+         'Liver adds a methyl group from SAM (made from methionine), forming creatine',
+         'Creatine travels in blood and is taken up by muscle',
+         'Creatine kinase uses ATP to form phosphocreatine',
+         'Creatine and phosphocreatine cyclize spontaneously into creatinine',
+         'Kidneys filter creatinine into the urine',
+         'Serum creatinine is used to estimate GFR']});
+(function(){
+  var MASS = [['Low muscle mass (frail, older adult)', 0.6], ['Average muscle mass', 1], ['High muscle mass + creatine supplement', 1.35]];
+  var mi = 1;
+  var btns = MASS.map(function(m, i){
+    var b = el('button', 'opt big', m[0]); b.type = 'button'; b.onclick = function(){ mi = i; draw(); };
+    $('crMass').appendChild(b); return b;
+  });
+  function draw(){
+    var gfr = +$('crGfr').value, f = MASS[mi][1];
+    var scr = 0.9 * f * (100 / gfr), est = 90 / scr, diff = Math.round((est - gfr) / gfr * 100);
+    btns.forEach(function(b, i){ b.classList.toggle('sel', i === mi); });
+    $('crGfrV').textContent = gfr + ' mL/min';
+    $('crScr').textContent = scr.toFixed(2) + ' mg/dL';
+    $('crEst').textContent = Math.round(est) + ' mL/min';
+    $('crDiff').textContent = diff === 0 ? 'Accurate' : (diff > 0 ? '+' : '') + diff + '%';
+    $('crNote').textContent = diff > 10 ? 'Overestimate. Little muscle makes little creatinine, so serum creatinine looks reassuring. A renally cleared drug dosed on this estimate could accumulate.' :
+      diff < -10 ? 'Underestimate. More muscle and a larger creatine pool raise creatinine production, so filtration looks worse than it is.' :
+      'With average muscle mass, the model’s assumption holds and the estimate tracks the true GFR.';
+  }
+  $('crGfr').oninput = draw; draw();
+})();
+
+/* ============================================================
+   8. INTEGRATION CHALLENGE: rebuild the network
+   ============================================================ */
+(function(){
+  var STATES = [
+    {id:'fed', label:'Fed (0–4 h)', lead:'A mixed meal is being absorbed and insulin is high.', source:'Dietary glucose absorbed through the portal vein',
+     explain:'Fed: nutrients arrive by portal vein and chylomicron, insulin drives storage, and the liver exports surplus lipid as VLDL. Adipose is taking up fat, not releasing it, so glycerol, fatty acid, and alanine flows to other organs are quiet.'},
+    {id:'fast', label:'12-hour fast', lead:'Overnight, no food for about 12 hours.', source:'Glycogen breakdown, then gluconeogenesis',
+     explain:'Twelve hours: glucagon is high, adipose releases glycerol and fatty acids, and muscle releases alanine. Muscle and heart burn fatty acids. Ketone production has begun but is not yet a major fuel, so the ketone flows stay off.'},
+    {id:'starve', label:'Prolonged starvation', lead:'Weeks without food; the body has adapted.', source:'Gluconeogenesis, with output leveled off',
+     explain:'Prolonged starvation: every fasting flow continues, and ketone bodies now fuel brain and muscle. Alanine release continues at a much lower rate (about 20 g/day of protein), which is why urea output has fallen. Glycogen is long gone.'}
+  ];
+  var SRC_OPTS = STATES.map(function(s){ return s.source; });
+  var TOGGLE = EDGES.filter(function(e){ return !e.fixed && !e.offChallenge; });
+  var FIXED = EDGES.filter(function(e){ return e.fixed; });
+  var sel = {}, checked = {}, cur = 0;
+  STATES.forEach(function(s){ sel[s.id] = {edges:[], source:null}; });
+  var map = makeMap($('rbMap'));
+  legendFor(document.querySelector('.rbLegend'), TOGGLE.concat(FIXED).map(function(e){ return e.id; }));
+  TOGGLE.forEach(function(e){
+    var g = map.edges[e.id].g;
+    g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button');
+    function toggle(){
+      var st = STATES[cur]; if(checked[st.id]) return;
+      var list = sel[st.id].edges, i = list.indexOf(e.id);
+      if(i > -1) list.splice(i, 1); else list.push(e.id);
+      paint();
+    }
+    g.addEventListener('click', toggle);
+    g.addEventListener('keydown', function(ev){ if(ev.key === 'Enter' || ev.key === ' '){ ev.preventDefault(); toggle(); } });
+  });
+  var tabs = STATES.map(function(s, i){
+    var b = el('button', 'opt big', s.label); b.type = 'button'; b.onclick = function(){ cur = i; paint(); };
+    $('rbTabs').appendChild(b); return b;
+  });
+  var srcBtns = shuffle(SRC_OPTS).map(function(o){
+    var b = el('button', 'opt', o); b.type = 'button'; b.dataset.val = o;
+    b.onclick = function(){ var st = STATES[cur]; if(checked[st.id]) return; sel[st.id].source = o; paint(); };
+    $('rbSource').appendChild(b); return b;
+  });
+  function paint(){
+    var st = STATES[cur], s = sel[st.id], done = checked[st.id];
+    tabs.forEach(function(b, i){ b.classList.toggle('sel', i === cur); b.innerHTML = STATES[i].label + (checked[STATES[i].id] ? ' ✓' : ''); });
+    $('rbLead').textContent = st.lead + (done ? '' : ' Tap a flow to switch it on or off.');
+    EDGES.forEach(function(e){
+      if(e.offChallenge){ map.set(e.id, 'off'); return; }
+      if(e.fixed){ map.set(e.id, 'fixed'); return; }
+      var on = s.edges.indexOf(e.id) > -1, key = e.states.indexOf(st.id) > -1, g = map.edges[e.id].g;
+      g.setAttribute('aria-pressed', on ? 'true' : 'false');
+      g.setAttribute('aria-label', EDGE_LONG[e.id] + (on ? ', on' : ', off'));
+      if(!done) map.set(e.id, 'toggle ' + (on ? 'on' : 'ghost'));
+      else map.set(e.id, on && key ? 'on right' : on && !key ? 'wrongOn' : !on && key ? 'missed' : 'ghost');
+    });
+    map.light(s.edges.concat(FIXED.map(function(e){ return e.id; })));
+    srcBtns.forEach(function(b){
+      var v = b.dataset.val; b.disabled = !!done;
+      b.classList.toggle('sel', s.source === v);
+      b.classList.toggle('bad', !!done && s.source === v && v !== st.source);
+      b.classList.toggle('reveal', !!done && v === st.source && s.source !== st.source);
+    });
+    var x = $('rbExplain');
+    if(done){
+      var right = TOGGLE.filter(function(e){ return (s.edges.indexOf(e.id) > -1) === (e.states.indexOf(st.id) > -1); }).length + (s.source === st.source ? 1 : 0);
+      $('rbScore').textContent = right + ' of ' + (TOGGLE.length + 1) + ' decisions correct. Glowing = correctly on; red dashed = on but shouldn’t be; red dotted = missed.';
+      x.classList.add('show'); x.innerHTML = '<p>' + st.explain + '</p>';
+    } else { $('rbScore').textContent = ''; x.classList.remove('show'); }
+    var n = STATES.filter(function(q){ return checked[q.id]; }).length;
+    $('rbOverall').textContent = n + ' of 3 states checked' + (n === 3 ? '. Network rebuilt.' : '.');
+  }
+  $('rbCheck').onclick = function(){
+    var st = STATES[cur]; if(checked[st.id]) return;
+    if(!sel[st.id].source){ $('rbScore').textContent = 'Choose where the liver’s glucose comes from first.'; return; }
+    checked[st.id] = true; paint();
+    if(STATES.every(function(q){ return checked[q.id]; })) saveAct('rebuild', {sel:sel});
+  };
+  $('rbClear').onclick = function(){
+    var st = STATES[cur]; var wasAll = STATES.every(function(q){ return checked[q.id]; });
+    sel[st.id] = {edges:[], source:null}; checked[st.id] = false;
+    if(wasAll) clearAct('rebuild');
+    paint();
+  };
+  $('rbResetAll').onclick = function(){ STATES.forEach(function(q){ sel[q.id] = {edges:[], source:null}; checked[q.id] = false; }); clearAct('rebuild'); cur = 0; paint(); };
+  var s = savedAct('rebuild');
+  if(s && s.sel){ sel = s.sel; STATES.forEach(function(q){ checked[q.id] = true; }); }
+  paint();
+})();
+
+/* ============================================================
+   9. KEEP THE WELCOME MAP IN STEP WITH PROGRESS
+   engine.js defines paintNav() after this script. DOMContentLoaded
+   fires after engine.js has run, so wrapping it here means every
+   checkpoint, activity, and quiz submission also redraws the map,
+   without adding a script after engine.js.
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof paintNav !== 'function') return;
+  var enginePaint = paintNav;
+  window.paintNav = function(){ enginePaint.apply(this, arguments); refreshWelcome(); };
+  refreshWelcome();
+});
+
+</script>
+<script src="shared/engine.js"></script>
+</body>
+</html>
