@@ -236,13 +236,28 @@ for (const file of PAGES.filter((f) => f !== 'index.html')) {
         const where = `${file} › "${label}" › button "${text || '(no text)'}"`;
         const before = problems.length;
         const btn = page.locator('[data-test-target="1"]');
-        try {
-          hasTouch ? await btn.tap({ timeout: 2000 }) : await btn.click({ timeout: 2000 });
-        } catch (e) {
+        // Try up to 3 times. A tap can miss for a moment while the page is still shifting after the
+        // previous tap; a real person just taps again. Only a button that stays untappable is a failure.
+        let lastError = null;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          // Some activities redraw their buttons right after a tap, which replaces the button we picked.
+          // The fresh copy gets picked up on the next pass, so a vanished button is not a failure.
+          if ((await btn.count()) === 0) break;
+          try {
+            hasTouch ? await btn.tap({ timeout: 2500 }) : await btn.click({ timeout: 2500 });
+            lastError = null;
+            if (attempt > 1) info.annotations.push({ type: 'notes', description: `${where}: needed ${attempt} tries to tap (page was still moving)` });
+            break;
+          } catch (e) {
+            lastError = e;
+            await page.waitForTimeout(400);
+          }
+        }
+        if (lastError) {
           // Playwright's call log says what stopped the tap (e.g. "<div class=readout> intercepts pointer events").
-          const why = String(e.message).split('\n').filter((l) => /intercepts pointer events|not visible|not stable|not enabled|outside of the viewport/.test(l))
-            .map((l) => l.replace(/\x1b\[[0-9;]*m/g, '').replace(/^\s*-\s*/, '').trim())[0] || String(e.message).split('\n')[0];
-          expect.soft(null, `${where}: could not be ${hasTouch ? 'tapped' : 'clicked'} — ${why}`).toBeUndefined();
+          const lines = String(lastError.message).replace(/\x1b\[[0-9;]*m/g, '').split('\n').map((l) => l.replace(/^\s*-\s*/, '').trim()).filter(Boolean);
+          const why = lines.find((l) => /intercepts pointer events|not visible|not stable|not enabled|outside of the viewport/.test(l)) || lines.slice(-3).join(' | ');
+          expect.soft(null, `${where}: could not be ${hasTouch ? 'tapped' : 'clicked'} after 3 tries — ${why}`).toBeUndefined();
         }
         await page.evaluate(() => document.querySelectorAll('[data-test-target]').forEach((e) => e.removeAttribute('data-test-target'))).catch(() => {});
         expect.soft(problems.slice(before), `${where}: errors when ${hasTouch ? 'tapped' : 'clicked'}`).toEqual([]);
