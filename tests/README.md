@@ -68,6 +68,10 @@ Error: aminoacids.html › "The alpha helix" › button "Start over": errors whe
 That reads as: page `aminoacids.html`, section *The alpha helix*, the button
 labelled *Start over*, and a JavaScript error happened when it was tapped.
 
+After every run, `test-results/SUMMARY.txt` is written: a plain-text list of every
+failure with its full message. **If you want someone to look at a run, send that file
+(or the whole `test-results` folder) — screenshots alone don't say what went wrong.**
+
 For a picture-based report, run `npm run report` after a test run. It opens a
 web page listing every test, with a **screenshot of the page at the moment of
 failure**.
@@ -135,5 +139,6 @@ phone:
 - `playwright.config.js` — chooses which browsers/devices to test in.
 - `tests/static-server.js` — a tiny web server so the pages load like on a real website.
 - `tests/compat.spec.js` — the tests themselves.
+- `tests/summary-reporter.js` — writes `test-results/SUMMARY.txt` after each run.
 - `test-results/` and `playwright-report/` — created by each run (screenshots and
   the report). They are ignored by git and safe to delete.

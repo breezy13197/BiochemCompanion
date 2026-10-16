@@ -28,7 +28,7 @@ module.exports = defineConfig({
   expect: { timeout: 5_000 },
   fullyParallel: true,
   retries: 0,                       // a failure should be reproducible, not hidden by retries
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [['list'], ['html', { open: 'never' }], ['./tests/summary-reporter.js']],
   use: {
     baseURL: `http://localhost:${PORT}`,
     screenshot: 'only-on-failure',
