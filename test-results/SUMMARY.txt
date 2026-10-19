@@ -1,0 +1,40 @@
+Passed: 73   Failed: 1   Other: 0
+
+FAILED [iphone] 3. controls respond: aametabolism.html  (failed)
+   - Error: aametabolism.html › "Break the pathway" › button "Continue →": could not be tapped after 3 tries — element is not visible
+     expect(received).toBeUndefined()
+     Received: null
+
+
+NOTES
+[iphone] 3. controls respond: enzymes.html: notes: enzymes.html › "Competitive & uncompetitive" › button "ASubstrate saturation": needed 2 tries to tap (page was still moving)
+[iphone] 3. controls respond: cac.html: notes: cac.html › "Energy-state simulator" › slider #1 (no id): moving it changed nothing on screen
+cac.html › "Energy-state simulator" › slider #2 (no id): moving it changed nothing on screen
+cac.html › "Energy-state simulator" › slider #3 (no id): moving it changed nothing on screen
+cac.html › "Energy-state simulator" › slider #4 (no id): moving it changed nothing on screen
+[iphone] 3. controls respond: aametabolism.html: notes: aametabolism.html › "Glucose or ketone bodies?" › button "DKetone bodies": needed 3 tries to tap (page was still moving)
+[iphone] 3. controls respond: aametabolism.html: notes: aametabolism.html › "Regulate & troubleshoot" › slider #1 (nagR): moving it changed nothing on screen
+aametabolism.html › "Methionine, SAM & cysteine" › slider #1 (metR): moving it changed nothing on screen
+[iphone] 3. controls respond: hemoglobin.html: notes: hemoglobin.html › "Curve simulator" › slider #3 (sBpg): moving it changed nothing on screen
+[iphone] 3. controls respond: integration.html: notes: integration.html › "The DEE mixer" › slider #3 (deeDit): moving it changed nothing on screen
+[iphone] 4. drag and drop works: glycogen.html: note: glycogen.html › "Activating glucose": 6 draggable-styled item(s) but no drop area to drag onto (these are probably tap-to-place; test 3 taps them). If this activity SHOULD be draggable, add its drop-area selector to DROP_ZONES in compat.spec.js.
+[iphone] 4. drag and drop works: glycogen.html: note: glycogen.html › "The cAMP cascade": 7 draggable-styled item(s) but no drop area to drag onto (these are probably tap-to-place; test 3 taps them). If this activity SHOULD be draggable, add its drop-area selector to DROP_ZONES in compat.spec.js.
+[iphone] 4. drag and drop works: oxphos.html: note: oxphos.html › "Why electrons move": 5 draggable-styled item(s) but no drop area to drag onto (these are probably tap-to-place; test 3 taps them). If this activity SHOULD be draggable, add its drop-area selector to DROP_ZONES in compat.spec.js.
+[iphone] 4. drag and drop works: oxphos.html: note: oxphos.html › "Tracing the shuttles": 5 draggable-styled item(s) but no drop area to drag onto (these are probably tap-to-place; test 3 taps them). If this activity SHOULD be draggable, add its drop-area selector to DROP_ZONES in compat.spec.js.
+[iphone] 4. drag and drop works: signaling.html: note: signaling.html › "The β-adrenergic cascade": 1 draggable-styled item(s) but no drop area to drag onto (these are probably tap-to-place; test 3 taps them). If this activity SHOULD be draggable, add its drop-area selector to DROP_ZONES in compat.spec.js.
+[iphone] 8. hub: backup download and restore code paths exist: browser features: {"blob":true,"objectUrl":true,"fileReader":true,"downloadAttr":true}
+[iphone] 9. report browser features (informational): features: {
+  "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1",
+  "viewport": "390x664",
+  "touchPoints": 0,
+  "pointerEvents": true,
+  "css gap in flexbox": true,
+  "css aspect-ratio": true,
+  "css inset": true,
+  "css :has()": true,
+  "css dvh units": true,
+  "css touch-action": true,
+  "smooth scrolling": true,
+  "optional chaining (?.)": true,
+  "localStorage usable": true
+}

@@ -1,0 +1,282 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - link "← Back to hub" [ref=e4]:
+      - /url: index.html
+      - generic [ref=e5]: ←
+      - text: Back to hub
+    - generic [ref=e6]:
+      - generic [ref=e7]: "N"
+      - generic [ref=e8]:
+        - generic [ref=e9]: Amino Acid Metabolism & Biosynthesis
+        - generic [ref=e10]: PHA3134 · Study Companion
+    - navigation [ref=e11]:
+      - generic [ref=e12]:
+        - button "1 Module 1 · Amino Acid Economy" [ref=e13] [cursor=pointer]:
+          - generic [ref=e14]: "1"
+          - generic [ref=e15]: Module 1 · Amino Acid Economy
+        - button "Expand Module 1 · Amino Acid Economy" [ref=e16] [cursor=pointer]: ▶
+      - generic [ref=e17]:
+        - button "2 Module 2 · Follow the Nitrogen" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19]: "2"
+          - generic [ref=e20]: Module 2 · Follow the Nitrogen
+        - button "Expand Module 2 · Follow the Nitrogen" [ref=e21] [cursor=pointer]: ▶
+      - generic [ref=e22]:
+        - button "3 Module 3 · Follow the Carbon" [ref=e23] [cursor=pointer]:
+          - generic [ref=e24]: "3"
+          - generic [ref=e25]: Module 3 · Follow the Carbon
+        - button "Expand Module 3 · Follow the Carbon" [ref=e26] [cursor=pointer]: ▶
+      - generic [ref=e27]:
+        - button "4 Module 4 · Build an Amino Acid" [ref=e28] [cursor=pointer]:
+          - generic [ref=e29]: "4"
+          - generic [ref=e30]: Module 4 · Build an Amino Acid
+        - button "Expand Module 4 · Build an Amino Acid" [ref=e31] [cursor=pointer]: ▶
+      - generic [ref=e32]:
+        - button "5 Module 5 · Build Something Else" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: "5"
+          - generic [ref=e35]: Module 5 · Build Something Else
+        - button "Expand Module 5 · Build Something Else" [ref=e36] [cursor=pointer]: ▶
+      - generic [ref=e37]:
+        - button "✦ Retrieval Practice" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: ✦
+          - generic [ref=e40]: Retrieval Practice
+        - button "Expand Retrieval Practice" [ref=e41] [cursor=pointer]: ▶
+      - generic [ref=e42]:
+        - button "★ Mastery Challenge" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: ★
+          - generic [ref=e45]: Mastery Challenge
+        - button "Expand Mastery Challenge" [ref=e46] [cursor=pointer]: ▶
+      - list [ref=e47]:
+        - listitem [ref=e48]:
+          - button "25-question mastery exam" [ref=e49] [cursor=pointer]:
+            - generic [ref=e51]: 25-question mastery exam
+    - generic [ref=e52]:
+      - img [ref=e53]
+      - generic [ref=e56]:
+        - generic [ref=e57]: 4%
+        - generic [ref=e58]:
+          - text: of the companion
+          - text: complete
+    - button "Clear my saved progress" [ref=e59] [cursor=pointer]
+  - main [ref=e60]:
+    - generic [ref=e61]:
+      - generic [ref=e62]:
+        - heading "25-question mastery exam" [level=1] [ref=e63]
+        - generic [ref=e64]: Follow the nitrogen, follow the carbon.
+      - generic [ref=e65]:
+        - button "Two atoms, two stories" [ref=e66] [cursor=pointer]:
+          - generic [ref=e67]: "N"
+          - text: Two atoms, two stories
+        - generic [ref=e68]: 4% complete
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]: Mastery Challenge
+        - heading "25-question mastery exam" [level=2] [ref=e72]
+        - paragraph [ref=e73]: "A fresh mix every attempt: 8 concept, 10 application, and 7 integration questions drawn from all five modules. After you submit, the breakdown shows every concept area, and a targeted round lets you practice only the ones you missed. Your best normal-attempt score is kept."
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - generic [ref=e76]: Question 1 of 25application
+            - paragraph [ref=e77]: Converting N-acetylserotonin to melatonin requires a methyl donor. Which molecule provides the methyl group?
+            - generic [ref=e78]:
+              - button "ATetrahydrobiopterin (BH₄)" [ref=e79] [cursor=pointer]
+              - button "BAcetyl-CoA" [ref=e80] [cursor=pointer]
+              - button "CN⁵-Methyl-tetrahydrofolate" [ref=e81] [cursor=pointer]
+              - button "DS-Adenosylmethionine (SAM)" [ref=e82] [cursor=pointer]
+          - generic [ref=e83]:
+            - generic [ref=e84]: Question 2 of 25concept
+            - paragraph [ref=e85]: What is the main biochemical role of S-adenosylmethionine?
+            - generic [ref=e86]:
+              - button "AAmino group donor" [ref=e87] [cursor=pointer]
+              - button "BElectron carrier" [ref=e88] [cursor=pointer]
+              - button "CFormyl group carrier" [ref=e89] [cursor=pointer]
+              - button "DMethyl group donor" [ref=e90] [cursor=pointer]
+          - generic [ref=e91]:
+            - generic [ref=e92]: Question 3 of 25application
+            - paragraph [ref=e93]: At which point do antihistamines act to relieve allergy symptoms?
+            - generic [ref=e94]:
+              - button "AHistidine uptake into cells" [ref=e95] [cursor=pointer]
+              - button "BHistamine receptors" [ref=e96] [cursor=pointer]
+              - button "CHistidine decarboxylase" [ref=e97] [cursor=pointer]
+              - button "D5-HT receptors" [ref=e98] [cursor=pointer]
+          - generic [ref=e99]:
+            - generic [ref=e100]: Question 4 of 25application
+            - paragraph [ref=e101]: In the glucose–alanine (Cahill) cycle, what does the liver send back to skeletal muscle?
+            - generic [ref=e102]:
+              - button "APyruvate" [ref=e103] [cursor=pointer]
+              - button "BAlanine" [ref=e104] [cursor=pointer]
+              - button "CUrea" [ref=e105] [cursor=pointer]
+              - button "DGlucose" [ref=e106] [cursor=pointer]
+          - generic [ref=e107]:
+            - generic [ref=e108]: Question 5 of 25integration
+            - paragraph [ref=e109]: In vitamin B₁₂ deficiency, homocysteine accumulates. Why does functional folate deficiency also develop?
+            - generic [ref=e110]:
+              - button "AHomocysteine destroys THF directly" [ref=e111] [cursor=pointer]
+              - button "BFolate becomes trapped as N⁵-methyl-THF when methionine synthase stalls" [ref=e112] [cursor=pointer]
+              - button "CSAM converts THF into BH₄" [ref=e113] [cursor=pointer]
+              - button "DVitamin B₁₂ is required to absorb folate from the intestine" [ref=e114] [cursor=pointer]
+          - generic [ref=e115]:
+            - generic [ref=e116]: Question 6 of 25integration
+            - paragraph [ref=e117]: In hyperammonemia, brain cells trap excess NH₄⁺ using glutamate dehydrogenase and glutamine synthetase. Which consequence of this trapping can impair brain energy production?
+            - generic [ref=e118]:
+              - button "ALoss of urea from brain cells" [ref=e119] [cursor=pointer]
+              - button "BExcess ATP produced by glutamine synthetase" [ref=e120] [cursor=pointer]
+              - button "CAccumulation of acetyl-CoA derived from glutamine" [ref=e121] [cursor=pointer]
+              - button "DDepletion of α-ketoglutarate from the citric acid cycle" [ref=e122] [cursor=pointer]
+          - generic [ref=e123]:
+            - generic [ref=e124]: Question 7 of 25application
+            - paragraph [ref=e125]: Glutamate dehydrogenase uses NAD(P)⁺ as it removes the amino group from glutamate. To which enzyme class does it belong?
+            - generic [ref=e126]:
+              - button "AHydrolase" [ref=e127] [cursor=pointer]
+              - button "BOxidoreductase" [ref=e128] [cursor=pointer]
+              - button "CLigase" [ref=e129] [cursor=pointer]
+              - button "DTransferase" [ref=e130] [cursor=pointer]
+          - generic [ref=e131]:
+            - generic [ref=e132]: Question 8 of 25concept
+            - paragraph [ref=e133]: How many ATP molecules are consumed for each molecule of urea synthesized?
+            - generic [ref=e134]:
+              - button "A5" [ref=e135] [cursor=pointer]
+              - button "B3" [ref=e136] [cursor=pointer]
+              - button "C4" [ref=e137] [cursor=pointer]
+              - button "D2" [ref=e138] [cursor=pointer]
+          - generic [ref=e139]:
+            - generic [ref=e140]: Question 9 of 25application
+            - paragraph [ref=e141]: Argininosuccinate lyase cleaves argininosuccinate. Which pair of products forms?
+            - generic [ref=e142]:
+              - button "AOrnithine and urea" [ref=e143] [cursor=pointer]
+              - button "BArginine and succinate" [ref=e144] [cursor=pointer]
+              - button "CArginine and fumarate" [ref=e145] [cursor=pointer]
+              - button "DCitrulline and aspartate" [ref=e146] [cursor=pointer]
+          - generic [ref=e147]:
+            - generic [ref=e148]: Question 10 of 25concept
+            - paragraph [ref=e149]: Which amino acid is synthesized from pyruvate in a single transamination step?
+            - generic [ref=e150]:
+              - button "AGlutamate" [ref=e151] [cursor=pointer]
+              - button "BAspartate" [ref=e152] [cursor=pointer]
+              - button "CAlanine" [ref=e153] [cursor=pointer]
+              - button "DSerine" [ref=e154] [cursor=pointer]
+          - generic [ref=e155]:
+            - generic [ref=e156]: Question 11 of 25application
+            - paragraph [ref=e157]: After 48 hours of fasting, liver glycogen is depleted. What happens to skeletal muscle protein?
+            - generic [ref=e158]:
+              - button "AIt is converted directly into ketone bodies inside the muscle" [ref=e159] [cursor=pointer]
+              - button "BIt is protected because fatty acids meet the full fuel demand" [ref=e160] [cursor=pointer]
+              - button "CIt is synthesized faster to store incoming amino acids" [ref=e161] [cursor=pointer]
+              - button "DIt is broken down so amino acid carbon skeletons can supply glucose and energy" [ref=e162] [cursor=pointer]
+          - generic [ref=e163]:
+            - generic [ref=e164]: Question 12 of 25integration
+            - paragraph [ref=e165]: An infant has hyperammonemia with very low carbamoyl phosphate formation, yet the CPS I gene and protein are normal. Which enzyme deficiency best explains this?
+            - generic [ref=e166]:
+              - button "AGlutaminase" [ref=e167] [cursor=pointer]
+              - button "BArginase" [ref=e168] [cursor=pointer]
+              - button "COrnithine transcarbamoylase" [ref=e169] [cursor=pointer]
+              - button "DN-acetylglutamate synthase" [ref=e170] [cursor=pointer]
+          - generic [ref=e171]:
+            - generic [ref=e172]: Question 13 of 25integration
+            - paragraph [ref=e173]: During heavy oxidative stress, the ratio of reduced glutathione (GSH) to oxidized glutathione (GSSG) falls. Which change would restore the ratio?
+            - generic [ref=e174]:
+              - button "ADecreased cysteine supply" [ref=e175] [cursor=pointer]
+              - button "BIncreased glutathione peroxidase activity" [ref=e176] [cursor=pointer]
+              - button "CIncreased glutathione reductase activity" [ref=e177] [cursor=pointer]
+              - button "DIncreased histidine decarboxylase activity" [ref=e178] [cursor=pointer]
+          - generic [ref=e179]:
+            - generic [ref=e180]: Question 14 of 25application
+            - paragraph [ref=e181]: Glycine is made from serine. Which glycolytic intermediate supplies the carbon skeleton of serine?
+            - generic [ref=e182]:
+              - button "ADihydroxyacetone phosphate" [ref=e183] [cursor=pointer]
+              - button "B3-Phosphoglycerate" [ref=e184] [cursor=pointer]
+              - button "CPhosphoenolpyruvate" [ref=e185] [cursor=pointer]
+              - button "DPyruvate" [ref=e186] [cursor=pointer]
+          - generic [ref=e187]:
+            - generic [ref=e188]: Question 15 of 25concept
+            - paragraph [ref=e189]: During starvation, carbon skeletons of glucogenic amino acids from muscle help maintain blood glucose. Which organ carries out most of this gluconeogenesis?
+            - generic [ref=e190]:
+              - button "ASkeletal muscle" [ref=e191] [cursor=pointer]
+              - button "BLiver" [ref=e192] [cursor=pointer]
+              - button "CAdipose tissue" [ref=e193] [cursor=pointer]
+              - button "DBrain" [ref=e194] [cursor=pointer]
+          - generic [ref=e195]:
+            - generic [ref=e196]: Question 16 of 25integration
+            - paragraph [ref=e197]: A patient has elevated homocysteine and reduced methionine regeneration, with normal cystathionine β-synthase activity. Which cofactor deficiency best explains these findings?
+            - generic [ref=e198]:
+              - button "ATetrahydrobiopterin (BH₄)" [ref=e199] [cursor=pointer]
+              - button "BCobalamin (vitamin B₁₂)" [ref=e200] [cursor=pointer]
+              - button "CPyridoxine (vitamin B₆)" [ref=e201] [cursor=pointer]
+              - button "DAscorbate (vitamin C)" [ref=e202] [cursor=pointer]
+          - generic [ref=e203]:
+            - generic [ref=e204]: Question 17 of 25concept
+            - paragraph [ref=e205]: Which cofactor is used by the aromatic amino acid hydroxylases?
+            - generic [ref=e206]:
+              - button "ATetrahydrobiopterin (BH₄)" [ref=e207] [cursor=pointer]
+              - button "BTetrahydrofolate (THF)" [ref=e208] [cursor=pointer]
+              - button "CCobalamin (B₁₂)" [ref=e209] [cursor=pointer]
+              - button "DPyridoxal phosphate (PLP)" [ref=e210] [cursor=pointer]
+          - generic [ref=e211]:
+            - generic [ref=e212]: Question 18 of 25application
+            - paragraph [ref=e213]: Glutathione reductase regenerates reduced glutathione from its disulfide form using NADPH. To which enzyme class does it belong?
+            - generic [ref=e214]:
+              - button "ALigase" [ref=e215] [cursor=pointer]
+              - button "BTransferase" [ref=e216] [cursor=pointer]
+              - button "COxidoreductase" [ref=e217] [cursor=pointer]
+              - button "DHydrolase" [ref=e218] [cursor=pointer]
+          - generic [ref=e219]:
+            - generic [ref=e220]: Question 19 of 25application
+            - paragraph [ref=e221]: A cell’s oxaloacetate supply falls sharply. Synthesis of which pair of amino acids is most directly limited?
+            - generic [ref=e222]:
+              - button "AAlanine and cysteine" [ref=e223] [cursor=pointer]
+              - button "BGlutamate and glutamine" [ref=e224] [cursor=pointer]
+              - button "CAspartate and asparagine" [ref=e225] [cursor=pointer]
+              - button "DSerine and glycine" [ref=e226] [cursor=pointer]
+          - generic [ref=e227]:
+            - generic [ref=e228]: Question 20 of 25application
+            - paragraph [ref=e229]: A newly characterized degradation pathway yields acetyl-CoA and succinyl-CoA from a single amino acid. How should that amino acid be classified?
+            - generic [ref=e230]:
+              - button "AGlucogenic" [ref=e231] [cursor=pointer]
+              - button "BKetogenic" [ref=e232] [cursor=pointer]
+              - button "CBoth glucogenic and ketogenic" [ref=e233] [cursor=pointer]
+          - generic [ref=e234]:
+            - generic [ref=e235]: Question 21 of 25concept
+            - paragraph [ref=e236]: Phenylketonuria (PKU) results from deficient activity of which enzyme?
+            - generic [ref=e237]:
+              - button "ATyrosine hydroxylase" [ref=e238] [cursor=pointer]
+              - button "BAromatic amino acid decarboxylase" [ref=e239] [cursor=pointer]
+              - button "CPhenylethanolamine N-methyltransferase" [ref=e240] [cursor=pointer]
+              - button "DPhenylalanine hydroxylase" [ref=e241] [cursor=pointer]
+          - generic [ref=e242]:
+            - generic [ref=e243]: Question 22 of 25concept
+            - paragraph [ref=e244]: What is a glucogenic amino acid degraded to?
+            - generic [ref=e245]:
+              - button "AAcetyl-CoA or acetoacetyl-CoA" [ref=e246] [cursor=pointer]
+              - button "BKetone bodies" [ref=e247] [cursor=pointer]
+              - button "CUrea and CO₂" [ref=e248] [cursor=pointer]
+              - button "DPyruvate or a citric acid cycle intermediate" [ref=e249] [cursor=pointer]
+          - generic [ref=e250]:
+            - generic [ref=e251]: Question 23 of 25integration
+            - paragraph [ref=e252]: Valine is degraded to succinyl-CoA. Which sequence allows its carbons to reach glucose?
+            - generic [ref=e253]:
+              - button "ASuccinyl-CoA → succinate → fumarate → malate → oxaloacetate → PEP → glucose" [ref=e254] [cursor=pointer]
+              - button "BSuccinyl-CoA → α-ketoglutarate → glutamate → glucose" [ref=e255] [cursor=pointer]
+              - button "CSuccinyl-CoA → acetyl-CoA → pyruvate → glucose" [ref=e256] [cursor=pointer]
+              - button "DSuccinyl-CoA → acetoacetyl-CoA → pyruvate → glucose" [ref=e257] [cursor=pointer]
+          - generic [ref=e258]:
+            - generic [ref=e259]: Question 24 of 25concept
+            - paragraph [ref=e260]: What is the main role of glutathione in cells?
+            - generic [ref=e261]:
+              - button "ACarrying nitrogen from muscle to liver" [ref=e262] [cursor=pointer]
+              - button "BDonating methyl groups for biosynthesis" [ref=e263] [cursor=pointer]
+              - button "CNeutralizing reactive oxygen species and detoxifying the cell" [ref=e264] [cursor=pointer]
+              - button "DStoring surplus cysteine for protein synthesis" [ref=e265] [cursor=pointer]
+          - generic [ref=e266]:
+            - generic [ref=e267]: Question 25 of 25integration
+            - paragraph [ref=e268]: A patient has markedly elevated ALT and AST along with rising blood ammonia. Which interpretation best links these findings?
+            - generic [ref=e269]:
+              - button "AThe kidney is releasing aminotransferases while retaining urea" [ref=e270] [cursor=pointer]
+              - button "BAn inherited urea cycle enzyme deficiency is causing aminotransferase release" [ref=e271] [cursor=pointer]
+              - button "CMuscle is exporting excess alanine, which raises ALT and ammonia together" [ref=e272] [cursor=pointer]
+              - button "DHepatocyte injury releases aminotransferases and reduces the liver’s capacity to run the urea cycle" [ref=e273] [cursor=pointer]
+        - generic [ref=e274]:
+          - button "Submit exam" [ref=e275] [cursor=pointer]
+          - button "Start over" [ref=e276] [cursor=pointer]
+      - button "← Back" [ref=e278] [cursor=pointer]
+```
