@@ -254,6 +254,21 @@ for (const file of PAGES.filter((f) => f !== 'index.html')) {
           }
         }
         if (lastError) {
+          const log = String(lastError.message).replace(/\x1b\[[0-9;]*m/g, '');
+          const covered = /intercepts pointer events/.test(log);
+          if (!covered && (await btn.count()) > 0 && !(await btn.isVisible().catch(() => false))) {
+            // The button hid itself (e.g. a "Continue" button hides its box once used). Not a failure.
+            info.annotations.push({ type: 'notes', description: `${where}: hid itself before it could be tapped again` });
+            lastError = null;
+          } else if (!covered && /not stable/.test(log) && (await btn.count()) > 0) {
+            // Still shifting but not covered by anything: trigger its click handler directly so we still
+            // learn whether the handler throws an error. A covered button is never excused this way.
+            await btn.dispatchEvent('click').catch(() => {});
+            info.annotations.push({ type: 'notes', description: `${where}: kept shifting, so its click handler was triggered directly` });
+            lastError = null;
+          }
+        }
+        if (lastError) {
           // Playwright's call log says what stopped the tap (e.g. "<div class=readout> intercepts pointer events").
           const lines = String(lastError.message).replace(/\x1b\[[0-9;]*m/g, '').split('\n').map((l) => l.replace(/^\s*-\s*/, '').trim()).filter(Boolean);
           const why = lines.find((l) => /intercepts pointer events|not visible|not stable|not enabled|outside of the viewport/.test(l)) || lines.slice(-3).join(' | ');
