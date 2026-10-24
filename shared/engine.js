@@ -142,6 +142,9 @@ function resolveStartSection(){
   if(fromURL && FLOW.some(function(f){return f.key===fromURL;})){
     return FLOW.findIndex(function(f){return f.key===fromURL;});
   }
+  /* A companion with a home page (shared/home.js) opens there; the home
+     page's own "Continue" button picks up from state.lastSection. */
+  if(FLOW.length && FLOW[0].key==='home')return 0;
   if(state.lastSection && FLOW.some(function(f){return f.key===state.lastSection;})){
     return FLOW.findIndex(function(f){return f.key===state.lastSection;});
   }
@@ -286,6 +289,9 @@ function paintNav(){
     st.textContent=done2?'Done':'Not started';
   });
   refreshLocks();
+  /* The companion home page (shared/home.js), if this page has one,
+     redraws itself from the same progress numbers used above. */
+  if(typeof renderCompanionHome==='function')renderCompanionHome();
 }
 
 /* Back / Next follow the study path in FLOW, not the order the

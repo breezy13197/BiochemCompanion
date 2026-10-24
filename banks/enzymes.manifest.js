@@ -22,12 +22,15 @@ var MANIFEST = {
   file   : 'enzymes.html',          /* link the hub sends students to */
   accent : '#2FA97A',   /* this companion’s colour, for the dashboard */
   accentSoft : '#E7F6EF',
+  /* One plain sentence under the title on this companion's home page. */
+  tagline    : "How enzymes speed up reactions, how fast they work, and how drugs and cells switch them off.",
 
   /* Every module, in study order. `quiz` names the POOL `m` value
      for that module’s quiz; `checks` are the checkpoint ids that
      gate a section; `activity` is a key in state.activities. */
   modules: [
-    { id:'m1', title:'Module 1 · Fundamentals & catalysis', sections:[
+    { id:'m1', title:'Module 1 · Fundamentals & catalysis', summary:"What an enzyme does, why reactions need a push, and how the active site picks its substrate.",
+      sections:[
       { key:'m1home', label:'Module overview' },
       { key:'m1s1', label:'What enzymes do', checks:['c1','c1b','c1c'] },
       { key:'m1s2', label:'Energetics of catalysis', checks:['c2','c2b','c2c'] },
@@ -35,7 +38,8 @@ var MANIFEST = {
       { key:'m1s4', label:'Enzyme terminology', checks:['c4','c4b'], activity:'sort' },
       { key:'m1quiz', label:'Module 1 quiz', quiz:'m1' }
     ]},
-    { id:'m2', title:'Module 2 · Kinetics & rate factors', sections:[
+    { id:'m2', title:'Module 2 · Kinetics & rate factors', summary:"Michaelis-Menten kinetics: what Km and kcat tell you, and how substrate, temperature and pH change the rate.",
+      sections:[
       { key:'m2home', label:'Module overview' },
       { key:'m2s1', label:'Michaelis-Menten curve', checks:['c5','c5b','c5c'] },
       { key:'m2s2', label:'kcat & efficiency', checks:['c6','c6b'], activity:'bench' },
@@ -43,14 +47,16 @@ var MANIFEST = {
       { key:'m2s4', label:'Putting it together', checks:['c8','c9','c10'] },
       { key:'m2quiz', label:'Module 2 quiz', quiz:'m2' }
     ]},
-    { id:'m3', title:'Module 3 · The seven classes', sections:[
+    { id:'m3', title:'Module 3 · The seven classes', summary:"One question that sorts any reaction into one of the seven enzyme classes.",
+      sections:[
       { key:'m3home', label:'Module overview' },
       { key:'m3s1', label:'One question tells you the class', checks:['c11','c11b','c11c'], activity:'tree' },
       { key:'m3s2', label:'The seven classes', checks:['c16','c17'], activity:'inspect' },
       { key:'m3s3', label:'Classification challenge', checks:['c12','c12b'], activity:'cls' },
       { key:'m3quiz', label:'Module 3 quiz', quiz:'m3' }
     ]},
-    { id:'m4', title:'Module 4 · Inhibition & regulation', sections:[
+    { id:'m4', title:'Module 4 · Inhibition & regulation', summary:"How inhibitors change Km and Vmax, reversible versus covalent inhibition, and allosteric control.",
+      sections:[
       { key:'m4home', label:'Module overview' },
       { key:'m4s1', label:'Competitive & uncompetitive', checks:['c13','c13b'], activity:'tbl' },
       { key:'m4s2', label:'Identify the inhibitor', checks:['c17b','c17c'], activity:'inh' },
@@ -58,10 +64,12 @@ var MANIFEST = {
       { key:'m4s4', label:'Allosteric control & isozymes', checks:['c15','c15b'] },
       { key:'m4quiz', label:'Module 4 quiz', quiz:'m4' }
     ]},
-    { id:'flash', title:'Retrieval Practice', sections:[
+    { id:'flash', title:'Retrieval Practice', summary:"Flashcards for every key term and idea in this companion, for quick retrieval practice.",
+      sections:[
       { key:'flashcards', label:'Flashcards · all terms' }
     ]},
-    { id:'final', title:'Final Mastery Exam', unlockAfter:"*", sections:[
+    { id:'final', title:'Final Mastery Exam', unlockAfter:"*", summary:"A mixed exam drawn from every module. It unlocks once all of the modules are complete.",
+      sections:[
       { key:'final', label:'25-question mastery exam', quiz:'final' }
     ]}
   ],
