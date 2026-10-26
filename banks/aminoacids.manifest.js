@@ -16,14 +16,18 @@ var MANIFEST = {
   file   : 'aminoacids.html',
   accent : '#0D8C80',
   accentSoft : '#DDF5F1',
+  /* One plain sentence under the title on this companion's home page. */
+  tagline    : "The twenty amino acids, how their charge follows pH, and how they build proteins.",
 
   modules: [
-    { id:'lab', title:'Amino Acid Reference Lab', sections:[
+    { id:'lab', title:'Amino Acid Reference Lab', summary:"A reference lab for the twenty amino acids: names, abbreviations, classes and side chains.",
+      sections:[
       { key:'labhome', label:'About this lab' },
       { key:'lab', label:'Explorer &; practice', checks:['cL1','cL2','cL3'], activity:'aapractice' }
     ]},
 
-    { id:'m1', title:'Module 1 · Anatomy & classification', sections:[
+    { id:'m1', title:'Module 1 · Anatomy & classification', summary:"Given a side chain, predict how the amino acid will behave.",
+      sections:[
       { key:'m1home', label:'Module overview' },
       { key:'m1s1', label:'The alpha-amino acid framework', checks:['c1','c1b','c1c'], activity:'buildaa' },
       { key:'m1s2', label:'Grouping the twenty', checks:['c2','c2b'] },
@@ -31,7 +35,8 @@ var MANIFEST = {
       { key:'m1quiz', label:'Module 1 quiz', quiz:'m1' }
     ]},
 
-    { id:'m2', title:'Module 2 · Ionization & pKa', sections:[
+    { id:'m2', title:'Module 2 · Ionization & pKa', summary:"Charge is a function of pH. Learn to predict zwitterions and read pKa values.",
+      sections:[
       { key:'m2home', label:'Module overview' },
       { key:'m2s1', label:'Backbone &; the zwitterion', checks:['c4','c4b'], activity:'chargebb' },
       { key:'m2s2', label:'Acidic side chains', checks:['c5','c5b'], activity:'chargesc' },
@@ -39,7 +44,8 @@ var MANIFEST = {
       { key:'m2quiz', label:'Module 2 quiz', quiz:'m2' }
     ]},
 
-    { id:'m3', title:'Module 3 · From amino acids to peptides', sections:[
+    { id:'m3', title:'Module 3 · From amino acids to peptides', summary:"How one bond joins amino acids into peptides, and how a sequence is read.",
+      sections:[
       { key:'m3home', label:'Module overview' },
       { key:'m3s1', label:'Key terms', checks:['c7','c7b'] },
       { key:'m3s2', label:'Why the peptide bond is rigid', checks:['c8','c8b','c8c'] },
@@ -47,7 +53,8 @@ var MANIFEST = {
       { key:'m3quiz', label:'Module 3 quiz', quiz:'m3' }
     ]},
 
-    { id:'m4', title:'Module 4 · Protein structure', sections:[
+    { id:'m4', title:'Module 4 · Protein structure', summary:"The four levels of protein structure and what holds each one together.",
+      sections:[
       { key:'m4home', label:'Module overview' },
       { key:'m4s1', label:'The four levels', checks:['c10','c10b'], activity:'levels' },
       { key:'m4s2', label:'The alpha helix', checks:['c11','c11b','c11c'], activity:'wheel' },
@@ -57,7 +64,8 @@ var MANIFEST = {
       { key:'m4quiz', label:'Module 4 quiz', quiz:'m4' }
     ]},
 
-    { id:'m5', title:'Module 5 · Post-translational modifications', sections:[
+    { id:'m5', title:'Module 5 · Post-translational modifications', summary:"What happens to a protein after it leaves the ribosome, and why so many drugs target those steps.",
+      sections:[
       { key:'m5home', label:'Module overview' },
       { key:'m5s1', label:'From gene to mature protein', checks:['c15','c15b'], activity:'pathorder' },
       { key:'m5s2', label:'Phosphorylation', checks:['c16','c16b'] },
@@ -65,11 +73,13 @@ var MANIFEST = {
       { key:'m5quiz', label:'Module 5 quiz', quiz:'m5' }
     ]},
 
-    { id:'flash', title:'Retrieval Practice', sections:[
+    { id:'flash', title:'Retrieval Practice', summary:"Flashcards for every key term and idea in this companion, for quick retrieval practice.",
+      sections:[
       { key:'flashcards', label:'Flashcards · all terms' }
     ]},
 
-    { id:'final', title:'Final Mastery Exam', unlockAfter:'*', sections:[
+    { id:'final', title:'Final Mastery Exam', unlockAfter:'*', summary:"A mixed exam drawn from every module. It unlocks once all of the modules are complete.",
+      sections:[
       { key:'final', label:'25-Question Mastery Exam', quiz:'final' }
     ]}
   ],

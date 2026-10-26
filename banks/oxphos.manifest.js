@@ -16,48 +16,58 @@ var MANIFEST = {
   file       : 'oxphos.html',
   accent     : '#1E5FD0',
   accentSoft : '#E8EFFD',
+  /* One plain sentence under the title on this companion's home page. */
+  tagline    : "How electrons flowing through the mitochondrial membrane are turned into ATP.",
 
   modules: [
-    { id:'m1', title:'Module 1 \u00B7 Follow the electrons', sections:[
+    { id:'m1', title:'Module 1 \u00B7 Follow the electrons', summary:"Where do the electrons go, and what happens because they move?",
+      sections:[
       { key:'m1home', label:'Module overview' },
       { key:'m1s1',   label:'Why electrons move',      checks:['c1a','c1b','c1c'], activity:'ladder' },
       { key:'m1s2',   label:'Building the chain',      checks:['c2a','c2b','c2c'], activity:'highway' },
       { key:'m1s3',   label:'Counting the protons',    checks:['c3a','c3b'],       activity:'protons' },
       { key:'m1quiz', label:'Module 1 quiz',           quiz:'m1' }
     ]},
-    { id:'m2', title:'Module 2 \u00B7 Build the battery', sections:[
+    { id:'m2', title:'Module 2 \u00B7 Build the battery', summary:"Where the energy from NADH is actually stored.",
+      sections:[
       { key:'m2home', label:'Module overview' },
       { key:'m2s1',   label:'Charging the mitochondrion',  checks:['c4a','c4b'],       activity:'charge' },
       { key:'m2s2',   label:'Coupling, and what breaks it', checks:['c5a','c5b','c5c'], activity:'coupling' },
       { key:'m2quiz', label:'Module 2 quiz',                quiz:'m2' }
     ]},
-    { id:'m3', title:'Module 3 \u00B7 Spend the gradient', sections:[
+    { id:'m3', title:'Module 3 \u00B7 Spend the gradient', summary:"How proton movement is converted into ATP.",
+      sections:[
       { key:'m3home', label:'Module overview' },
       { key:'m3s1',   label:'Anatomy of the machine',   checks:['c6a','c6b'],       activity:'parts' },
       { key:'m3s2',   label:'The binding-change cycle', checks:['c7a','c7b','c7c'], activity:'rotor' },
       { key:'m3quiz', label:'Module 3 quiz',            quiz:'m3' }
     ]},
-    { id:'m4', title:'Module 4 \u00B7 Count the ATP', sections:[
+    { id:'m4', title:'Module 4 \u00B7 Count the ATP', summary:"Why one molecule of glucose can yield 30 ATP or 32.",
+      sections:[
       { key:'m4home', label:'Module overview' },
       { key:'m4s1',   label:'Building the ATP ledger', checks:['c8a','c8b'],       activity:'yield' },
       { key:'m4s2',   label:'Tracing the shuttles',    checks:['c9a','c9b','c9c'], activity:'shuttle' },
       { key:'m4quiz', label:'Module 4 quiz',           quiz:'m4' }
     ]},
-    { id:'m5', title:'Module 5 \u00B7 Break the system', sections:[
+    { id:'m5', title:'Module 5 \u00B7 Break the system', summary:"If you know where a compound acts, can you predict what the cell will do?",
+      sections:[
       { key:'m5home', label:'Module overview' },
       { key:'m5s1',   label:'Mapping the inhibitors',        checks:['c10a','c10b'],        activity:'inhibmap' },
       { key:'m5s2',   label:'Uncouplers and drug targets',   checks:['c11a','c11b','c11c'], activity:'detective' },
       { key:'m5quiz', label:'Module 5 quiz',                 quiz:'m5' }
     ]},
-    { id:'lab', title:'Mastery Lab \u00B7 Diagnose', sections:[
+    { id:'lab', title:'Mastery Lab \u00B7 Diagnose', summary:"Nothing new is taught here. This lab makes the five modules work as one mental model.",
+      sections:[
       { key:'labhome', label:'Lab overview' },
       { key:'lab1',    label:'Case files',        checks:['c12a','c12b','c12c'], activity:'cases' },
       { key:'labquiz', label:'Integration check', quiz:'lab' }
     ]},
-    { id:'flash', title:'Retrieval Practice', sections:[
+    { id:'flash', title:'Retrieval Practice', summary:"Flashcards for every key term and idea in this companion, for quick retrieval practice.",
+      sections:[
       { key:'flashcards', label:'Flashcards' }
     ]},
-    { id:'final', title:'Mastery Challenge', unlockAfter:'*', sections:[
+    { id:'final', title:'Mastery Challenge', unlockAfter:'*', summary:"A mixed exam drawn from every module. It unlocks once all of the modules are complete.",
+      sections:[
       { key:'final', label:'25-question mastery exam', quiz:'final' }
     ]}
   ],

@@ -34,10 +34,13 @@ var MANIFEST = {
   file       : 'glycogen.html',
   accent     : '#C0562A',
   accentSoft : '#FCEEE5',
+  /* One plain sentence under the title on this companion's home page. */
+  tagline    : "How the body stores glucose as glycogen, takes it apart, and controls both directions.",
 
   modules: [
 
-    { id:'m1', title:'Module 1 · Why glycogen? Structure and tissue roles', sections:[
+    { id:'m1', title:'Module 1 · Why glycogen? Structure and tissue roles', summary:"Why cells store glucose as a branched polymer, and how liver and muscle use it differently.",
+      sections:[
       { key:'m1home', label:'Module overview' },
       { key:'m1s1',   label:'The osmotic problem',        checks:['c1','c1b'],        activity:'osmo'   },
       { key:'m1s2',   label:'Bonds, ends, and branching', checks:['c2','c2b','c2c'],  activity:'build'  },
@@ -45,7 +48,8 @@ var MANIFEST = {
       { key:'m1quiz', label:'Module 1 quiz',              quiz:'m1' }
     ]},
 
-    { id:'m2', title:'Module 2 · Glycogenolysis: take it apart', sections:[
+    { id:'m2', title:'Module 2 · Glycogenolysis: take it apart', summary:"Operate the three enzymes that take a glycogen particle apart, and find out why each one stalls.",
+      sections:[
       { key:'m2home', label:'Module overview' },
       { key:'m2s1',   label:'Glycogen phosphorylase',     checks:['c4','c4b','c4c'],  activity:'phos'     },
       { key:'m2s2',   label:'The debranching enzyme',     checks:['c5','c5b'],        activity:'debranch' },
@@ -53,7 +57,8 @@ var MANIFEST = {
       { key:'m2quiz', label:'Module 2 quiz',              quiz:'m2' }
     ]},
 
-    { id:'m3', title:'Module 3 · Glycogenesis: build it up', sections:[
+    { id:'m3', title:'Module 3 · Glycogenesis: build it up', summary:"Build glycogen up with five enzymes, an activated sugar and a primer protein.",
+      sections:[
       { key:'m3home', label:'Module overview' },
       { key:'m3s1',   label:'Activating glucose',         checks:['c7','c7b'],        activity:'udp'    },
       { key:'m3s2',   label:'Who starts the molecule?',   checks:['c8','c8b'],        activity:'primer' },
@@ -61,7 +66,8 @@ var MANIFEST = {
       { key:'m3quiz', label:'Module 3 quiz',              quiz:'m3' }
     ]},
 
-    { id:'m4', title:'Module 4 · The glycogen control room', sections:[
+    { id:'m4', title:'Module 4 · The glycogen control room', summary:"Set a physiological condition, predict what both pathways will do, and check yourself.",
+      sections:[
       { key:'m4home', label:'Module overview' },
       { key:'m4s1',   label:'The cAMP cascade',           checks:['c10','c10b','c10c'], activity:'cascade'   },
       { key:'m4s2',   label:'Phosphorylation detective',  checks:['c11','c11b'],        activity:'detective' },
@@ -70,7 +76,8 @@ var MANIFEST = {
       { key:'m4quiz', label:'Module 4 quiz',              quiz:'m4' }
     ]},
 
-    { id:'m5', title:'Module 5 · When the pathway breaks', sections:[
+    { id:'m5', title:'Module 5 · When the pathway breaks', summary:"Glycogen storage disorders as reasoning practice: from symptoms to tissue to pathway to enzyme.",
+      sections:[
       { key:'m5home', label:'Module overview' },
       { key:'m5s1',   label:'Reasoning from the patient', checks:['c14','c14b'],  activity:'cases'  },
       { key:'m5s2',   label:'The disease matrix',         checks:['c15','c15b'],  activity:'matrix' },
@@ -80,18 +87,21 @@ var MANIFEST = {
     /* Ungraded: no checks, no activity, no quiz. The map unlocks
        itself as the modules above are completed, but it never
        gates anything and never counts toward the progress ring. */
-    { id:'map', title:'Pathway Map', sections:[
+    { id:'map', title:'Pathway Map', summary:"A pathway map that fills in piece by piece as you finish modules.",
+      sections:[
       { key:'pathmap', label:'Your glycogen map' }
     ]},
 
-    { id:'flash', title:'Retrieval Practice', sections:[
+    { id:'flash', title:'Retrieval Practice', summary:"Flashcards for every key term and idea in this companion, for quick retrieval practice.",
+      sections:[
       { key:'flashcards', label:'Flashcards' }
     ]},
 
     /* unlockAfter:'*' means every other module that has gradable
        content — m1 through m5. The map and flashcard modules are
        excluded automatically because they have none. */
-    { id:'final', title:'Final Mastery Exam', unlockAfter:'*', sections:[
+    { id:'final', title:'Final Mastery Exam', unlockAfter:'*', summary:"A mixed exam drawn from every module. It unlocks once all of the modules are complete.",
+      sections:[
       { key:'final', label:'25-question mastery exam', quiz:'final' }
     ]}
   ],

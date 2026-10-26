@@ -11,13 +11,17 @@ var MANIFEST = {
   file       : "integration.html",
   accent     : "#5F7A1A",
   accentSoft : "#EEF3DF",
+  /* One plain sentence under the title on this companion's home page. */
+  tagline    : "How fuels, hormones and organs work together as one system across fed and fasting states.",
 
   modules: [
-    { id:"start", title:"Start here", sections:[
+    { id:"start", title:"Start here", summary:"A body map that starts almost empty and fills in as you complete each section.",
+      sections:[
       { key:"welcome", label:"Your integration map" }
     ]},
 
-    { id:"m1", title:"Module 1 · Energy economy & fuel storage", sections:[
+    { id:"m1", title:"Module 1 · Energy economy & fuel storage", summary:"Which fuels are available, how efficiently each is stored, and what sets energy expenditure.",
+      sections:[
       { key:"m1home", label:"Module overview" },
       { key:"m1s1", label:"What fuels are available?", checks:["c1a","c1b","c1c"], activity:"kcal" },
       { key:"m1s2", label:"Build the fuel warehouse", checks:["c2a","c2b","c2c"], activity:"warehouse" },
@@ -26,7 +30,8 @@ var MANIFEST = {
       { key:"m1quiz", label:"Module 1 quiz", quiz:"m1" }
     ]},
 
-    { id:"m2", title:"Module 2 · The metabolic state simulator", sections:[
+    { id:"m2", title:"Module 2 · The metabolic state simulator", summary:"Follow one person through time after a meal and track glucose, insulin, glucagon and each organ.",
+      sections:[
       { key:"m2home", label:"Module overview" },
       { key:"m2s1", label:"After a meal", checks:["c5a","c5b","c5c"], activity:"routing" },
       { key:"m2s2", label:"The overnight fast", checks:["c6a","c6b","c6c"], activity:"tracker" },
@@ -35,7 +40,8 @@ var MANIFEST = {
       { key:"m2quiz", label:"Module 2 quiz", quiz:"m2" }
     ]},
 
-    { id:"m3", title:"Module 3 · Hormones as a network", sections:[
+    { id:"m3", title:"Module 3 · Hormones as a network", summary:"Given a signal, what should every tissue do? Given a situation, which hormones change?",
+      sections:[
       { key:"m3home", label:"Module overview" },
       { key:"m3s1", label:"Insulin & glucagon", checks:["c9a","c9b"], activity:"arrowgrid" },
       { key:"m3s2", label:"Hormone control panel", checks:["c10a","c10b","c10c"], activity:"hormonematch" },
@@ -44,7 +50,8 @@ var MANIFEST = {
       { key:"m3quiz", label:"Module 3 quiz", quiz:"m3" }
     ]},
 
-    { id:"m4", title:"Module 4 · The metabolic division of labor", sections:[
+    { id:"m4", title:"Module 4 · The metabolic division of labor", summary:"Why the liver, fat, muscle, heart, brain and red blood cells each burn what they burn.",
+      sections:[
       { key:"m4home", label:"Module overview" },
       { key:"m4s1", label:"Who burns what?", checks:["c13a","c13b","c13c"], activity:"whocan" },
       { key:"m4s2", label:"The liver: traffic controller", checks:["c14a","c14b","c14c"], activity:"livermatch" },
@@ -53,15 +60,18 @@ var MANIFEST = {
       { key:"m4quiz", label:"Module 4 quiz", quiz:"m4" }
     ]},
 
-    { id:"map", title:"Integration challenge", sections:[
+    { id:"map", title:"Integration challenge", summary:"Rebuild the network yourself: turn on the flows that run in each metabolic state.",
+      sections:[
       { key:"rebuild", label:"Rebuild the network", checks:["c17a","c17b"], activity:"rebuild" }
     ]},
 
-    { id:"flash", title:"Retrieval practice", sections:[
+    { id:"flash", title:"Retrieval practice", summary:"Flashcards for every key term and idea in this companion, for quick retrieval practice.",
+      sections:[
       { key:"flashcards", label:"Flashcards" }
     ]},
 
-    { id:"final", title:"Final mastery exam", unlockAfter:"*", sections:[
+    { id:"final", title:"Final mastery exam", unlockAfter:"*", summary:"A mixed exam drawn from every module. It unlocks once all of the modules are complete.",
+      sections:[
       { key:"final", label:"25-question mastery exam", quiz:"final" }
     ]}
   ],
